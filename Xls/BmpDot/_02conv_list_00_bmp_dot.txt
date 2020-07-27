@@ -1,0 +1,17 @@
+dfs\IdCommon.dfs BmpDotCategoryId.dft	BmpDotCategory.csv	BmpDotCategoryId.inc
+dfs\IdCommon.dfs BmpDotEmoId.dft	BmpDotEmo.csv		BmpDotEmoId.inc
+dfs\IdCommon.dfs BmpDotFormId.dft	BmpDotForm.csv		BmpDotFormId.inc
+dfs\IdCommon.dfs BmpDotSlotId.dft	BmpDotSlot.csv		BmpDotSlotId.inc
+dfs\IdCommon.dfs BmpDotDirId.dft	BmpDotDir.csv		BmpDotDirId.inc
+dfs\IdCommon.dfs BmpDotOptionId.dft	BmpDotOption.csv	BmpDotOptionId.inc
+
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotCategory.csv	BmpDotCategoryLabel.inc
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotEmo.csv	BmpDotEmoLabel.inc
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotForm.csv	BmpDotFormLabel.inc
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotSlot.csv	BmpDotSlotLabel.inc
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotDir.csv	BmpDotDirLabel.inc
+dfs\LabelCommon.dfs LabelCommon.dft BmpDotOption.csv	BmpDotOptionLabel.inc
+
+dfs\BmpDotSlotNum.dfs
+dfs\BmpDotSlotParent.dfs
+dfs\BmpDotSlotCategory.dfs
