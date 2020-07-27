@@ -522,16 +522,16 @@ void CBezierTestLoop::update0( void ){
             m_fAdjustRateS = 2.0f*CRand::GetRandF() - 1.0f;
             m_fAdjustRateLR = 2.0f*CRand::GetRandF() - 1.0f;
             m_fAdjustRateUD = 2.0f*CRand::GetRandF() - 1.0f;
+            
+            // 線と色の設定
+            m_nLineType = 1 + CRand::GetRand( 5 );
+            m_pButtonLine->setFocused( m_nLineType != 0 );
+            fixBrush( m_nLineType );
+
+            m_nColorType = 1 + CRand::GetRand( 4 );
+            m_pButtonColor->setFocused( m_nColorType != 0 );
         }
         
-        // 線と色の設定
-        m_nLineType = 1 + CRand::GetRand( 5 );
-        m_pButtonLine->setFocused( m_nLineType != 0 );
-        fixBrush( m_nLineType );
-
-        m_nColorType = 1 + CRand::GetRand( 4 );
-        m_pButtonColor->setFocused( m_nColorType != 0 );
-
         isUpdated = true;
     }
     // [SETTING]
