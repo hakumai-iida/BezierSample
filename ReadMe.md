@@ -23,7 +23,7 @@
 ・Xcode 11.6(11E708)  
 
 ### 動作確認端末
-・iPhoneX iOS 11.2  
+・iPhoneX iOS 13.5.1  
 ・iPhone7plus iOS 13.3.1  
 ・iPhone6plus iOS 10.3.3  
 ・iPhone6 iOS 11.2.6  
