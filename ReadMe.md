@@ -22,14 +22,6 @@
 ・macOS Catalina 10.15.6  
 ・Xcode 11.6(11E708)  
 
-### 動作確認端末
-・iPhoneX iOS 13.5.1  
-・iPhone7plus iOS 13.3.1  
-・iPhone6plus iOS 10.3.3  
-・iPhone6 iOS 11.2.6  
-・iPhone5s iOS 10.2  
-・iPad(第六世代) iOS 12.2  
-
 ----
 ## Android で動作確認をする場合
 **AndroidStudio** から **/Prj_Android** を開いてコンパイルしてください。
@@ -39,9 +31,6 @@
 ・Android Studio 3.1.2  
 ・Java 1.8.0_152  
 ・NDK 17.0.4754217  
-
-### 動作確認端末
-・Nexus6 android 7.1.1  
 
 ----
 ## サンプルの操作に関して
