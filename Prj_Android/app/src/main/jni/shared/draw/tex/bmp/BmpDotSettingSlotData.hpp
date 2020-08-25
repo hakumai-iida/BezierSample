@@ -51,6 +51,9 @@ protected:
     // 個別調整
     int m_nRateAdjForT;             // [2]: テンション（傾き）
     int m_nRateAdjForS;             // [2]: サイズ
+    
+    // 無効指定（※無効データはデフォルトが参照されるのでスロット自体の無効化はフラグで行う）
+    bool m_bInvalid;                // [1]: 無効フラグ
 
 public:
     // コンストラクタ／デストラクタ
@@ -75,6 +78,8 @@ public:
     
     inline void setRateAdjForT( int rate ){ m_nRateAdjForT = rate; }
     inline void setRateAdjForS( int rate ){ m_nRateAdjForS = rate; }
+    
+    inline void setInvalid( bool flag ){ m_bInvalid = flag; }
 
 	//------------
 	// 取得
@@ -90,10 +95,12 @@ public:
     inline eBD_DIR getDir( void ){ return( m_eDir ); }
     
     inline int getRateAdjForT( void ){ return( m_nRateAdjForT ); }
-    inline float getAdjForT( void ){ return( CConst::ConvBezierRateScale( m_nRateAdjForT ) ); }
+    inline float getAdjForT( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjForT ) ); }
 
     inline int getRateAdjForS( void ){ return( m_nRateAdjForS ); }
-    inline float getAdjForS( void ){ return( CConst::ConvBezierRateScale( m_nRateAdjForS ) ); }
+    inline float getAdjForS( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjForS ) ); }
+    
+    inline bool isInvalid( void ){ return( m_bInvalid ); }
 
     //------------
     // 判定

@@ -23,16 +23,6 @@
   +----------------------------------------------------------------+*/
 // 結合ラベル
 const char* g_pArrLabelJointPoint[] = {
-    // テンポラリ
-    "TEMP_A_0_FROM",    "TEMP_A_0_TO",
-    "TEMP_A_1_FROM",    "TEMP_A_1_TO",
-    "TEMP_B_0_FROM",    "TEMP_B_0_TO",
-    "TEMP_B_1_FROM",    "TEMP_B_1_TO",
-    "TEMP_C_0_FROM",    "TEMP_C_0_TO",
-    "TEMP_C_1_FROM",    "TEMP_C_1_TO",
-    "TEMP_D_0_FROM",    "TEMP_D_0_TO",
-    "TEMP_D_1_FROM",    "TEMP_D_1_TO",
-    
     // [UP_BODY]：腹から上半身へのつなぎ
     "UP_BODY_0_FROM",   "UP_BODY_0_TO",
     "UP_BODY_1_FROM",   "UP_BODY_1_TO",
@@ -80,6 +70,20 @@ const char* g_pArrLabelJointPoint[] = {
     "ANKLE_L1_FROM",    "ANKLE_L1_TO",
     "ANKLE_R0_FROM",    "ANKLE_R0_TO",
     "ANKLE_R1_FROM",    "ANKLE_R1_TO",
+    
+    // [BD_OPTION A]：汎用枠：Ａ
+    "BD_OPTION_A_L0_FROM",   "BD_OPTION_A_L0_TO",
+    "BD_OPTION_A_L1_FROM",   "BD_OPTION_A_L1_TO",
+
+    "BD_OPTION_A_R0_FROM",   "BD_OPTION_A_R0_TO",
+    "BD_OPTION_A_R1_FROM",   "BD_OPTION_A_R1_TO",
+
+    // [BD_OPTION B]：汎用枠：Ｂ
+    "BD_OPTION_B_L0_FROM",   "BD_OPTION_B_L0_TO",
+    "BD_OPTION_B_L1_FROM",   "BD_OPTION_B_L1_TO",
+
+    "BD_OPTION_B_R0_FROM",   "BD_OPTION_B_R0_TO",
+    "BD_OPTION_B_R1_FROM",   "BD_OPTION_B_R1_TO",
 
     NULL,
 };
@@ -107,7 +111,7 @@ void CJointPoint::clear( void ){
 // 登録情報の取得（※無効時は[NULL]を返す)
 //-----------------------------------
 stJOINT_POINT_CELL* CJointPoint::getJointPoint( eJOINT_POINT id ){
-    if( id < 0 || id >= eJOINT_POINT_MAX ){
+    if( ! IS_JOINT_POINT_VALID( id ) ){
         //LOGE( "@ CJointPoint::getJointPoint: INVALID: id=%d\n", id );
         return( NULL );
     }
@@ -150,17 +154,17 @@ void CJointPoint::registJointPoint( eJOINT_POINT id, int rateX, int rateY, int r
 //-------------------------
 // 方向線調整値の設定
 //-------------------------
-void CJointPoint::setDirRateXY( eJOINT_POINT id, int dirRX, int dirRY, float openRate, float closeRate ){
+void CJointPoint::setDirRateXY( eJOINT_POINT id, float openDirX, float openDirY, float closeDirX, float closeDirY  ){
     stJOINT_POINT_CELL* pCell = getJointPoint( id );
     
     // 無効は無視
     if( pCell == NULL ){
-        LOGE( "@ CJointPoint::setDirRateXY: INVALID: id=%d, dirRX=%d, dirRY=%d, openRate=%f, closeRate=%f\n",
-              id, dirRX, dirRY, openRate, closeRate );
+        LOGE( "@ CJointPoint::setDirRateXY: INVALID: id=%d, openDirX=%f, openDirY=%f, closeDirX=%f, closeDirY=%f\n",
+              id, openDirX, openDirY, closeDirX, closeDirY );
     }
     
-    pCell->dirRateX = dirRX;
-    pCell->dirRateY = dirRY;
-    pCell->openRateForDir = openRate;
-    pCell->closeRateForDir = closeRate;
+    pCell->openDirX = openDirX;
+    pCell->openDirY = openDirY;
+    pCell->closeDirX = closeDirX;
+    pCell->closeDirY = closeDirY;
 }

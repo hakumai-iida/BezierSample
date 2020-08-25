@@ -33,6 +33,7 @@ enum eMEM_FIELD{
     eMEM_FIELD_D_FILL,        // 動的：for [shared/draw/tex/fill/]（※解像度調整）
     eMEM_FIELD_D_BEZIER,      // 動的：for [shared/draw/tex/bezier/]（※解像度調整）
     eMEM_FIELD_D_BMP,         // 動的：for [shared/draw/tex/bmp/]
+    eMEM_FIELD_D_BMP_PAL,     // 動的：for [shared/draw/tex/bmp_pal/]
     eMEM_FIELD_D_TEX,         // 動的：for [shared/draw/tex/]
     eMEM_FIELD_D_OBJ,         // 動的：for [shared/obj, shared/app/obj/]
     eMEM_FIELD_D_BG,          // 動的：for [shared/app/bg]

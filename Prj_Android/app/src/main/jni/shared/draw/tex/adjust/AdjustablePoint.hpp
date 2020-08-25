@@ -169,6 +169,7 @@ public:
     inline void setOfsMaxRateXYForV( int ofsRX, int ofsRY ){ m_nOfsMaxRateXForV = ofsRX; m_nOfsMaxRateYForV = ofsRY; }
     
     inline void setDelayType( eDELAY_LOG type, int depth=0 ){ m_eDelayType = type; m_nDelayDepth = depth; }
+    inline void setDelayDepth( int depth ){ m_nDelayDepth = depth; }
     inline void setDelayPowerRate( int rateX, int rateY ){ m_nDelayPowerRateX = rateX; m_nDelayPowerRateY = rateY; }
 
 	//----------------

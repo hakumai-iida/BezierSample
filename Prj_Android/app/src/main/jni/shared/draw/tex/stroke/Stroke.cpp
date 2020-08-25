@@ -28,40 +28,40 @@
 //-------------------
 // フックターゲット調整
 //-------------------
-eSTROKE_HOOK_TARGET CStroke::AdjustHookTargetForSlotIndex( eSTROKE_HOOK_TARGET target, int slotIndex ){
+eSTROKE_HOOK_TARGET CStroke::AdjustHookTargetForSlotIndex( eSTROKE_HOOK_TARGET target, eBD_SLOT slot, int slotIndex ){
     // 対象が有効
     if( IS_STROKE_HOOK_TARGET_VALID( target ) ){
-        // 対象がテンポラリ枠であればそのまま返す
+        // テンポラリ
         if( target >= eSTROKE_HOOK_TARGET_TEMP_START && target <= eSTROKE_HOOK_TARGET_TEMP_END ){
-            return( target );
+            // 何もしない
         }
-        
-        // スロットインデックスが有効（※左右の概念のある要素の右側[1]からアクセスされた）
-        // 基本的に同一要素からのみのアクセスを想定（※脚が腕をアクセスしたり、逆サイドの要素にアクセスすることはない前提）
-        if( slotIndex > 0 ){
-            // 顔＆頭
-            if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_HEAD && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_HEAD ){
-                // 基準値へ戻してからスロット補正
-                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_HEAD + (2*(target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_HEAD)/2));
-                target = (eSTROKE_HOOK_TARGET)(target+1);   // 右枠しかないので＋１
+        // パーツ
+        else if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_PART && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_PART ){
+            if( IS_BD_SLOT_VALID( slot ) ){
+                // １パーツ内に１セットのHOOK枠がある（※スロットインデックス毎にも枠をもつ）
+                int ofs = 2*slot;
+                if( slotIndex > 0 ){ ofs += 1; }
+                ofs *= eSTROKE_HOOK_TARGET_NUM_IN_PART;
+                
+                target = (eSTROKE_HOOK_TARGET)(target - eSTROKE_HOOK_TARGET_CHECK_START_FOR_PART + ofs);
             }
-            // 特殊
-            else if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_ETC && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_ETC ){
-                // 基準値へ戻してからスロット補正
-                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_ETC + (2*(target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_ETC)/2));
-                target = (eSTROKE_HOOK_TARGET)(target+1);   // 右枠しかないので＋１
+        }
+        // スロットインデックスが有効（右の要素）であれば
+        else if( slotIndex > 0 ){
+            // 特定
+            if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_FIXED && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_FIXED ){
+                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_FIXED + 2*((target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_FIXED)/2));
+                target = (eSTROKE_HOOK_TARGET)(target+1);
             }
             // 腕
             else if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_ARM && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_ARM ){
-                // 基準値へ戻してからスロット補正
-                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_ARM + (2*(target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_ARM)/2));
-                target = (eSTROKE_HOOK_TARGET)(target+1);   // 右枠しかないので＋１
+                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_ARM + 2*((target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_ARM)/2));
+                target = (eSTROKE_HOOK_TARGET)(target+1);
             }
             // 脚
             else if( target >= eSTROKE_HOOK_TARGET_CHECK_START_FOR_LEG && target <= eSTROKE_HOOK_TARGET_CHECK_END_FOR_LEG ){
-                // 基準値へ戻してからスロット補正
-                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_LEG + (2*(target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_LEG)/2));
-                target = (eSTROKE_HOOK_TARGET)(target+1);   // 右枠しかないので＋１
+                target = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_CHECK_START_FOR_LEG + 2*((target-eSTROKE_HOOK_TARGET_CHECK_START_FOR_LEG)/2));
+                target = (eSTROKE_HOOK_TARGET)(target+1);
             }
         }
     }
@@ -74,14 +74,50 @@ eSTROKE_HOOK_TARGET CStroke::AdjustHookTargetForSlotIndex( eSTROKE_HOOK_TARGET t
 //-------------------
 eSTROKE_TOUCH_TARGET CStroke::AdjustTouchTargetForSlotIndex( eSTROKE_TOUCH_TARGET target, int slotIndex ){
     // 対象が有効
-    if( target >= 0 && target < eSTROKE_TOUCH_TARGET_MAX ){
-        // 対象がテンポラリ枠でない
-        if( target < eSTROKE_TOUCH_TARGET_TEMP_START || target > eSTROKE_TOUCH_TARGET_TEMP_END ){
-            
-            // スロットインデックスが右であれば
-            if( slotIndex > 0 ){
-                // 対象をインデックスで補正する
-                target = (eSTROKE_TOUCH_TARGET)(target + STROKE_TOUCH_TARGET_OFS_FOR_SLOT_INDEX*slotIndex);
+    if( IS_STROKE_TOUCH_TARGET_VALID( target ) ){
+        // テンポラリ
+        if( target >= eSTROKE_TOUCH_TARGET_TEMP_START && target <= eSTROKE_TOUCH_TARGET_TEMP_END ){
+            // 何もしない
+        }
+        // スロットインデックスが有効（右の要素）であれば
+        else if( slotIndex > 0 ){
+            // 腕
+            if( target >= eSTROKE_TOUCH_TARGET_CHECK_START_FOR_ARM && target <= eSTROKE_TOUCH_TARGET_CHECK_END_FOR_ARM ){
+                target = (eSTROKE_TOUCH_TARGET)(eSTROKE_TOUCH_TARGET_CHECK_START_FOR_ARM + 2*((target-eSTROKE_TOUCH_TARGET_CHECK_START_FOR_ARM)/2));
+                target = (eSTROKE_TOUCH_TARGET)(target + 1);
+            }
+            // 脚
+            else if( target >= eSTROKE_TOUCH_TARGET_CHECK_START_FOR_LEG && target <= eSTROKE_TOUCH_TARGET_CHECK_END_FOR_LEG ){
+                target = (eSTROKE_TOUCH_TARGET)(eSTROKE_TOUCH_TARGET_CHECK_START_FOR_LEG + 2*((target-eSTROKE_TOUCH_TARGET_CHECK_START_FOR_LEG)/2));
+                target = (eSTROKE_TOUCH_TARGET)(target + 1);
+            }
+        }
+    }
+    
+    return( target );
+}
+
+//------------------
+// ガイドターゲット調整
+//------------------
+eSTROKE_GUIDE_TARGET CStroke::AdjustGuideTargetForSlotIndex( eSTROKE_GUIDE_TARGET target, int slotIndex ){
+    // 対象が有効
+    if( IS_STROKE_GUIDE_TARGET_VALID( target ) ){
+        // テンポラリ
+        if( target >= eSTROKE_GUIDE_TARGET_TEMP_START && target <= eSTROKE_GUIDE_TARGET_TEMP_END ){
+            // 何もしない
+        }
+        // スロットインデックスが有効（右の要素）であれば
+        else if( slotIndex > 0 ){
+            // 腕
+            if( target >= eSTROKE_GUIDE_TARGET_CHECK_START_FOR_ARM && target <= eSTROKE_GUIDE_TARGET_CHECK_END_FOR_ARM ){
+                target = (eSTROKE_GUIDE_TARGET)(eSTROKE_GUIDE_TARGET_CHECK_START_FOR_ARM + 2*((target-eSTROKE_GUIDE_TARGET_CHECK_START_FOR_ARM)/2));
+                target = (eSTROKE_GUIDE_TARGET)(target + 1);
+            }
+            // 脚
+            else if( target >= eSTROKE_GUIDE_TARGET_CHECK_START_FOR_LEG && target <= eSTROKE_GUIDE_TARGET_CHECK_END_FOR_LEG ){
+                target = (eSTROKE_GUIDE_TARGET)(eSTROKE_GUIDE_TARGET_CHECK_START_FOR_LEG + 2*((target-eSTROKE_GUIDE_TARGET_CHECK_START_FOR_LEG)/2));
+                target = (eSTROKE_GUIDE_TARGET)(target + 1);
             }
         }
     }

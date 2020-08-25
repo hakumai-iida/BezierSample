@@ -77,41 +77,50 @@ void CAnchorPointData::clear( void ){
         
     m_eJointPointId = eJOINT_POINT_INVALID;
     m_eHookTargetId = eSTROKE_HOOK_TARGET_INVALID;
-    
-    m_nStrokeSize = BEZIER_SCALE_RATE;
-    m_nStrokeStartSize = 0;
+    m_eGuideTargetId = eSTROKE_GUIDE_TARGET_INVALID;
+
     m_nStrokeStartRange = 0;
-    m_nStrokeEndSize = 0;
+    m_nStrokeStartSize = BEZIER_SCALE_RATE;
     m_nStrokeEndRange = 0;
+    m_nStrokeEndSize = BEZIER_SCALE_RATE;
     m_nStrokeEdgeFillSize = 0;
     
     m_eTouchTargetId = eSTROKE_TOUCH_TARGET_INVALID;
-    m_eFrillId = eSTROKE_FRILL_INVALID;
+    m_eTouchTargetSubId = eSTROKE_TOUCH_TARGET_INVALID;
+    m_eStripeOrFrillMainPalOfsId = ePAL_OFS_INVALID;
+    m_eStripeOrFrillSubPalOfsId = ePAL_OFS_INVALID;
+    m_eFrillMainId = eSTROKE_FRILL_INVALID;
+    m_eFrillSubId = eSTROKE_FRILL_INVALID;
 
     // 初期値は０
-    m_nP00_TouchBasePos = 0;
-    m_nP01_TouchBaseSize = 0;
-    m_nP02_TouchBaseRot = 0;
-    m_nP03_TouchFrontArea = 0;
-    m_nP04_TouchFrontSize = 0;
-    m_nP05_TouchFrontRot = 0;
-    m_nP06_TouchBackArea = 0;
-    m_nP07_TouchBackSize = 0;
-    m_nP08_TouchBackRot = 0;
-    m_nP09_TouchFrontStep_FrillDummy = 0;
-    m_nP10_TouchFrontStep2_FrillDummy = 0;
-    m_nP11_TouchFrontStepRnd_FrillDummy = 0;
-    m_nP12_TouchBackStep_FrillDummy = 0;
-    m_nP13_TouchBackStep2_FrillDummy = 0;
-    m_nP14_TouchBackStepRnd_FrillDummy = 0;
+    m_nTouchBasePos = 0;
+    m_nTouchBaseSize = BEZIER_SCALE_RATE;
+    m_nTouchBaseRot = 0;
     
-    m_eStripeMainPalOfsId = ePAL_OFS_INVALID;
-    m_eStripeSubPalOfsId = ePAL_OFS_INVALID;
-
-    m_eOptionForValid = eBD_OPTION_INVALID;
-    m_eOptionForInvalid = eBD_OPTION_INVALID;
-
-    m_bEditMenuForFrill = false;
+    m_nTouchFrontArea = 0;
+    m_nTouchFrontSizeOfs = 0;
+    m_nTouchFrontRotRate = BEZIER_SCALE_RATE;
+    
+    m_nTouchBackArea = 0;
+    m_nTouchBackSizeOfs = 0;
+    m_nTouchBackRotRate = BEZIER_SCALE_RATE;
+    
+    m_nTouchFrontNum = 0;
+    m_nTouchFrontSkip = 0;
+    m_nTouchFrontBorderRate = 0;
+    
+    m_nTouchBackNum = 0;
+    m_nTouchBackSkip = 0;
+    m_nTouchBackBorderRate = 0;
+    
+    m_nTouchRandomOfsFor0 = 0;
+    m_nTouchRandomOfsFor1 = 0;
+    
+    m_nTouchHeadSkipRate = 0;
+    m_nTouchTailSkipRate = 0;
+    
+    m_nFrillWidthRateForMain = BEZIER_SCALE_RATE;
+    m_nFrillWidthRateForSub = BEZIER_SCALE_RATE;
 }
 
 //---------------------------
@@ -124,84 +133,72 @@ void CAnchorPointData::set( int rX, int rY, int inRX, int inRY, int outRX, int o
 }
 
 //---------------------------
-// 設定：ストロークサイズ
+// 設定：ストローク
 //---------------------------
-void CAnchorPointData::setStrokeSize( int size, int startSize, int startRange, int endSize, int endRange ){
-    m_nStrokeSize = size;
-    m_nStrokeStartSize = startSize;
+void CAnchorPointData::setStroke( int startRange, int startSize, int endRange, int endSize ){
     m_nStrokeStartRange = startRange;
-    m_nStrokeEndSize = endSize;
+    m_nStrokeStartSize = startSize;
     m_nStrokeEndRange = endRange;
+    m_nStrokeEndSize = endSize;
 }
 
 //---------------------------
 // 設定：タッチ（基本）
 //---------------------------
 void CAnchorPointData::setTouchBase( int pos, int size, int rot ){
-    m_nP00_TouchBasePos = pos;
-    m_nP01_TouchBaseSize = size;
-    m_nP02_TouchBaseRot = rot;
+    m_nTouchBasePos = pos;
+    m_nTouchBaseSize = size;
+    m_nTouchBaseRot = rot;
 }
 
 //---------------------------
 // 設定：タッチ（前方）
 //---------------------------
-void CAnchorPointData::setTouchFront( int area, int size, int rot, int step, int step2, int stepRnd ){
-    m_nP03_TouchFrontArea = area;
-    m_nP04_TouchFrontSize = size;
-    m_nP05_TouchFrontRot = rot;
+void CAnchorPointData::setTouchFront( int area, int sizeOfs, int rotRate, int num, int skip, int borderRate ){
+    m_nTouchFrontArea = area;
+    m_nTouchFrontSizeOfs = sizeOfs;
+    m_nTouchFrontRotRate = rotRate;
     
-    m_nP09_TouchFrontStep_FrillDummy = step;
-    m_nP10_TouchFrontStep2_FrillDummy = step2;
-    m_nP11_TouchFrontStepRnd_FrillDummy = stepRnd;
+    m_nTouchFrontNum = num;
+    m_nTouchFrontSkip = skip;
+    m_nTouchFrontBorderRate = borderRate;
 }
 
 //---------------------------
 // 設定：タッチ（後方）
 //---------------------------
-void CAnchorPointData::setTouchBack( int area, int size, int rot, int step, int step2, int stepRnd ){
-    m_nP06_TouchBackArea = area;
-    m_nP07_TouchBackSize = size;
-    m_nP08_TouchBackRot = rot;
+void CAnchorPointData::setTouchBack( int area, int sizeOfs, int rotRate, int num, int skip, int borderRate ){
+    m_nTouchBackArea = area;
+    m_nTouchBackSizeOfs = sizeOfs;
+    m_nTouchBackRotRate = rotRate;
 
-    m_nP12_TouchBackStep_FrillDummy = step;
-    m_nP13_TouchBackStep2_FrillDummy = step2;
-    m_nP14_TouchBackStepRnd_FrillDummy = stepRnd;
+    m_nTouchBackNum = num;
+    m_nTouchBackSkip = skip;
+    m_nTouchBackBorderRate = borderRate;
 }
 
 //---------------------------
-// 設定：フリル（基本）
+// 設定：タッチのランダム域
 //---------------------------
-void CAnchorPointData::setFrillBase( int pos, int size, int rot ){
-    m_nP00_TouchBasePos = pos;
-    m_nP01_TouchBaseSize = size;
-    m_nP02_TouchBaseRot = rot;
-
-    // 基本値を設定しておく（※[setFrillFront/setFrillBack]を呼ばなくても基本的な表示がでるように）
-    m_nP03_TouchFrontArea = BEZIER_SCALE_RATE;
-    m_nP04_TouchFrontSize = size;
-    m_nP05_TouchFrontRot = rot;
-    m_nP06_TouchBackArea = BEZIER_SCALE_RATE;
-    m_nP07_TouchBackSize = size;
-    m_nP08_TouchBackRot = rot;
+void CAnchorPointData::setTouchRandomOfs( int rand0, int rand1 ){
+    m_nTouchRandomOfsFor0 = rand0;
+    m_nTouchRandomOfsFor1 = rand1;
 }
 
 //---------------------------
-// 設定：フリル（前方）
+// 設定：タッチのスキップ率
 //---------------------------
-void CAnchorPointData::setFrillFront( int area, int size, int rot ){
-    m_nP03_TouchFrontArea = area;
-    m_nP04_TouchFrontSize = size;
-    m_nP05_TouchFrontRot = rot;
+void CAnchorPointData::setTouchSkipRate( int rateHead, int rateTail ){
+    m_nTouchHeadSkipRate = rateHead;
+    m_nTouchTailSkipRate = rateTail;
 }
 
 //---------------------------
-// 設定：フリル（後方）
+// 設定：タッチのスキップ率
 //---------------------------
-void CAnchorPointData::setFrillBack( int area, int size, int rot ){
-    m_nP06_TouchBackArea = area;
-    m_nP07_TouchBackSize = size;
-    m_nP08_TouchBackRot = rot;
+void CAnchorPointData::setFrillWidthRate( int rateMain, int rateSub ){
+    m_nFrillWidthRateForMain = rateMain;
+    m_nFrillWidthRateForSub = rateSub;
 }
 
 //---------------------------
@@ -211,7 +208,7 @@ eJOINT_POINT CAnchorPointData::getJointPointId( int slotIndex ){
     int id = m_eJointPointId;
 
     // スロットインデックスにより参照先を補正
-    if( id >= 0 && id < eJOINT_POINT_MAX && slotIndex >= 0 ){
+    if( IS_JOINT_POINT_VALID( id ) && IS_BD_SLOT_INDEX_VALID( slotIndex ) ){
         id += JOINT_POINT_OFS_FOR_SLOT_INDEX * slotIndex;
     }
 
@@ -221,8 +218,15 @@ eJOINT_POINT CAnchorPointData::getJointPointId( int slotIndex ){
 //---------------------------
 // フック対象IDの取得
 //---------------------------
-eSTROKE_HOOK_TARGET CAnchorPointData::getHookTargetId( int slotIndex ){
-    return( CStroke::AdjustHookTargetForSlotIndex( m_eHookTargetId, slotIndex ) );
+eSTROKE_HOOK_TARGET CAnchorPointData::getHookTargetId( eBD_SLOT slot, int slotIndex ){
+    return( CStroke::AdjustHookTargetForSlotIndex( m_eHookTargetId, slot, slotIndex ) );
+}
+
+//---------------------------
+// ガイド対象IDの取得
+//---------------------------
+eSTROKE_GUIDE_TARGET CAnchorPointData::getGuideTargetId( int slotIndex ){
+    return( CStroke::AdjustGuideTargetForSlotIndex( m_eGuideTargetId, slotIndex ) );
 }
 
 //---------------------------
@@ -230,6 +234,13 @@ eSTROKE_HOOK_TARGET CAnchorPointData::getHookTargetId( int slotIndex ){
 //---------------------------
 eSTROKE_TOUCH_TARGET CAnchorPointData::getTouchTargetId( int slotIndex ){
     return( CStroke::AdjustTouchTargetForSlotIndex( m_eTouchTargetId, slotIndex ) );
+}
+
+//---------------------------
+// タッチサブIDの取得
+//---------------------------
+eSTROKE_TOUCH_TARGET CAnchorPointData::getTouchTargetSubId( int slotIndex ){
+    return( CStroke::AdjustTouchTargetForSlotIndex( m_eTouchTargetSubId, slotIndex ) );
 }
 
 //--------------------
@@ -248,38 +259,42 @@ void CAnchorPointData::copy( CAnchorPointData* pData ){
         
     m_eJointPointId = pData->m_eJointPointId;
     m_eHookTargetId = pData->m_eHookTargetId;
-    
-    m_nStrokeSize = pData->m_nStrokeSize;
-    m_nStrokeStartSize = pData->m_nStrokeStartSize;
+    m_eGuideTargetId = pData->m_eGuideTargetId;
+
     m_nStrokeStartRange = pData->m_nStrokeStartRange;
-    m_nStrokeEndSize = pData->m_nStrokeEndSize;
+    m_nStrokeStartSize = pData->m_nStrokeStartSize;
     m_nStrokeEndRange = pData->m_nStrokeEndRange;
+    m_nStrokeEndSize = pData->m_nStrokeEndSize;
     m_nStrokeEdgeFillSize = pData->m_nStrokeEdgeFillSize;
 
     m_eTouchTargetId = pData->m_eTouchTargetId;
-    m_eFrillId = pData->m_eFrillId;
-    
-    m_nP00_TouchBasePos = pData->m_nP00_TouchBasePos;
-    m_nP01_TouchBaseSize = pData->m_nP01_TouchBaseSize;
-    m_nP02_TouchBaseRot = pData->m_nP02_TouchBaseRot;
-    m_nP03_TouchFrontArea = pData->m_nP03_TouchFrontArea;
-    m_nP04_TouchFrontSize = pData->m_nP04_TouchFrontSize;
-    m_nP05_TouchFrontRot = pData->m_nP05_TouchFrontRot;
-    m_nP06_TouchBackArea = pData->m_nP06_TouchBackArea;
-    m_nP07_TouchBackSize = pData->m_nP07_TouchBackSize;
-    m_nP08_TouchBackRot = pData->m_nP08_TouchBackRot;
-    m_nP09_TouchFrontStep_FrillDummy = pData->m_nP09_TouchFrontStep_FrillDummy;
-    m_nP10_TouchFrontStep2_FrillDummy = pData->m_nP10_TouchFrontStep2_FrillDummy;
-    m_nP11_TouchFrontStepRnd_FrillDummy = pData->m_nP11_TouchFrontStepRnd_FrillDummy;
-    m_nP12_TouchBackStep_FrillDummy = pData->m_nP12_TouchBackStep_FrillDummy;
-    m_nP13_TouchBackStep2_FrillDummy = pData->m_nP13_TouchBackStep2_FrillDummy;
-    m_nP14_TouchBackStepRnd_FrillDummy = pData->m_nP14_TouchBackStepRnd_FrillDummy;
+    m_eTouchTargetSubId = pData->m_eTouchTargetSubId;
+    m_eStripeOrFrillMainPalOfsId = pData->m_eStripeOrFrillMainPalOfsId;
+    m_eStripeOrFrillSubPalOfsId = pData->m_eStripeOrFrillSubPalOfsId;
+    m_eFrillMainId = pData->m_eFrillMainId;
+    m_eFrillSubId = pData->m_eFrillSubId;
 
-    m_eStripeMainPalOfsId = pData->m_eStripeMainPalOfsId;
-    m_eStripeSubPalOfsId = pData->m_eStripeSubPalOfsId;
-    
-    m_eOptionForValid = pData->m_eOptionForValid;
-    m_eOptionForInvalid = pData->m_eOptionForInvalid;
+    m_nTouchBasePos = pData->m_nTouchBasePos;
+    m_nTouchBaseSize = pData->m_nTouchBaseSize;
+    m_nTouchBaseRot = pData->m_nTouchBaseRot;
+    m_nTouchFrontArea = pData->m_nTouchFrontArea;
+    m_nTouchFrontSizeOfs = pData->m_nTouchFrontSizeOfs;
+    m_nTouchFrontRotRate = pData->m_nTouchFrontRotRate;
+    m_nTouchBackArea = pData->m_nTouchBackArea;
+    m_nTouchBackSizeOfs = pData->m_nTouchBackSizeOfs;
+    m_nTouchBackRotRate = pData->m_nTouchBackRotRate;
+    m_nTouchFrontNum = pData->m_nTouchFrontNum;
+    m_nTouchFrontSkip = pData->m_nTouchFrontSkip;
+    m_nTouchFrontBorderRate = pData->m_nTouchFrontBorderRate;
+    m_nTouchBackNum = pData->m_nTouchBackNum;
+    m_nTouchBackSkip = pData->m_nTouchBackSkip;
+    m_nTouchBackBorderRate = pData->m_nTouchBackBorderRate;
+    m_nTouchRandomOfsFor0 = pData->m_nTouchRandomOfsFor0;
+    m_nTouchRandomOfsFor1 = pData->m_nTouchRandomOfsFor1;
+    m_nTouchHeadSkipRate = pData->m_nTouchHeadSkipRate;
+    m_nTouchTailSkipRate = pData->m_nTouchTailSkipRate;
+    m_nFrillWidthRateForMain = pData->m_nFrillWidthRateForMain;
+    m_nFrillWidthRateForSub = pData->m_nFrillWidthRateForSub;
 }
 
 //---------------------------
@@ -293,38 +308,52 @@ void CAnchorPointData::read( CInputBuffer* pIB ){
    
     m_eJointPointId = (eJOINT_POINT)CEnum::ReadEnum( pIB, g_pArrLabelJointPoint );
     m_eHookTargetId = (eSTROKE_HOOK_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeHookTarget );
+    m_eGuideTargetId = (eSTROKE_GUIDE_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeGuideTarget );
 
-    m_nStrokeSize = pIB->readInt16();
-    m_nStrokeStartSize = pIB->readInt16();
     m_nStrokeStartRange = pIB->readInt16();
-    m_nStrokeEndSize = pIB->readInt16();
+    m_nStrokeStartSize = pIB->readInt16();
     m_nStrokeEndRange = pIB->readInt16();
+    m_nStrokeEndSize = pIB->readInt16();
     m_nStrokeEdgeFillSize = pIB->readInt16();
 
     m_eTouchTargetId = (eSTROKE_TOUCH_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeTouchTarget );
-    m_eFrillId = (eSTROKE_FRILL)CEnum::ReadEnum( pIB, g_pArrLabelStrokeFrill );
+    m_eTouchTargetSubId = (eSTROKE_TOUCH_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeTouchTarget );
+    m_eStripeOrFrillMainPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_eStripeOrFrillSubPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_eFrillMainId = (eSTROKE_FRILL)CEnum::ReadEnum( pIB, g_pArrLabelStrokeFrill );
+    m_eFrillSubId = (eSTROKE_FRILL)CEnum::ReadEnum( pIB, g_pArrLabelStrokeFrill );
     
-    m_nP00_TouchBasePos = pIB->readInt16();
-    m_nP01_TouchBaseSize = pIB->readInt16();
-    m_nP02_TouchBaseRot = pIB->readInt16();
-    m_nP03_TouchFrontArea = pIB->readInt16();
-    m_nP04_TouchFrontSize = pIB->readInt16();
-    m_nP05_TouchFrontRot = pIB->readInt16();
-    m_nP06_TouchBackArea = pIB->readInt16();
-    m_nP07_TouchBackSize = pIB->readInt16();
-    m_nP08_TouchBackRot = pIB->readInt16();
-    m_nP09_TouchFrontStep_FrillDummy = pIB->readInt16();
-    m_nP10_TouchFrontStep2_FrillDummy = pIB->readInt16();
-    m_nP11_TouchFrontStepRnd_FrillDummy = pIB->readInt16();
-    m_nP12_TouchBackStep_FrillDummy = pIB->readInt16();
-    m_nP13_TouchBackStep2_FrillDummy = pIB->readInt16();
-    m_nP14_TouchBackStepRnd_FrillDummy = pIB->readInt16();
+    m_nTouchBasePos = pIB->readInt16();
+    m_nTouchBaseSize = pIB->readInt16();
+    m_nTouchBaseRot = pIB->readInt16();
+    m_nTouchFrontArea = pIB->readInt16();
+    m_nTouchFrontSizeOfs = pIB->readInt16();
+    m_nTouchFrontRotRate = pIB->readInt16();
+    m_nTouchBackArea = pIB->readInt16();
+    m_nTouchBackSizeOfs = pIB->readInt16();
+    m_nTouchBackRotRate = pIB->readInt16();
+    m_nTouchFrontNum = pIB->readInt16();
+    m_nTouchFrontSkip = pIB->readInt16();
+    m_nTouchFrontBorderRate = pIB->readInt16();
+    m_nTouchBackNum = pIB->readInt16();
+    m_nTouchBackSkip = pIB->readInt16();
+    m_nTouchBackBorderRate = pIB->readInt16();
+    m_nTouchRandomOfsFor0 = pIB->readInt16();
+    m_nTouchRandomOfsFor1 = pIB->readInt16();
+    m_nTouchHeadSkipRate = pIB->readInt16();
+    m_nTouchTailSkipRate = pIB->readInt16();
+    m_nFrillWidthRateForMain = pIB->readInt16();
+    m_nFrillWidthRateForSub = pIB->readInt16();
     
-    m_eStripeMainPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
-    m_eStripeSubPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
-
-    m_eOptionForValid = (eBD_OPTION)CEnum::ReadEnum( pIB, g_pArrLabelBdOption );
-    m_eOptionForInvalid = (eBD_OPTION)CEnum::ReadEnum( pIB, g_pArrLabelBdOption );
+#if 0
+    // test
+    if( IS_STROKE_TOUCH_TARGET_VALID( m_eTouchTargetId ) ){
+        m_nStrokeStartRange = 0;
+        m_nStrokeStartSize = 7500;
+        m_nStrokeEndRange = 0;
+        m_nStrokeEndRange = 3000;
+    }
+#endif
 }
 
 //---------------------------
@@ -338,70 +367,42 @@ void CAnchorPointData::write( COutputBuffer* pOB ){
     
     CEnum::WriteEnum( pOB, m_eJointPointId, eJOINT_POINT_MAX, g_pArrLabelJointPoint );
     CEnum::WriteEnum( pOB, m_eHookTargetId, eSTROKE_HOOK_TARGET_MAX, g_pArrLabelStrokeHookTarget );
+    CEnum::WriteEnum( pOB, m_eGuideTargetId, eSTROKE_GUIDE_TARGET_MAX, g_pArrLabelStrokeGuideTarget );
 
-    pOB->writeInt16( (int16)m_nStrokeSize );
-    pOB->writeInt16( (int16)m_nStrokeStartSize );
     pOB->writeInt16( (int16)m_nStrokeStartRange );
-    pOB->writeInt16( (int16)m_nStrokeEndSize );
+    pOB->writeInt16( (int16)m_nStrokeStartSize );
     pOB->writeInt16( (int16)m_nStrokeEndRange );
+    pOB->writeInt16( (int16)m_nStrokeEndSize );
     pOB->writeInt16( (int16)m_nStrokeEdgeFillSize );
 
     CEnum::WriteEnum( pOB, m_eTouchTargetId, eSTROKE_TOUCH_TARGET_MAX, g_pArrLabelStrokeTouchTarget );
-    CEnum::WriteEnum( pOB, m_eFrillId, eSTROKE_FRILL_MAX, g_pArrLabelStrokeFrill );
-    
-    pOB->writeInt16( (int16)m_nP00_TouchBasePos );
-    pOB->writeInt16( (int16)m_nP01_TouchBaseSize );
-    pOB->writeInt16( (int16)m_nP02_TouchBaseRot );
-    pOB->writeInt16( (int16)m_nP03_TouchFrontArea );
-    pOB->writeInt16( (int16)m_nP04_TouchFrontSize );
-    pOB->writeInt16( (int16)m_nP05_TouchFrontRot );
-    pOB->writeInt16( (int16)m_nP06_TouchBackArea );
-    pOB->writeInt16( (int16)m_nP07_TouchBackSize );
-    pOB->writeInt16( (int16)m_nP08_TouchBackRot );
-    pOB->writeInt16( (int16)m_nP09_TouchFrontStep_FrillDummy );
-    pOB->writeInt16( (int16)m_nP10_TouchFrontStep2_FrillDummy );
-    pOB->writeInt16( (int16)m_nP11_TouchFrontStepRnd_FrillDummy );
-    pOB->writeInt16( (int16)m_nP12_TouchBackStep_FrillDummy );
-    pOB->writeInt16( (int16)m_nP13_TouchBackStep2_FrillDummy );
-    pOB->writeInt16( (int16)m_nP14_TouchBackStepRnd_FrillDummy );
-    
-    CEnum::WriteEnum( pOB, m_eStripeMainPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
-    CEnum::WriteEnum( pOB, m_eStripeSubPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_eTouchTargetSubId, eSTROKE_TOUCH_TARGET_MAX, g_pArrLabelStrokeTouchTarget );
+    CEnum::WriteEnum( pOB, m_eStripeOrFrillMainPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_eStripeOrFrillSubPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_eFrillMainId, eSTROKE_FRILL_MAX, g_pArrLabelStrokeFrill );
+    CEnum::WriteEnum( pOB, m_eFrillSubId, eSTROKE_FRILL_MAX, g_pArrLabelStrokeFrill );
 
-    CEnum::WriteEnum( pOB, m_eOptionForValid, eBD_OPTION_MAX, g_pArrLabelBdOption );
-    CEnum::WriteEnum( pOB, m_eOptionForInvalid, eBD_OPTION_MAX, g_pArrLabelBdOption );
-}
-
-//-------------------------------
-// 有効性の確認
-//-------------------------------
-bool CAnchorPointData::isValid( bool* arrOption ){
-    // 無効は無視
-    if( checkFlag( eAPD_FLAG_DISABLE ) ){
-        return( false );
-    }
-
-    // オプションが有効であれば確認
-    if( arrOption != NULL ){
-        // for Invalid
-        if( IS_BD_OPTION_VALID( m_eOptionForInvalid ) ){
-            // オプションが有効であれば無効化される
-            if( arrOption[m_eOptionForInvalid] ){
-                return( false );
-            }
-        }
-
-        // for Valid
-        if( IS_BD_OPTION_VALID( m_eOptionForValid) ){
-            // オプションが無効であれば有効化されない
-            if( ! arrOption[m_eOptionForValid] ){
-                return( false );
-            }
-        }
-    }
-    
-    // ここまできたら有効
-    return( true );
+    pOB->writeInt16( (int16)m_nTouchBasePos );
+    pOB->writeInt16( (int16)m_nTouchBaseSize );
+    pOB->writeInt16( (int16)m_nTouchBaseRot );
+    pOB->writeInt16( (int16)m_nTouchFrontArea );
+    pOB->writeInt16( (int16)m_nTouchFrontSizeOfs );
+    pOB->writeInt16( (int16)m_nTouchFrontRotRate );
+    pOB->writeInt16( (int16)m_nTouchBackArea );
+    pOB->writeInt16( (int16)m_nTouchBackSizeOfs );
+    pOB->writeInt16( (int16)m_nTouchBackRotRate );
+    pOB->writeInt16( (int16)m_nTouchFrontNum );
+    pOB->writeInt16( (int16)m_nTouchFrontSkip );
+    pOB->writeInt16( (int16)m_nTouchFrontBorderRate );
+    pOB->writeInt16( (int16)m_nTouchBackNum );
+    pOB->writeInt16( (int16)m_nTouchBackSkip );
+    pOB->writeInt16( (int16)m_nTouchBackBorderRate );
+    pOB->writeInt16( (int16)m_nTouchRandomOfsFor0 );
+    pOB->writeInt16( (int16)m_nTouchRandomOfsFor1 );
+    pOB->writeInt16( (int16)m_nTouchHeadSkipRate );
+    pOB->writeInt16( (int16)m_nTouchTailSkipRate );
+    pOB->writeInt16( (int16)m_nFrillWidthRateForMain );
+    pOB->writeInt16( (int16)m_nFrillWidthRateForSub );
 }
 
 //-------------------------------------------
@@ -711,38 +712,42 @@ void CAnchorPointData::applyRateScale( int rateScale ){
         
     // [m_eJointPointId]は無視
     // [m_eHookTargetId]は無視
-    
-    // [m_nStrokeSize]は無視
-    // [m_nStrokeStartSize]は無視
+    // [m_eGuideTargetId]は無視
+
     // [m_nStrokeStartRange]は無視
-    // [m_nStrokeEndSize]は無視
+    // [m_nStrokeStartSize]は無視
     // [m_nStrokeEndRange]は無視
+    // [m_nStrokeEndSize]は無視
     // [m_nStrokeEdgeFillSize]は無視
     
     // [m_eTouchTargetId]は無視
-    // [eSTROKE_FRILL m_eFrillId]は無視
-    
-    // [m_nP00_TouchBasePos]は無視
-    // [m_nP01_TouchBaseSize]は無視
-    // [m_nP02_TouchBaseRot]は無視
-    // [m_nP03_TouchFrontArea]は無視
-    // [m_nP04_TouchFrontSize]は無視
-    // [m_nP05_TouchFrontRot]は無視
-    // [m_nP06_TouchBackArea]は無視
-    // [m_nP07_TouchBackSize]は無視
-    // [m_nP08_TouchBackRot]は無視
-    // [m_nP09_TouchFrontStep_FrillDummy]は無視
-    // [m_nP10_TouchFrontStep2_FrillDummy]は無視
-    // [m_nP11_TouchFrontStepRnd_FrillDummy]は無視
-    // [m_nP12_TouchBackStep_FrillDummy]は無視
-    // [m_nP13_TouchBackStep2_FrillDummy]は無視
-    // [m_nP14_TouchBackStepRnd_FrillDummy]は無視
-    
-    // [m_eStripeMainPalOfsId]は無視
-    // [m_eStripeSubPalOfsId]は無視
-    
-    // [m_eOptionForValid]は無視
-    // [m_eOptionForInvalid]は無視
+    // [m_eTouchTargetSubId]は無視
+    // [m_eStripeOrFrillMainPalOfsId]は無視
+    // [m_eStripeOrFrillSubPalOfsId]は無視
+    // [eSTROKE_FRILL m_eFrillMainId]は無視
+    // [eSTROKE_FRILL m_eFrillSubId]は無視
+
+    // [m_nTouchBasePos]は無視
+    // [m_nTouchBaseSize]は無視
+    // [m_nTouchBaseRot]は無視
+    // [m_nTouchFrontArea]は無視
+    // [m_nTouchFrontSizeOfs]は無視
+    // [m_nTouchFrontRotRate]は無視
+    // [m_nTouchBackArea]は無視
+    // [m_nTouchBackSizeOfs]は無視
+    // [m_nTouchBackRotRate]は無視
+    // [m_nTouchFrontNum]は無視
+    // [m_nTouchFrontSkip]は無視
+    // [m_nTouchFrontBorderRate]は無視
+    // [m_nTouchBackNum]は無視
+    // [m_nTouchBackSkip]は無視
+    // [m_nTouchBackBorderRate]は無視
+    // [m_nTouchRandomOfsFor0]は無視
+    // [m_nTouchRandomOfsFor1]は無視
+    // [m_nTouchHeadSkipRate]は無視
+    // [m_nTouchTailSkipRate]は無視
+    // [m_nFrillWidthRateForMain]は無視
+    // [m_nFrillWidthRateForSub]は無視
 }
 
 //---------------------------------------------------------
@@ -750,7 +755,7 @@ void CAnchorPointData::applyRateScale( int rateScale ){
 //---------------------------------------------------------
 void CAnchorPointData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 12 + 15 + 2 + eAPD_FLAG_MAX );
+    pMenu->setItemNum( 8 + 6 + 21 + eAPD_FLAG_MAX );
     
     int id = 0;
     
@@ -760,14 +765,16 @@ void CAnchorPointData::setEditValueMenu( CEditValueMenu* pMenu ){
 
     pMenu->setItemAtAsLabel( id++, "HOOK", &m_eHookTargetId, eEDIT_VALUE_TYPE_INT32,
                              eSTROKE_HOOK_TARGET_INVALID, eSTROKE_HOOK_TARGET_MAX-1, g_pArrLabelStrokeHookTarget );
-    
+
+    pMenu->setItemAtAsLabel( id++, "GUIDE", &m_eGuideTargetId, eEDIT_VALUE_TYPE_INT32,
+                             eSTROKE_GUIDE_TARGET_INVALID, eSTROKE_GUIDE_TARGET_MAX-1, g_pArrLabelStrokeGuideTarget );
+
     pMenu->setSeparatorAt( id, true );
     
-    pMenu->setItemAt( id++, "STROKE: SIZE", &m_nStrokeSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
-    pMenu->setItemAt( id++, "STROKE: START_SIZE", &m_nStrokeStartSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
     pMenu->setItemAt( id++, "STROKE: START_RANGE", &m_nStrokeStartRange, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-    pMenu->setItemAt( id++, "STROKE: END_SIZE", &m_nStrokeEndSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "STROKE: START_SIZE", &m_nStrokeStartSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
     pMenu->setItemAt( id++, "STROKE: END_RANGE", &m_nStrokeEndRange, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "STROKE: END_SIZE", &m_nStrokeEndSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
     pMenu->setItemAt( id++, "STROKE: EDGE_FILL_SIZE", &m_nStrokeEdgeFillSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
     
     pMenu->setSeparatorAt( id, true );
@@ -775,84 +782,84 @@ void CAnchorPointData::setEditValueMenu( CEditValueMenu* pMenu ){
     pMenu->setItemAtAsLabel( id++, "TOUCH", &m_eTouchTargetId, eEDIT_VALUE_TYPE_INT32,
                              eSTROKE_TOUCH_TARGET_INVALID, eSTROKE_TOUCH_TARGET_MAX-1, g_pArrLabelStrokeTouchTarget );
 
-    pMenu->setItemAtAsLabel( id++, "FRILL: ID", &m_eFrillId, eEDIT_VALUE_TYPE_INT32,
+    pMenu->setItemAtAsLabel( id++, "TOUCH SUB", &m_eTouchTargetSubId, eEDIT_VALUE_TYPE_INT32,
+                             eSTROKE_TOUCH_TARGET_INVALID, eSTROKE_TOUCH_TARGET_MAX-1, g_pArrLabelStrokeTouchTarget );
+
+    pMenu->setItemAtAsLabel( id++, "STRIPE/FRILL_MAIN_PAL", &m_eStripeOrFrillMainPalOfsId, eEDIT_VALUE_TYPE_INT32,
+                            ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
+    pMenu->setItemAtAsLabel( id++, "STRIPE/FRILL_SUB_PAL", &m_eStripeOrFrillSubPalOfsId, eEDIT_VALUE_TYPE_INT32,
+                            ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
+
+    pMenu->setItemAtAsLabel( id++, "FRILL: MAIN_ID", &m_eFrillMainId, eEDIT_VALUE_TYPE_INT32,
+                             eSTROKE_FRILL_INVALID, eSTROKE_FRILL_MAX-1, g_pArrLabelStrokeFrill );
+
+    pMenu->setItemAtAsLabel( id++, "FRILL: SUB_ID", &m_eFrillSubId, eEDIT_VALUE_TYPE_INT32,
                              eSTROKE_FRILL_INVALID, eSTROKE_FRILL_MAX-1, g_pArrLabelStrokeFrill );
 
     pMenu->setSeparatorAt( id, true );
     
-    // 親の状況によりデータの扱いが異なる
-    if( m_bEditMenuForFrill ){
-        pMenu->setItemAt( id++, "FRILL: BASE_POS", &m_nP00_TouchBasePos, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: BASE_SIZE", &m_nP01_TouchBaseSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: BASE_ROT", &m_nP02_TouchBaseRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "FRILL: FRONT_AREA", &m_nP03_TouchFrontArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: FRONT_SIZE", &m_nP04_TouchFrontSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: FRONT_ROT", &m_nP05_TouchFrontRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "FRILL: BACK_AREA", &m_nP06_TouchBackArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: BACK_SIZE", &m_nP07_TouchBackSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: BACK_ROT", &m_nP08_TouchBackRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP09_TouchFrontStep_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP10_TouchFrontStep2_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP11_TouchFrontStepRnd_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP12_TouchBackStep_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP13_TouchBackStep2_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "FRILL: ----", &m_nP14_TouchBackStepRnd_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-    }else{
-        pMenu->setItemAt( id++, "TOUCH: BASE_POS", &m_nP00_TouchBasePos, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BASE_SIZE", &m_nP01_TouchBaseSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BASE_ROT", &m_nP02_TouchBaseRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_AREA", &m_nP03_TouchFrontArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_SIZE", &m_nP04_TouchFrontSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_ROT", &m_nP05_TouchFrontRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "TOUCH: BACK_AREA", &m_nP06_TouchBackArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BACK_SIZE", &m_nP07_TouchBackSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BACK_ROT", &m_nP08_TouchBackRot, eEDIT_VALUE_TYPE_INT32,
-                          BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_STEP", &m_nP09_TouchFrontStep_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_STEP_2", &m_nP10_TouchFrontStep2_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: FRONT_STEP_RND", &m_nP11_TouchFrontStepRnd_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BACK_STEP", &m_nP12_TouchBackStep_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BACK_STEP_2", &m_nP13_TouchBackStep2_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-        pMenu->setItemAt( id++, "TOUCH: BACK_STEP_RND", &m_nP14_TouchBackStepRnd_FrillDummy, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
-    }
+    pMenu->setItemAt( id++, "TOUCH: BASE_POS", &m_nTouchBasePos, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "TOUCH: BASE_SIZE", &m_nTouchBaseSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "TOUCH: BASE_ROT", &m_nTouchBaseRot, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
     
     pMenu->setSeparatorAt( id, true );
 
-    pMenu->setItemAtAsLabel( id++, "STRIPE_MAIN_PAL_F_ID", &m_eStripeMainPalOfsId, eEDIT_VALUE_TYPE_INT32,
-                            ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
-    pMenu->setItemAtAsLabel( id++, "STRIPE_SUB_PAL_F_ID", &m_eStripeSubPalOfsId, eEDIT_VALUE_TYPE_INT32,
-                            ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
+    pMenu->setItemAt( id++, "TOUCH: FRONT_AREA", &m_nTouchFrontArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "TOUCH: FRONT_SIZE_OFS", &m_nTouchFrontSizeOfs, eEDIT_VALUE_TYPE_INT32,
+                      -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "TOUCH: FRONT_ROT_RATE", &m_nTouchFrontRotRate, eEDIT_VALUE_TYPE_INT32,
+                      -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
+    
+    pMenu->setSeparatorAt( id, true );
+
+    pMenu->setItemAt( id++, "TOUCH: BACK_AREA", &m_nTouchBackArea, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "TOUCH: BACK_SIZE_OFS", &m_nTouchBackSizeOfs, eEDIT_VALUE_TYPE_INT32,
+                      -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "TOUCH: BACK_ROT_RATE", &m_nTouchBackRotRate, eEDIT_VALUE_TYPE_INT32,
+                      -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
+    
+    pMenu->setSeparatorAt( id, true );
+
+    pMenu->setItemAt( id++, "TOUCH: FRONT_NUM", &m_nTouchFrontNum, eEDIT_VALUE_TYPE_INT32, 0, 99 );
+    pMenu->setItemAt( id++, "TOUCH: FRONT_SKIP", &m_nTouchFrontSkip, eEDIT_VALUE_TYPE_INT32, 0, 99 );
+    pMenu->setItemAt( id++, "TOUCH: FRONT_BORDER_RATE", &m_nTouchFrontBorderRate, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    
+    pMenu->setSeparatorAt( id, true );
+
+    pMenu->setItemAt( id++, "TOUCH: BACK_NUM", &m_nTouchBackNum, eEDIT_VALUE_TYPE_INT32, 0, 99 );
+    pMenu->setItemAt( id++, "TOUCH: BACK_SKIP", &m_nTouchBackSkip, eEDIT_VALUE_TYPE_INT32, 0, 99 );
+    pMenu->setItemAt( id++, "TOUCH: BACK_BORDER_RATE", &m_nTouchBackBorderRate, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    
+    pMenu->setSeparatorAt( id, true );
+    
+    pMenu->setItemAt( id++, "TOUCH: RAND_OFS_0", &m_nTouchRandomOfsFor0, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "TOUCH: RAND_OFS_1", &m_nTouchRandomOfsFor1, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    
+
+    pMenu->setItemAt( id++, "TOUCH: HEAD_SKIP_RATE", &m_nTouchHeadSkipRate, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "TOUCH: TAIL_SKIP_RATE", &m_nTouchTailSkipRate, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE );
+
+    pMenu->setItemAt( id++, "FRILL: W_RATE_FOR_MAIN", &m_nFrillWidthRateForMain, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "TOUCH: W_RATE_FOR_SUB", &m_nFrillWidthRateForSub, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
 
     pMenu->setSeparatorAt( id, true );
     
-    pMenu->setItemAtAsLabel( id++, "OPT: VALID FOR", &m_eOptionForValid, eEDIT_VALUE_TYPE_INT32,
-                             eBD_OPTION_INVALID, eBD_OPTION_MAX-1, g_pArrLabelBdOption );
-
-    pMenu->setItemAtAsLabel( id++, "OPT: INVALID FOR", &m_eOptionForInvalid, eEDIT_VALUE_TYPE_INT32,
-                             eBD_OPTION_INVALID, eBD_OPTION_MAX-1, g_pArrLabelBdOption );
-
-    pMenu->setSeparatorAt( id, true );
-
     // フラグ
     pMenu->setItemAtAsBit( id++, "FLAG: DISABLE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_DISABLE );
     pMenu->setItemAtAsBit( id++, "FLAG: TRANSPARENCY", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_TRANSPARENCY );
     pMenu->setItemAtAsBit( id++, "FLAG: NO_FILL_GUIDE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_NO_FILL_GUIDE );
-    pMenu->setItemAtAsBit( id++, "FLAG: LINE_REPAIR_TEST", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_LINE_REPAIR_TEST );
-    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_NO_HOOK_IF_OW", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_NO_HOOK_IF_OVERWRAPPED );
-    pMenu->setItemAtAsBit( id++, "FLAG: STRIPE_FILL_FRONT", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_STRIPE_FILL_FRONT_EDGE );
-    pMenu->setItemAtAsBit( id++, "FLAG: STRIPE_FILL_BACK", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_STRIPE_FILL_BACK_EDGE );
-    pMenu->setItemAtAsBit( id++, "FLAG: REVERSE_TOUCH_POINT", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_REVERSE_TOUCH_POINT );
-    pMenu->setItemAtAsBit( id++, "FLAG: PUT_DOT_ON_FILL_OUT", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_DOT_PUT_ON_FILL_OUT );
+    pMenu->setItemAtAsBit( id++, "FLAG: DOT_ON_OUT_COL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_DOT_ON_OUT_COL );
     pMenu->setItemAtAsBit( id++, "FLAG: DOT_ERASE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_DOT_ERASE );
-    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_DIR_REV_X", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_DIR_REVERSE_X );
-    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_DIR_REV_Y", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_DIR_REVERSE_Y );
-    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_DIR_SWAP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_DIR_SWAP );
-
+    pMenu->setItemAtAsBit( id++, "FLAG: LINE_REPAIR_TEST", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_LINE_REPAIR_TEST );
+    pMenu->setItemAtAsBit( id++, "FLAG: REVERSE_TOUCH_POINT", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_REVERSE_TOUCH_POINT );
+    pMenu->setItemAtAsBit( id++, "FLAG: REVERSE_TOUCH SUB", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_REVERSE_TOUCH_SUB );
+    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_OR_FRILL_DIR_SWAP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_OR_FRILL_DIR_SWAP );
+    pMenu->setItemAtAsBit( id++, "FLAG: JOINT_NO_HOOK_IF_OW", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_JOINT_NO_HOOK_IF_OVERWRAPPED );
+    pMenu->setItemAtAsBit( id++, "FLAG: AS_TOUCH_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eAPD_FLAG_AS_TOUCH_STROKE );
+    
     // 確定
     pMenu->fixMenu();
 }

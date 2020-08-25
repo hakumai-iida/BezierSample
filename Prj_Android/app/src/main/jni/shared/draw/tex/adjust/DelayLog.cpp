@@ -27,6 +27,7 @@
   +----------------------------------------------------------------+*/
 const char* g_pArrLabelDelayLog[] = {
     "CLOTH",    // 布
+    "FRILL",    // フリル
     "HAIR",     // 髪
     "SKIN",     // 肌
     "BUST",     // 胸（※肌よりも柔らかいなびき＆高反発）
@@ -57,7 +58,8 @@ void CDelayLog::clear( void ){
     // デフォルト値：（とりあえず）
     //-----------------------------------------------
     m_oArrSpring[eDELAY_LOG_CLOTH].set( DELAY_LOG_SPRING_LENGTH, 0.10f, 0.80f );     // 布
-    m_oArrSpring[eDELAY_LOG_HAIR].set(  DELAY_LOG_SPRING_LENGTH, 0.05f, 0.95f );     // 髪
+    m_oArrSpring[eDELAY_LOG_FRILL].set( DELAY_LOG_SPRING_LENGTH, 0.06f, 0.90f );     // フリル
+    m_oArrSpring[eDELAY_LOG_HAIR].set(  DELAY_LOG_SPRING_LENGTH, 0.04f, 0.95f );     // 髪
     m_oArrSpring[eDELAY_LOG_SKIN].set(  DELAY_LOG_SPRING_LENGTH, 0.60f, 0.70f );     // 肌
     m_oArrSpring[eDELAY_LOG_BUST].set(  DELAY_LOG_SPRING_LENGTH, 0.40f, 0.85f );     // 胸
 

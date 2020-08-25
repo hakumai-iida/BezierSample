@@ -52,11 +52,27 @@ void CSlotAdjuster::clear( void ){
     m_nJointMaxRateOfsRForH = 0;
     m_nJointRateRotOfs = 0;
     m_nJointRateOfsForRotCenter = 0;
+
+    m_nJointOpenFromRateDirX_p = 0;
+    m_nJointOpenFromRateDirY_p = 0;
+    m_nJointCloseFromRateDirX_p = 0;
+    m_nJointCloseFromRateDirY_p = 0;
+    m_nJointOpenToRateDirX_p = 0;
+    m_nJointOpenToRateDirY_p = 0;
+    m_nJointCloseToRateDirX_p = 0;
+    m_nJointCloseToRateDirY_p = 0;
     
-    m_nJointRateDirForFrom = 0;
-    m_nJointRateDirForTo = 0;
-    m_nJointRateDirForOpen = 0;
-    m_nJointRateDirForClose = 0;
+    m_nJointOpenFromRateDirX_m = 0;
+    m_nJointOpenFromRateDirY_m = 0;
+    m_nJointCloseFromRateDirX_m = 0;
+    m_nJointCloseFromRateDirY_m = 0;
+    m_nJointOpenToRateDirX_m = 0;
+    m_nJointOpenToRateDirY_m = 0;
+    m_nJointCloseToRateDirX_m = 0;
+    m_nJointCloseToRateDirY_m = 0;
+    
+    m_nCoverRateScale = BEZIER_SCALE_RATE;
+    m_nCoverRateRot = 0;
 }
 
 //--------------------
@@ -86,10 +102,26 @@ void CSlotAdjuster::copy( CSlotAdjuster* pData ){
     m_nJointRateRotOfs = pData->m_nJointRateRotOfs;
     m_nJointRateOfsForRotCenter = pData->m_nJointRateOfsForRotCenter;
     
-    m_nJointRateDirForFrom = pData->m_nJointRateDirForFrom;
-    m_nJointRateDirForTo = pData->m_nJointRateDirForTo;
-    m_nJointRateDirForOpen = pData->m_nJointRateDirForOpen;
-    m_nJointRateDirForClose = pData->m_nJointRateDirForClose;
+    m_nJointOpenFromRateDirX_p = pData->m_nJointOpenFromRateDirX_p;
+    m_nJointOpenFromRateDirY_p = pData->m_nJointOpenFromRateDirY_p;
+    m_nJointCloseFromRateDirX_p = pData->m_nJointCloseFromRateDirX_p;
+    m_nJointCloseFromRateDirY_p = pData->m_nJointCloseFromRateDirY_p;
+    m_nJointOpenToRateDirX_p = pData->m_nJointOpenToRateDirX_p;
+    m_nJointOpenToRateDirY_p = pData->m_nJointOpenToRateDirY_p;
+    m_nJointCloseToRateDirX_p = pData->m_nJointCloseToRateDirX_p;
+    m_nJointCloseToRateDirY_p = pData->m_nJointCloseToRateDirY_p;
+    
+    m_nJointOpenFromRateDirX_m = pData->m_nJointOpenFromRateDirX_m;
+    m_nJointOpenFromRateDirY_m = pData->m_nJointOpenFromRateDirY_m;
+    m_nJointCloseFromRateDirX_m = pData->m_nJointCloseFromRateDirX_m;
+    m_nJointCloseFromRateDirY_m = pData->m_nJointCloseFromRateDirY_m;
+    m_nJointOpenToRateDirX_m = pData->m_nJointOpenToRateDirX_m;
+    m_nJointOpenToRateDirY_m = pData->m_nJointOpenToRateDirY_m;
+    m_nJointCloseToRateDirX_m = pData->m_nJointCloseToRateDirX_m;
+    m_nJointCloseToRateDirY_m = pData->m_nJointCloseToRateDirY_m;
+    
+    m_nCoverRateScale = pData->m_nCoverRateScale;
+    m_nCoverRateRot = pData->m_nCoverRateRot;
 }
 
 //---------------------------
@@ -114,10 +146,26 @@ void CSlotAdjuster::read( CInputBuffer* pIB ){
     m_nJointRateRotOfs = pIB->readInt16();
     m_nJointRateOfsForRotCenter = pIB->readInt16();
 
-    m_nJointRateDirForFrom = pIB->readInt16();
-    m_nJointRateDirForTo = pIB->readInt16();
-    m_nJointRateDirForOpen = pIB->readInt16();
-    m_nJointRateDirForClose = pIB->readInt16();
+    m_nJointOpenFromRateDirX_p = pIB->readInt16();
+    m_nJointOpenFromRateDirY_p = pIB->readInt16();
+    m_nJointCloseFromRateDirX_p = pIB->readInt16();
+    m_nJointCloseFromRateDirY_p = pIB->readInt16();
+    m_nJointOpenToRateDirX_p = pIB->readInt16();
+    m_nJointOpenToRateDirY_p = pIB->readInt16();
+    m_nJointCloseToRateDirX_p = pIB->readInt16();
+    m_nJointCloseToRateDirY_p = pIB->readInt16();
+
+    m_nJointOpenFromRateDirX_m = pIB->readInt16();
+    m_nJointOpenFromRateDirY_m = pIB->readInt16();
+    m_nJointCloseFromRateDirX_m = pIB->readInt16();
+    m_nJointCloseFromRateDirY_m = pIB->readInt16();
+    m_nJointOpenToRateDirX_m = pIB->readInt16();
+    m_nJointOpenToRateDirY_m = pIB->readInt16();
+    m_nJointCloseToRateDirX_m = pIB->readInt16();
+    m_nJointCloseToRateDirY_m = pIB->readInt16();
+    
+    m_nCoverRateScale = pIB->readInt16();
+    m_nCoverRateRot = pIB->readInt16();
 }
 
 //---------------------------
@@ -142,10 +190,26 @@ void CSlotAdjuster::write( COutputBuffer* pOB ){
     pOB->writeInt16( (int16)m_nJointRateRotOfs );
     pOB->writeInt16( (int16)m_nJointRateOfsForRotCenter );
     
-    pOB->writeInt16( (int16)m_nJointRateDirForFrom );
-    pOB->writeInt16( (int16)m_nJointRateDirForTo );
-    pOB->writeInt16( (int16)m_nJointRateDirForOpen );
-    pOB->writeInt16( (int16)m_nJointRateDirForClose );
+    pOB->writeInt16( (int16)m_nJointOpenFromRateDirX_p );
+    pOB->writeInt16( (int16)m_nJointOpenFromRateDirY_p );
+    pOB->writeInt16( (int16)m_nJointCloseFromRateDirX_p );
+    pOB->writeInt16( (int16)m_nJointCloseFromRateDirY_p );
+    pOB->writeInt16( (int16)m_nJointOpenToRateDirX_p );
+    pOB->writeInt16( (int16)m_nJointOpenToRateDirY_p );
+    pOB->writeInt16( (int16)m_nJointCloseToRateDirX_p );
+    pOB->writeInt16( (int16)m_nJointCloseToRateDirY_p );
+
+    pOB->writeInt16( (int16)m_nJointOpenFromRateDirX_m );
+    pOB->writeInt16( (int16)m_nJointOpenFromRateDirY_m );
+    pOB->writeInt16( (int16)m_nJointCloseFromRateDirX_m );
+    pOB->writeInt16( (int16)m_nJointCloseFromRateDirY_m );
+    pOB->writeInt16( (int16)m_nJointOpenToRateDirX_m );
+    pOB->writeInt16( (int16)m_nJointOpenToRateDirY_m );
+    pOB->writeInt16( (int16)m_nJointCloseToRateDirX_m );
+    pOB->writeInt16( (int16)m_nJointCloseToRateDirY_m );
+    
+    pOB->writeInt16( (short)m_nCoverRateScale );
+    pOB->writeInt16( (short)m_nCoverRateRot );
 }
 
 //-----------------------------
@@ -155,7 +219,7 @@ eJOINT_POINT CSlotAdjuster::getJointPointIdForFrom( int slotIndex ){
     int id = m_eJointPointIdForFrom;
     
     // スロットインデックスにより参照先を補正
-    if( id >= 0 && slotIndex >= 0 ){
+    if( IS_JOINT_POINT_VALID( id ) && IS_BD_SLOT_INDEX_VALID( slotIndex ) ){
         id += JOINT_POINT_OFS_FOR_SLOT_INDEX * slotIndex;
     }
     
@@ -169,7 +233,7 @@ eJOINT_POINT CSlotAdjuster::getJointPointIdForTo( int slotIndex ){
     int id = m_eJointPointIdForTo;
     
     // スロットインデックスにより参照先を補正
-    if( id >= 0 && slotIndex >= 0 ){
+    if( IS_JOINT_POINT_VALID( id ) && IS_BD_SLOT_INDEX_VALID( slotIndex ) ){
         id += JOINT_POINT_OFS_FOR_SLOT_INDEX * slotIndex;
     }
     
@@ -198,10 +262,17 @@ void CSlotAdjuster::applyRateScale( int rateScale ){
     // [m_nJointRateRotOfs]は無視（※この値は割合）
     // [m_nJointRateOfsForRotCenter]は無視（この値は半径に対して適用される割合）
     
-    // [m_nJointRateDirForFrom]は無視（※この値は割合値）
-    // [m_nJointRateDirForTo]は無視（※この値は割合値）
-    // [m_nJointRateDirForOpen]は無視（※この値は割合値）
-    // [m_nJointRateDirForClose]は無視（※この値は割合値）
+    // [m_nJointOpenFromRateDirX_p/m]は無視（※この値は割合値）
+    // [m_nJointOpenFromRateDirY_p/m]は無視（※この値は割合値）
+    // [m_nJointCloseFromRateDirX_p/m]は無視（※この値は割合値）
+    // [m_nJointCloseFromRateDirY_p/m]は無視（※この値は割合値）
+    // [m_nJointOpenToRateDirX_p/m]は無視（※この値は割合値）
+    // [m_nJointOpenToRateDirY_p/m]は無視（※この値は割合値）
+    // [m_nJointCloseToRateDirX_p/m]は無視（※この値は割合値）
+    // [m_nJointCloseToRateDirY_p/m]は無視（※この値は割合値）
+    
+    // [m_nCoverRateScale]
+    // [m_nCoverRateRot]
 }
 
 //---------------------------------------------------------
@@ -209,7 +280,7 @@ void CSlotAdjuster::applyRateScale( int rateScale ){
 //---------------------------------------------------------
 void CSlotAdjuster::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 2 + 2 + 11 );
+    pMenu->setItemNum( 2 + 2 + 7 + 16 + 2 );
     
     int id = 0;
     
@@ -252,17 +323,60 @@ void CSlotAdjuster::setEditValueMenu( CEditValueMenu* pMenu ){
     
     pMenu->setSeparatorAt( id, true );
     
-    pMenu->setItemAt( id++, "J: DIR FOR FROM", &m_nJointRateDirForFrom, eEDIT_VALUE_TYPE_INT32,
+    pMenu->setItemAt( id++, "J: + OPEN FROM DIR X", &m_nJointOpenFromRateDirX_p, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
 
-    pMenu->setItemAt( id++, "J: DIR FOR TO", &m_nJointRateDirForTo, eEDIT_VALUE_TYPE_INT32,
+    pMenu->setItemAt( id++, "J: + OPEN FROM DIR Y", &m_nJointOpenFromRateDirY_p, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
 
-    pMenu->setItemAt( id++, "J: DIR FOR OPEN", &m_nJointRateDirForOpen, eEDIT_VALUE_TYPE_INT32,
+    pMenu->setItemAt( id++, "J: + CLOSE FROM DIR X", &m_nJointCloseFromRateDirX_p, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: + CLOSE FROM DIR Y", &m_nJointCloseFromRateDirY_p, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: + OPEN TO DIR X", &m_nJointOpenToRateDirX_p, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: + OPEN TO DIR Y", &m_nJointOpenToRateDirY_p, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: + CLOSE TO DIR X", &m_nJointCloseToRateDirX_p, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: + CLOSE TO DIR Y", &m_nJointCloseToRateDirY_p, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setSeparatorAt( id, true );
     
-    pMenu->setItemAt( id++, "J: DIR FOR CLOSE", &m_nJointRateDirForClose, eEDIT_VALUE_TYPE_INT32,
+    pMenu->setItemAt( id++, "J: - OPEN FROM DIR X", &m_nJointOpenFromRateDirX_m, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - OPEN FROM DIR Y", &m_nJointOpenFromRateDirY_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - CLOSE FROM DIR X", &m_nJointCloseFromRateDirX_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - CLOSE FROM DIR Y", &m_nJointCloseFromRateDirY_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - OPEN TO DIR X", &m_nJointOpenToRateDirX_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - OPEN TO DIR Y", &m_nJointOpenToRateDirY_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - CLOSE TO DIR X", &m_nJointCloseToRateDirX_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "J: - CLOSE TO DIR Y", &m_nJointCloseToRateDirY_m, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setSeparatorAt( id, true );
+
+    pMenu->setItemAt( id++, "COVER: SCALE", &m_nCoverRateScale, eEDIT_VALUE_TYPE_INT32, BEZIER_SCALE_RATE/10, BEZIER_SCALE_RATE_MAX );
+    pMenu->setItemAt( id++, "COVER: ROT", &m_nCoverRateRot, eEDIT_VALUE_TYPE_INT32, BEZIER_ROTATION_RATE_MIN, BEZIER_ROTATION_RATE_MAX );
 
     // 確定
     pMenu->fixMenu();

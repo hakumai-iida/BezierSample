@@ -53,11 +53,13 @@
 void CBezierTestLoop::allocForLayerForHookA( void ){
     // レイヤー確保
     m_pLayerHookA = CLayerData::Alloc();
-    m_pLayerHookA->setFlagOn( eLAYER_FLAG_STAY_HOOK );
+    m_pLayerHookA->setFlagOn( eLAYER_FLAG_STAY_HOOK_TEMP );
 
 #ifdef DELAY_TEST
     m_pLayerHookA->setDelayType( eDELAY_LOG_HAIR, 0 );
-    m_pLayerHookA->setDelayPowerRate( 1000, 1000 );
+    m_pLayerHookA->setDelayPowerRateForXY( -1000, -1000 );
+    m_pLayerHookA->setDelayPowerRateForRot( -500, -500 );
+    m_pLayerHookA->setDelayPowerRateForScale( 3000, 3000 );
 #endif
     
     //-----------------------
@@ -137,11 +139,12 @@ void CBezierTestLoop::allocForLayerForHookA( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerHookA->addData( pPOD );
 
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,-3000, bucketPalOfs );
+    pFP->set( 0,-3000 );
     pPOD->addData( pFP );
 }
 
@@ -152,11 +155,13 @@ void CBezierTestLoop::allocForLayerForHookA( void ){
 void CBezierTestLoop::allocForLayerForHookB( void ){
     // レイヤー確保
     m_pLayerHookB = CLayerData::Alloc();
-    m_pLayerHookB->setFlagOn( eLAYER_FLAG_STAY_HOOK );
+    m_pLayerHookB->setFlagOn( eLAYER_FLAG_STAY_HOOK_TEMP );
 
 #ifdef DELAY_TEST
     m_pLayerHookB->setDelayType( eDELAY_LOG_BUST, 0 );
-    m_pLayerHookB->setDelayPowerRate( 1000, 1000 );
+    m_pLayerHookB->setDelayPowerRateForXY( 1000, 1000 );
+    m_pLayerHookB->setDelayPowerRateForRot( 200, 200 );
+    m_pLayerHookB->setDelayPowerRateForScale( -5000, -5000 );
 #endif
    
     //-----------------------
@@ -219,11 +224,12 @@ void CBezierTestLoop::allocForLayerForHookB( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerHookB->addData( pPOD );
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 }
 
@@ -234,11 +240,12 @@ void CBezierTestLoop::allocForLayerForHookB( void ){
 void CBezierTestLoop::allocForLayerForHookC( void ){
     // レイヤー確保
     m_pLayerHookC = CLayerData::Alloc();
-    m_pLayerHookC->setFlagOn( eLAYER_FLAG_STAY_HOOK );
     
 #ifdef DELAY_TEST
     m_pLayerHookC->setDelayType( eDELAY_LOG_SKIN, 0 );
-    m_pLayerHookC->setDelayPowerRate( 1000, 1000 );
+    m_pLayerHookC->setDelayPowerRateForXY( 1000, -1000 );
+    m_pLayerHookC->setDelayPowerRateForRot( 800, -800 );
+    m_pLayerHookC->setDelayPowerRateForScale( 3000, -3000 );
 #endif
 
     //-----------------------
@@ -315,10 +322,11 @@ void CBezierTestLoop::allocForLayerForHookC( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerHookC->addData( pPOD );
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( -3000,0, bucketPalOfs );
+    pFP->set( -3000,0 );
     pPOD->addData( pFP );
 }

@@ -18,6 +18,9 @@
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
  +----------------------------------------------------------------+*/
+// 下塗りセルサイズ（※とりあえず）
+#define FILL_UNDERCOAT_CELL_MAX  4096
+
 /*+----------------------------------------------------------------+
   |	Struct		構造体型宣言
   +----------------------------------------------------------------+*/
@@ -37,6 +40,10 @@ struct stFILL_UNDERCOAT_CELL{
 // 塗り
 //-----------------------------------------------------------------
 class CFill{
+public:
+    // ガイド調整
+    static void AdjustFillGuideForOutCol( BYTE* pBufGuide, int w, int h );
+
 protected:
     //-------------------------------------------
     // 設定値
@@ -47,7 +54,7 @@ protected:
     // 塗りつぶし対象
     //-------------------------------------------
     BYTE* m_pBuf;               // 塗りつぶしバッファ（※実際の出力先）
-    BYTE* m_pBufUndercoat;      // 下塗りバッファ（※指定座標を内側にもつ閉じた領域が渡される想定）
+    BYTE* m_pBufGuide;          // ガイドバッファ（※指定座標を内側にもつ閉じた領域が渡される想定）
     BYTE* m_pBufGuard;          // ガードバッファ
     int m_nDotW, m_nDotH;       // バッファサイズ
 
@@ -91,63 +98,110 @@ public:
     //（※この処理の後は[pBufGuide]が破壊されている点に注意すること＝塗りガイドを再利用したい場合は退避＆復旧する必要がある）
     // [pBufGuard]で出力を制限する
     //--------------------------------------------------------------------------------------------------
-    bool fill0( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y, BYTE palGrp, BYTE palVal, BYTE testPalGrp,
-                bool isForAdd, int addVal );
+    bool fill0( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y,
+                BYTE palGrp, BYTE palVal, BYTE testPalGrp, bool isForAdd, bool isOnOutCol, int addVal );
 
     // 通常塗り
-    inline bool fill( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y, BYTE palGrp, BYTE palVal, BYTE testPalGrp ){
-        return( fill0( pBuf, pBufGuide, pBufGuard, w, h, x, y, palGrp, palVal, testPalGrp, false, 0 ) );
+    inline bool fill( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y,
+                      BYTE palGrp, BYTE palVal, BYTE testPalGrp, bool isOnOutCol ){
+        return( fill0( pBuf, pBufGuide, pBufGuard, w, h, x, y, palGrp, palVal, testPalGrp, false, isOnOutCol, 0 ) );
     }
 
-    // 領域加算
-    inline bool fillAddForAdd( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y, BYTE testPalGrp, int addVal ){
-        return( fill0( pBuf, pBufGuide, pBufGuard, w, h, x, y, 0, 0, testPalGrp, true, addVal ) );
+    // 加算塗り
+    inline bool fillAdd( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int x, int y,
+                               BYTE testPalGrp, int addVal, bool isOnOutCol ){
+        return( fill0( pBuf, pBufGuide, pBufGuard, w, h, x, y, 0, 0, testPalGrp, true, isOnOutCol, addVal ) );
     }
 
     //--------------------------------------------------------------------------------------------------
     // オフセット（別画素参照）による加算（※フラグにより[全色／予約]処理へ切り替え＆[addVal]の値で加算／減算の切り替え）
     //--------------------------------------------------------------------------------------------------
-    bool fillAddWithOfs( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal, bool isReserve );
+    bool ofsAdd( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal, eFILL_OPTION type );
     
-    // 全色加算
-    inline bool fillAddForColor( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal ){
-        return( fillAddWithOfs( pBuf, pBufGuide, pBufGuard, w, h, ofsX, ofsY, addVal, false ) );
+    // 未出力領域への明暗予約
+    inline bool ofsAddForReserve( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal ){
+        return( ofsAdd( pBuf, pBufGuide, pBufGuard, w, h, ofsX, ofsY, addVal, eFILL_OPTION_RESERVE ) );
+    }
+    
+    // 出力領域への明暗
+    inline bool ofsAddForInto( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal ){
+        return( ofsAdd( pBuf, pBufGuide, pBufGuard, w, h, ofsX, ofsY, addVal, eFILL_OPTION_INTO ) );
     }
 
-    // パレット値予約
-    inline bool fillAddForReserve( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal ){
-        return( fillAddWithOfs( pBuf, pBufGuide, pBufGuard, w, h, ofsX, ofsY, addVal, true ) );
+    // 色による明暗
+    inline bool ofsAddForColor( BYTE* pBuf, BYTE* pBufGuide, BYTE* pBufGuard, int w, int h, int ofsX, int ofsY, int addVal ){
+        return( ofsAdd( pBuf, pBufGuide, pBufGuard, w, h, ofsX, ofsY, addVal, eFILL_OPTION_COLOR ) );
     }
-    
+
     //--------------------------------------------------------------------------------------------------
     // マスク
     //--------------------------------------------------------------------------------------------------
-    bool fillMask( BYTE* pBuf, BYTE* pBufGuide, int w, int h, int x, int y );
-
+    bool mask( BYTE* pBuf, BYTE* pBufGuide, int w, int h, int x, int y );
+    
+    //==============================================================
+    // 以下、[FillForExe.cpp]にて実装
+    //==============================================================
 protected:
-    // [下塗り]: ワーク関連
+    //--------------------------------------------------
+    // [fill0]から呼ばれる
+    //--------------------------------------------------
+    // 領域に対するオフ描き込み（出力色のみを書き込む）
+    void exeFillOff( void );
+
+    // 領域に対する描き込み
+    void exeFillMono( BYTE palGrp, BYTE testPalGrp );
+    void exeFillMonoOnOutCol( BYTE palGrp );
+
+    void exeFillMonoAdd( BYTE palGrp, BYTE testPalGrp, int addVal );
+    void exeFillMonoAddOnOutCol( BYTE palGrp, int addVal );
+
+    void exeFillMonoSub( BYTE palGrp, BYTE testPalGrp, int subVal );
+    void exeFillMonoSubOnOutCol( BYTE palGrp, int subVal );
+
+    // 領域に対する明暗
+    void exeFillAdd( BYTE testPalGrp, int addVal );
+    void exeFillAddOnOutCol( int addVal );
+
+    void exeFillSub( BYTE testPalGrp, int subVal );
+    void exeFillSubOnOutCol( int subVal );
+
+    //--------------------------------------------------
+    // [ofsAdd]から呼ばれる
+    //--------------------------------------------------
+    // 出力色による明暗予約
+    void exeOfsAddForReserve( int ofsX, int ofsY, int addVal );
+    void exeOfsSubForReserve( int ofsX, int ofsY, int subVal );
+
+    // 出力色への明暗
+    void exeOfsAddForInto( int ofsX, int ofsY, int addVal );
+    void exeOfsSubForInto( int ofsX, int ofsY, int subVal );
+    
+    // 色への明暗
+    void exeOfsAddForColor( int ofsX, int ofsY, int addVal );
+    void exeOfsSubForColor( int ofsX, int ofsY, int subVal );
+    
+    //--------------------------------------------------
+    // [mask]から呼ばれる
+    //--------------------------------------------------
+    // ガード値の描き込み
+    void exeMask( void );
+    
+    //==============================================================
+    // 以下、[FillForUndercoat.cpp]にて実装
+    //==============================================================
+protected:
+    // ワーク管理
     void readyForUndercoat( void );
-    bool isUndercoatCellEmpty( void );
+    inline bool isUndercoatCellEmpty( void ){ return( m_nUndercoatCellHeadAt == m_nUndercoatCellTailAt ); }
+    
     void addUndercoatCell( int hint, int xL, int xR, int y );
     stFILL_UNDERCOAT_CELL* getUndercoatCell( void );
     
-    // [下塗り]: ラインのスキャン
-    void scanLineForUndercoat( int xL, int xR, int y, bool isMoveUp );
-
-    // [下塗り]: 塗りつぶし
+    // 塗りつぶし
     void fillUndercoat( int x, int y );
     
-    // [本塗り]: 指定タイプ毎の処理（※下塗り色による色バッファへの処理）
-    void fillForOff( void );
-    void fillForGuard( void );
-    void fillForMono( BYTE palGrp, BYTE testPalGrp );
-    void fillForMonoWithOfs( BYTE palGrp, int palValOfs, BYTE testPalGrp );
-    void addForArea( BYTE testPalGrp, int addVal );
-    void subForArea( BYTE testPalGrp, int subVal );
-    void addForColor( int ofsX, int ofsY, int addVal );
-    void subForColor( int ofsX, int ofsY, int subVal );
-    void addForReserve( int ofsX, int ofsY, int addVal );
-    void subForReserve( int ofsX, int ofsY, int subVal );
+    // ラインのスキャン
+    void scanLineForUndercoat( int xL, int xR, int y, bool isMoveUp );
 };
 
 /*+----------------------------------------------------------------+

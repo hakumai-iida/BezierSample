@@ -225,6 +225,99 @@ uint32 CConst::CalcMoveForRGBA( uint32 rgbaFrom, uint32 rgbaDest, int count, int
     return( (r<<24) | (g<<16) | (b<<8) | (a<<0) );
 }
 
+//--------------------------
+// 色の調整：明るく
+//--------------------------
+void CConst::AdjustColor( BYTE* pR, BYTE* pG, BYTE* pB, bool isDark, float rate, int minStep ){
+    int temp;
+    int tempR = *pR;
+    int tempG = *pG;
+    int tempB = *pB;
+
+    // R
+    temp = (int)(rate*tempR);
+    if( temp < minStep ){ temp = minStep; }
+    if( isDark ){
+        tempR -= temp;
+        if( tempR < 0 ){ tempR = 0;}
+    }else{
+        tempR += temp;
+        if( tempR > 255 ){ tempR = 255; }
+    }
+
+    // G
+    temp = (int)(rate*tempG);
+    if( temp < minStep ){ temp = minStep; }
+    if( isDark ){
+        tempG -= temp;
+        if( tempG < 0 ){ tempG = 0;}
+    }else{
+        tempG += temp;
+        if( tempG > 255 ){ tempG = 255; }
+    }
+
+    // B
+    temp = (int)(rate*tempB);
+    if( temp < minStep ){ temp = minStep; }
+    if( isDark ){
+        tempB -= temp;
+        if( tempB < 0 ){ tempB = 0;}
+    }else{
+        tempB += temp;
+        if( tempB > 255 ){ tempB = 255; }
+    }
+
+    *pR = tempR;
+    *pG = tempG;
+    *pB = tempB;
+}
+
+//--------------------------
+// 色の調整：ランダム
+//--------------------------
+void CConst::AdjustColorRand( BYTE* pR, BYTE* pG, BYTE* pB, int randRange ){
+    int tempR = *pR;
+    int tempG = *pG;
+    int tempB = *pB;
+
+    // レンジが有効なら元の値に対するランダム調整
+    if( randRange > 0 ){
+        if( CRand::IsRandHappen( 1, 2 ) ){
+            tempR -= CRand::GetRand( randRange );
+            if( tempR < 0 ){ tempR = 0; }
+        }else{
+            tempR += CRand::GetRand( randRange );
+            if( tempR > 255 ){ tempR = 255; }
+        }
+
+        if( CRand::IsRandHappen( 1, 2 ) ){
+            tempG -= CRand::GetRand( randRange );
+            if( tempG < 0 ){ tempG = 0; }
+        }else{
+            tempG += CRand::GetRand( randRange );
+            if( tempG > 255 ){ tempG = 255; }
+        }
+
+        if( CRand::IsRandHappen( 1, 2 ) ){
+            tempB -= CRand::GetRand( randRange );
+            if( tempB < 0 ){ tempB = 0; }
+        }else{
+            tempB += CRand::GetRand( randRange );
+            if( tempB > 255 ){ tempB = 255; }
+        }
+    }
+    // レンジが無効なら単純なランダム
+    else{
+        tempR = CRand::GetRand( 256 );
+        tempG = CRand::GetRand( 256 );
+        tempB = CRand::GetRand( 256 );
+    }
+
+    *pR = tempR;
+    *pG = tempG;
+    *pB = tempB;
+}
+
 //--------------------------------
 // 最大までインクリメント
 //--------------------------------
@@ -253,6 +346,38 @@ bool CConst::DecrementToZero( float *pVal, float delta ){
 
 	// ０であれば通知
 	return( *pVal <= 0.0f );
+}
+
+//----------------------
+// 利用率の算出
+//----------------------
+float CConst::CalcUseRate( int num, int max ){
+    // ０は０
+    if( num <= 0 ){
+        return( 0.0f );
+    }
+    
+    // 分母が０なのは困る（※ありえない値を返しておく
+    if( max <= 0 ){
+        return( 999.9f );
+    }
+
+    // ここまできたら百分率を返す
+    return( 100.0f*num/max );
+}
+
+//----------------------
+// 利用状況警告色
+//----------------------
+DWORD CConst::GetUseAlertRGBA( float rate ){
+    // [95%]を超えたら赤信号
+    if( rate >= 95.0f ){ return( 0xFFA0A0FF ); }
+
+    // [90%]で黄信号
+    if( rate >= 90.0f ){ return( 0xFFFF40FF ); }
+    
+    // ここまできたら青信号
+    return( 0xA0FFA0FF );
 }
 
 //--------------------------------

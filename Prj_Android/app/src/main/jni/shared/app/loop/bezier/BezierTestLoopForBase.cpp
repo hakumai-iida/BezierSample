@@ -17,37 +17,41 @@
 // ブラシ＆塗り指定
 //-------------------------------------------------
 #define CHECK_BRUSH             eBRUSH_C_BASE
-#define CHECK_BRUSH_DOT         eBRUSH_C_BASE
+#define CHECK_BRUSH_FOR_DOT     eBRUSH_SQUARE_XL
+#define CHECK_BRUSH_FOR_ERASE   eBRUSH_CIRCLE_XL
 #define CHECK_PAL_OFS           ePAL_OFS_C_SKIN
 #define CHECK_PAL_OFS_OPTION    ePAL_OFS_C_HAIR
-#define CHECK_PAL_OFS_STRIPE_A  ePAL_OFS_C_DRESS
-#define CHECK_PAL_OFS_STRIPE_B  ePAL_OFS_C_SYMBOL_SUB
 
 //-------------------------------------------------
 // 動作指定
 //-------------------------------------------------
 // ドット確認
-//#define BASE_FOR_DOT_TEST
+//#define DOT_TEST
+
+// エッジ調整（※アンカーポイントの折り返しによる角度が尖っている場合の先端調整）
+#define EDGE_FILL_TEST
 
 // ストローク消去確認
 #define ERASE_TEST
 
-// 塗りつぶしオプション確認
-#define FILL_OPTION_TEST
-
-// 塗り出力領域へのストローク確認
-#define BASE_STROKE_ON_OUT_TEST
-
-// エッジ調整（※アンカーポイントの折り返しによる角度が尖っている場合の先端調整）
-#define BASE_FOR_EDGE_FILL_TEST
-
-// タッチ確認
-#define BASE_FOR_TOUCH_TEST
-//#define BASE_FOR_TOUCH_TEST_WITH_STRIPE
-//#define BASE_FOR_TOUCH_TEST_WITH_FRILL
-
 // マスク確認
-#define BASE_FOR_MASK_TEST
+#define MASK_TEST
+
+// 出力領域への描画確認
+#define ON_FILL_OUT_TEST
+
+// 塗りつぶしオプション確認
+#define FILL_OPTION_TEST_A
+
+#define FILL_OPTION_TEST_B
+#define FILL_OPTION_TEST_B_WITH_ANTI
+
+#define FILL_OPTION_TEST_C
+#define FILL_OPTION_TEST_C_WITH_ANTI
+
+// ガイド確認
+#define GUIDE_TEST
+#define GUIDE_TEST_AT_PAINT
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
@@ -76,28 +80,73 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     CAnchorPointData* pAP;
     CAdjustablePoint* pAdj;
 
-#ifdef BASE_FOR_DOT_TEST
-    eBRUSH brush = CHECK_BRUSH_DOT;
-#else
-    eBRUSH brush = CHECK_BRUSH;
-#endif
-
     //------------------------------
     // 塗りワーク
     //------------------------------
     CPaintObjectData* pPOD;
     CFillPointData* pFP;
     eBUCKET bucket = eBUCKET_TEST_MONO;
-    ePAL_OFS bucketPalOfs = CHECK_PAL_OFS_OPTION;
+
+    // ブラシ＆パレット
+    eBRUSH brush = CHECK_BRUSH;
+    ePAL_OFS bucketPalOfs = CHECK_PAL_OFS;
+    
+#ifdef GUIDE_TEST
+    //==================================
+    // ガイド登録：左下領域の矩形
+    //==================================
+    // ブラシ
+    brush = CHECK_BRUSH;
+
+    //--------------------------
+    // 補正矩形：ラインの確保
+    //--------------------------
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setBrushId( brush );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    m_pLayerBase->addData( pLOD );
+    
+    // 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -4000,+4000, 0,0, 0,0 );
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    pLOD->addData( pAP );
+    
+    // 点１
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -2000,+4000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->setFlagOn( eAPD_FLAG_NO_FILL_GUIDE );
+    pLOD->addData( pAP );
+    
+    // 点２
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -2000,+2000, 0,0, 0,0 );
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    pLOD->addData( pAP );
+    
+    // 点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -4000,+2000, 0,0, 0,0 );
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    pLOD->addData( pAP );
+#endif
        
-#ifdef BASE_FOR_MASK_TEST
+#ifdef MASK_TEST
+    //==================================
+    // マスク領域：右上領域に円形でマスクする
+    //==================================
+    // ブラシ＆パレット指定
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS_OPTION;
+
     //----------------------
-    // マスクの線
+    // マスク：ラインの確保
     //----------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
-    pLOD->setTempAdjust( 1250, -1250, 8000,8000 );
+    pLOD->setTempAdjust( 1250, -1250, 6666,6666 );
     m_pLayerBase->addData( pLOD );
     
     // 点０
@@ -137,22 +186,30 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setDelayPowerRate( 1000, 1000 );
 
     //----------------------
-    // 塗りオブジェクト確保＆設定
+    // マスク：ペイントの確保
     //----------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 1250,-1250, bucketPalOfs );
+    pFP->set( 1250,-1250 );
     pFP->setOption( eFILL_OPTION_MASK );
     pPOD->addData( pFP );
 #endif
 
-#ifdef FILL_OPTION_TEST
+#ifdef FILL_OPTION_TEST_A
+    //==========================================
+    // 領域左上の矩形：歯を補正する矩形（※塗り予約確認）
+    //==========================================
+    // ブラシ＆パレット指定
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS_OPTION;
+
     //--------------------------
-    // 影を落とす要素：ライン
+    // 補正矩形：ラインの確保
     //--------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
@@ -181,32 +238,43 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD->addData( pAP );
     
     //--------------------------
-    // 影を落とす要素：ペイント
+    // 補正矩形：ペイントの確保
     //--------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
-    
+
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( -2000,-1500, bucketPalOfs );
-    //pFP->setOption( eFILL_OPTION_RESERVE_BRIGHT );
-    pFP->setOption( eFILL_OPTION_RESERVE_DARK );
-    pFP->setOptionOfsXY( +10, +10 );
+    pFP->set( -2000,-1500 );
+    pPOD->addData( pFP );
+
+    // 明暗予約
+    pFP = CFillPointData::Alloc();
+    pFP->set( -2000,-1500 );
+    //pFP->setOption( eFILL_OPTION_RESERVE, -1 );     // 明るく
+    pFP->setOption( eFILL_OPTION_RESERVE, +1 );     // 暗く
+    pFP->setOptionOfsXY( +8, +8 );
     pPOD->addData( pFP );
 #endif
     
-#ifdef BASE_FOR_MASK_TEST
+#ifdef MASK_TEST
 /*
+    // ブラシ指定（※塗りは無し）
+    brush = CHECK_BRUSH;
+    
+    //==========================================
+    // マスクのクリア：領域右側の矩形ストローク後にクリア
+    //==========================================
     //--------------------------
-    // マスクのクリア（ストローク）
+    // マスクのクリア：ラインの確保
     //--------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
     pLOD->setTempAdjust( 2000, 2000, 10000,10000 );
-    pLOD->setFlagOn( eLOD_FLAG_GUIDE_RESET_FULL );
-    pLOD->setFlagOn( eLOD_FLAG_GUIDE_RESET_AFTER_STROKE );
+    pLOD->setFlagOn( eLOD_FLAG_RESET_MASK_AFTER_STROKE );
     m_pLayerBase->addData( pLOD );
     
     // 点０
@@ -235,36 +303,38 @@ void CBezierTestLoop::allocForLayerForBase( void ){
 */
 #endif
 
-    //--------------------------
-    // パレット戻す
-    //--------------------------
-    bucketPalOfs = CHECK_PAL_OFS;
-
+    //========================================
+    // 基本図形（※歯のような形状）
+    //========================================
+    // ブラシ指定
+#ifdef DOT_TEST
+    brush = CHECK_BRUSH_FOR_DOT;
+#else
+    brush = CHECK_BRUSH;
+#endif
+    
     //---------------------
-    // オブジェクト確保＆設定
+    // 歯：ラインの確保
     //---------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
-#ifdef BASE_FOR_DOT_TEST
-    pLOD->setFlagOn( eLOD_FLAG_DOT );
+    pLOD->setStrokeSize( 20000 );
+#ifdef DOT_TEST
+    pLOD->setFlagOn( eLOD_FLAG_DOT );           // ドット指定
 #else
-    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );    // パスを閉じる
 #endif
 
     m_pLayerBase->addData( pLOD );
     
     //-----------------------------
-    // 点０(A)
+    // 歯：点０
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( -3600, 900, 0, 2000, 0, -2000 );
-#ifdef BASE_FOR_EDGE_FILL_TEST
-    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない
-#else
-    pAP->setStrokeSize( 10000, 30000,6666, 0,0 );
-#endif
-#ifdef BASE_FOR_TOUCH_TEST
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_A0 );
+    pAP->setStroke( 0,20000, 0,5000 );
+#ifdef EDGE_FILL_TEST
+    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
     pLOD->addData( pAP );
     
@@ -278,17 +348,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setOfsMinRateXYForV( 0, 0 );
 
     //-----------------------------
-    // 点１(B)
+    // 歯：点１
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( -1400, -1800, -1000, 0, 1000, 0 );
-#ifdef BASE_FOR_EDGE_FILL_TEST
-    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない
-#else
-    pAP->setStrokeSize( 10000, 0,0, 2500,3333 );
-#endif
-#ifdef BASE_FOR_TOUCH_TEST
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_B0 );
+    pAP->setStroke( 0,5000, 0,2500 );
+#ifdef EDGE_FILL_TEST
+    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
     pLOD->addData( pAP );
     
@@ -302,17 +368,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setOfsMinRateXYForV( 0, +400 );
 
     //-----------------------------
-    // 点２(C)
+    // 歯：点２
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( 1000, -800, 1600, -800, -1600, 800 );
-#ifdef BASE_FOR_EDGE_FILL_TEST
-    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない
-#else
-    pAP->setStrokeSize( 20000, 2500,3333, 2500,3333 );
-#endif
-#ifdef BASE_FOR_TOUCH_TEST
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_C0 );
+    pAP->setStroke( 3333,2500, 3333,5000 );
+#ifdef EDGE_FILL_TEST
+    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
     pLOD->addData( pAP );
 
@@ -326,17 +388,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setOfsMinRateXYForV( 0, +250 );
 
     //-----------------------------
-    // 点３(D)
+    // 歯：点３
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
-    pAP->set( 3200, 1600, -2000, 0, 0, 400 );
-#ifdef BASE_FOR_EDGE_FILL_TEST
-    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画される
-#else
-    pAP->setStrokeSize( 30000, 2500,3333, 0,0 );
-#endif
-#ifdef BASE_FOR_TOUCH_TEST
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_D0 );
+    pAP->set( 3200, 1600, -2000, 0, 0, 800 );
+    pAP->setStroke( 0,5000, 0,10000 );
+#ifdef EDGE_FILL_TEST
+    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画される（角度が深いので）
 #endif
     pLOD->addData( pAP );
 
@@ -350,17 +408,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setOfsMinRateXYForV( 0, -250 );
 
     //-----------------------------
-    // 点４(E)
+    // 歯：点４
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
-    pAP->set( -300, 3000, 800, 0, -800, 0 );
-#ifdef BASE_FOR_EDGE_FILL_TEST
-    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない
-#else
-    pAP->setStrokeSize( 30000, 0,0, 0,0 );
-#endif
-#ifdef BASE_FOR_TOUCH_TEST
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_E0 );
+    pAP->set( -300, 3000, 1600, 0, -800, 0 );
+    pAP->setStroke( 0,10000, 0,20000 );
+#ifdef EDGE_FILL_TEST
+    pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
     pLOD->addData( pAP );
 
@@ -374,8 +428,16 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pAdj->setOfsMinRateXYForV( 0, -500 );
 
 #ifdef ERASE_TEST
+    //===============================================================
+    // 消去ストローク：領域全体に曲線を引く
+    //（※消去ストロークも色テストをするので塗られていない領域のみクリアする）
+    //（※[FILL_OPTION]で左上に矩形が描いている場合、そこの線は欠けた感じになる）
+    //===============================================================
+    // ブラシ差し替え
+    brush = CHECK_BRUSH_FOR_ERASE;
+    
     //------------------------------
-    // 消去ストローク確保＆設定
+    // 消去ストローク：ラインの確保
     //------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
@@ -404,296 +466,337 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD->addData( pAP );
 #endif
 
-#ifndef BASE_FOR_DOT_TEST
+#ifndef DOT_TEST
+    //====================================
+    // 歯を塗りつぶす（※ドット出力指定でなければ）
+    //====================================
+    // パレット指定
+    bucketPalOfs = CHECK_PAL_OFS;
+
     //---------------------
-    // オブジェクト確保＆設定
+    // 歯：ペイントの確保
     //---------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    //-----------------------------
     // 塗り０
-    //-----------------------------
     pFP = CFillPointData::Alloc();
-    pFP->set( -2000, 1000, bucketPalOfs );
+    pFP->set( -2000, 1000 );
     pPOD->addData( pFP );
 
-    //-------------------------------------
-    // タッチテスト
-    //-------------------------------------
-    #ifdef BASE_FOR_TOUCH_TEST
+    #ifdef FILL_OPTION_TEST_A
+    // 明暗：食い込み：１
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_INTO, -1 );     // 明るく
+    pFP->setOptionOfsXY( -10, -10 );
+    pPOD->addData( pFP );
+
+    // 明暗：食い込み：２
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_INTO, +1 );     // 暗く
+    pFP->setOptionOfsXY( +10, +10 );
+    pPOD->addData( pFP );
+    #endif
+#endif
+
+#ifdef ON_FILL_OUT_TEST
+    //=====================================================
+    // 出力済み領域への書き込みテスト：領域右上の重なり合う矩形
+    // 奥の矩形にのみストロークが描画される（手前の領域には影響しない）
+    //=====================================================
+    // ブラシ＆パレット指定
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS_OPTION;
+
+    //---------------------------------
+    // 手前の矩形：ラインの確保
+    //---------------------------------
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setBrushId( brush );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    m_pLayerBase->addData( pLOD );
+    
+    // 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 0,-3000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点１
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +3000,-3000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+
+    // 点２
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +3000,0, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 0,0, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    //----------------------------------
+    // 手前の矩形：ペイントの確保
+    //----------------------------------
+    pPOD = CPaintObjectData::Alloc();
+    pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
+    m_pLayerBase->addData( pPOD );
+    
+    // 塗り０
+    pFP = CFillPointData::Alloc();
+    pFP->set( +2000,-2000 );
+    #ifdef MASK_TEST
+    // マスクのクリア（塗り）：これで以降の描画でマスクが無効（描き込みが可能）になる
+    pPOD->setFlagOn( ePOD_FLAG_RESET_MASK_AFTER_FILL );
+    #endif
+    pPOD->addData( pFP );
+
+    //------------------------------------
+    // 奥の矩形（出力テストの領域）：ラインの確保
+    //------------------------------------
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setBrushId( brush );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    m_pLayerBase->addData( pLOD );
+    
+    // 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +1000,-4000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点１（タッチ指定＝矩形の右辺に沿ってタッチが描画される）
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +4000,-4000, 0,0, 0,0 );
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_H );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点２
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +4000,-1000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +1000,-1000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    //----------------------------------
+    // 奥の矩形：ペイントの確保
+    //----------------------------------
+    pPOD = CPaintObjectData::Alloc();
+    pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
+    pPOD->setFlagOn( ePOD_FLAG_FOCUS_OUT_COL_AFTER_FILL );  // 出力色を残す（※ここの塗り領域が以降の処理の[ON_OUT_COL]の対象となる）
+    m_pLayerBase->addData( pPOD );
+    
+    // 塗り０
+    pFP = CFillPointData::Alloc();
+    pFP->set( +2000,-2000 );
+    pPOD->addData( pFP );
     
     //------------------------------
-    // タッチ／フリルオブジェクト確保＆設定
+    // 奥の矩形：ラインの確保（タッチ）
     //------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
-    pLOD->setFlagOn( eLOD_FLAG_TOUCH );
-    #ifdef BASE_FOR_TOUCH_TEST_WITH_FRILL
-    pLOD->setFlagOn( eLOD_FLAG_TOUCH_IS_FRILL );
-    #else
     pLOD->setTestPalOfsId( bucketPalOfs );
-    #ifdef BASE_FOR_TOUCH_TEST_WITH_STRIPE
-    pLOD->setFlagOn( eLOD_FLAG_TOUCH_IS_STRIPE );
-    pLOD->setFlagOn( eLOD_FLAG_GUIDE_DRAW_BEFORE_STROKE );
-    pLOD->setFlagOn( eLOD_FLAG_GUIDE_RESET_AFTER_STROKE );  // ガイドは都度消す
-    #endif
-    #endif
+    pLOD->setFlagOn( eLOD_FLAG_TOUCH );
     m_pLayerBase->addData( pLOD );
-
-    #ifdef BASE_FOR_TOUCH_TEST_WITH_FRILL
-    {
-        //-----------------------------
-        // [フリル]:点Ａ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,0 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_A0 );
-        pAP->setFrillId( eSTROKE_FRILL_TEST_TRIANGLE );
-        pAP->setFrillBase(  5000, 1500, 3050 );
-        pAP->setFrillFront( 10000, 1000, 2650 );
-        pAP->setFrillBack( 10000, 1000, 3750 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [フリル]:点Ｂ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,0 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_B0 );
-        pAP->setFrillId( eSTROKE_FRILL_TEST_CIRCLE );
-        pAP->setFrillBase(  5000, 1500, 0 );
-        pAP->setFrillFront( 10000, 1000, 0 );
-        pAP->setFrillBack( 10000, 1000, 0 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [フリル]:点Ｃ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,0 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_C0 );
-        pAP->setFrillId( eSTROKE_FRILL_TEST_SQUARE );
-        pAP->setFrillBase(  2500, 1500, 900 );
-        pAP->setFrillFront( 10000, 1000, 1800 );
-        pAP->setFrillBack( 10000, 1000, -150 );
-        pLOD->addData( pAP );
-    }
-    #else
-    {
-        #ifdef BASE_FOR_TOUCH_TEST_WITH_STRIPE
-        //-----------------------------
-        // [ストライプ]:点Ａ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,500 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_A0 );
-        
-        pAP->setTouchBase( 5000, 10000, 0 );                // 中央を基本に１００％で描画（※回転０度）
-        pAP->setTouchFront( 8500, 10000, 0, 400, 0, 0 );    // 前方８５％まで１００％で描画＆幅４％間隔（※回転０度）
-        pAP->setTouchBack( 8500, 10000, 0, 400, 0, 0 );     // 広報８５％まで１００％で描画＆幅４％間隔（※回転０度）
-
-#if 0
-        pAP->setFlagOn( eAPD_FLAG_STRIPE_FILL_FRONT_EDGE );
-        pAP->setFlagOn( eAPD_FLAG_STRIPE_FILL_BACK_EDGE );
-#endif
-        pAP->setStripeMainPalOfsId( CHECK_PAL_OFS_STRIPE_A );
-        pAP->setStripeSubPalOfsId( CHECK_PAL_OFS_STRIPE_B );
-        pLOD->addData( pAP );
-
-        // 点Ａ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 6000,200, -200,0, 0,0 );
-        pLOD->addData( pAP );
-        
-        #else
-        
-        //-----------------------------
-        // [タッチ]:点Ａ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,-500 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_A0 );
-        pAP->setTouchBase( 0, 10000, 0 );                   // ０％開始（※後方のみ）
-        pAP->setTouchBack( 10000, 5000, 0, 100, 200, 0 );   // 後方１００％まで１＋２％のステップで５０％の長さまで
-        pLOD->addData( pAP );
-        
-        // 点Ａ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 2000,200, -200,0, 0,0 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [タッチ]:点Ｂ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 200,0 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_B0 );
-        pAP->setTouchBase( 7000, 5000, 0 );                    // ７０％開始（※前方のみ）
-        pAP->setTouchFront( 10000, 10000, 0, 100, 100, 0 );    // 前方１００％まで１＋１％のステップで１００％の長さまで
-        pLOD->addData( pAP );
-
-        // 点Ｂ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,500, 100,0, 0,0 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [タッチ]:点Ｃ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,-100 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_C0 );
-        pAP->setTouchBase( 5000, 10000, 0 );                    // ５０％開始（※中央から）
-        pAP->setTouchFront( 8000, 1000, 0, 100, 0, 0 );         // 前方８０％まで１％のステップで１０％の長さまで
-        pAP->setTouchBack( 8000, 5000, 0, 100, 0, 0 );          // 後方８０％まで１％のステップで５０％の長さまで
-        pLOD->addData( pAP );
-
-        // 点Ｃ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( -1000,0, 0,0, 100,0 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [タッチ]:点Ｄ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,0 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_D0 );
-        pAP->setTouchBase( 10000, 10000, 0 );                   // ５０％開始（中央から）
-        pAP->setTouchFront( 10000, 10000, -500, 200, 0, 0 );    // 前方１００％まで角度を加えながら２％のステップで
-        pAP->setTouchBack( 10000, 10000, 500, 200, 0, 0 );      // 後方１００％まで角度を加えながら２％のステップで
-        pLOD->addData( pAP );
-
-        // 点Ｄ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( -500,-500, 0,0, 0,0 );
-        pLOD->addData( pAP );
-
-        //-----------------------------
-        // [タッチ]:点Ｅ０
-        //-----------------------------
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 0,0, 0,0, 0,500 );
-        pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_E0 );
-        pAP->setTouchBase( 5000, 10000, -300 );
-        pAP->setTouchFront( 10000, 10000, 0, 200, 0, 0 );
-        pAP->setTouchBack( 10000, 5000, -600, 200, 0, 0 );
-        pLOD->addData( pAP );
-
-        // 点Ｅ１
-        pAP = CAnchorPointData::Alloc();
-        pAP->set( 2000,200, -200,0, 0,0 );
-        pLOD->addData( pAP );
-        #endif
-    }
-    #endif
-    // タッチテスト終了
-    #endif
+    
+    // [タッチ]: 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 0,0, 0,0, 0,-500 );
+    pAP->setStroke( 0,20000, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_DOT_ON_OUT_COL );             // 出力色上に描画する
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_H );
+    pAP->setTouchBase( 0, 10000, 0 );
+    pAP->setTouchBack( 10000, 0, 0, 8, 0, 0 );
+    pLOD->addData( pAP );
+    
+    // [タッチ]: 点１
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -5000,500, 0,1000, 0,0 );
+    pLOD->addData( pAP );
+    
+    //------------------------------------
+    // 中央の矩形（出力塗り）：ラインの確保
+    //------------------------------------
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setBrushId( brush );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    m_pLayerBase->addData( pLOD );
+    
+    // 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +1500,-3500, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点１
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +3500,-3500, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点２
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +3500,-1500, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    // 点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( +1500,-1500, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pLOD->addData( pAP );
+    
+    //----------------------------------
+    // 中央の矩形：ペイントの確保
+    //----------------------------------
+    pPOD = CPaintObjectData::Alloc();
+    pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( ePAL_OFS_C_SKIN );
+    m_pLayerBase->addData( pPOD );
+    
+    // 塗り０
+    pFP = CFillPointData::Alloc();
+    pFP->set( +2000,-2000 );
+    pFP->setFlagOn( eFPD_FLAG_FILL_ON_OUT_COL );        // 出力色領域上に描画する
+    pPOD->addData( pFP );
 #endif
 
-#ifdef FILL_OPTION_TEST
-    //---------------------------------
-    // ラインオブジェクト確保＆設定：明色塗り
-    //（※範囲目一杯に描いているので拡大厳禁）
-    //---------------------------------
+#ifdef FILL_OPTION_TEST_B
+    //====================================
+    // 歯に対する塗りオプション（※基本確認）
+    //====================================
+    // ブラシ＆パレット指定
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS;   // テストパレット
+
+    //--------------------------------------
+    // 明色塗り：ラインの確保
+    //（※画面左側に大きめに描いているので拡大厳禁）
+    //--------------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
     pLOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：明色塗り
+    // 明色塗り：点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,-4000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点１：明色塗り
+    // 明色塗り：点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,-4000, 0,0, -3000,+3000 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );   // 歯の左側を横断する線
     pLOD->addData( pAP );
     
-    // 点２：明色塗り）
+    // 明色塗り：点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,+4000, -3000,-3000, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点３：明色塗り
+    // 明色塗り：点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,+4000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
     //----------------------------------
-    // ペイントオブジェクト確保＆設定：明色塗り
+    // 明色塗り：ペイントの確保
     //----------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs, -2 );  // 明るく
     pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：明色塗り
+    // 明色塗り：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( -2500,0, bucketPalOfs );
-    pFP->setOption( eFILL_OPTION_BRIGHT, eSTROKE_TOUCH_TARGET_TEMP_A );
+    pFP->set( -2500,0 );
     pPOD->addData( pFP );
-    
-    //---------------------------------
-    // ラインオブジェクト確保＆設定：暗色塗り
-    //（※範囲目一杯に描いているので拡大厳禁）
-    //---------------------------------
+
+    #ifdef FILL_OPTION_TEST_B_WITH_ANTI
+    // 明色塗り：アンチ（※座標に意味はない）
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, -2 );
+    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_A );
+    pFP->setOptionStroke( 2, 6 );
+    pPOD->addData( pFP );
+    #endif
+
+    //-------------------------------------
+    // 暗色塗り：ラインの確保
+    //（※画面右側に大きめに描いているので拡大厳禁）
+    //-------------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
     pLOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：暗色塗り
+    // 暗色塗り：点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,-4000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点１：暗色塗り
+    // 暗色塗り：点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( +2000,-4000, 0,0, -3000,+3000 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_B );
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_B );   // 歯の右側を横断する線
     pLOD->addData( pAP );
     
-    // 点２：暗色塗り
+    // 暗色塗り：点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( +2000,+4000, -3000,-3000, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点３：暗色塗り
+    // 暗色塗り：点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,+4000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
     //----------------------------------
-    // ペイントオブジェクト確保＆設定：暗色塗り
+    // 暗色塗り：ペイントの確保
     //----------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs, +3 );  // 暗く
     pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：暗色塗り
+    // 暗色塗り：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( +2500,0, bucketPalOfs );
-    pFP->setOption( eFILL_OPTION_DARK, eSTROKE_TOUCH_TARGET_TEMP_B );
+    pFP->set( +2500,0 );
     pPOD->addData( pFP );
 
+    #ifdef FILL_OPTION_TEST_B_WITH_ANTI
+    // 暗色塗り：アンチ（※座標に意味はない）
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, +3 );
+    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_B );
+    pFP->setOptionStroke( 2, 0 );
+    pPOD->addData( pFP );
+    #endif
+
     //--------------------------------
-    // ラインオブジェクト確保＆設定：明暗
+    // 明暗：ラインの確保（※目玉）
     //--------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
@@ -701,63 +804,63 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pLOD );
  
-    pLOD->setTempAdjust( -1500,-300, 2000, 2000 );
+    pLOD->setTempAdjust( -1500,1300, 2000,2000 );
     
-    // 点０：明暗
+    // 明暗：点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -2500,0, 0,1388, 0,-1388 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点１：明暗
+    // 明暗：点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,-2500, -1388,0, 1388,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点２：明暗
+    // 明暗：点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( 2500,0, 0,-1388, 0,1388 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点３：明暗
+    // 明暗：点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,2500, 1388,0, -1388,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
     //----------------------------------
-    // ペイントオブジェクト確保＆設定
+    // 明暗：ペイントの確保
     //----------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
     pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：明暗
+    // 明暗：塗り０（目玉：白目）
     pFP = CFillPointData::Alloc();
-    pFP->set( -1500,0 );
-    pFP->setOption( eFILL_OPTION_AREA_BRIGHT );
-    //pFP->setOption( eFILL_OPTION_AREA_DARK );
+    pFP->set( -1500,1300 );
+    //pFP->setOption( eFILL_OPTION_AREA, -1 );    // 明るく
+    pFP->setOption( eFILL_OPTION_AREA, +1 );    // 暗く
     pPOD->addData( pFP );
     
-    // 塗り１：ポイント（ハイライト）
+    // ポイント（目玉：瞳孔）：塗り１
     pFP = CFillPointData::Alloc();
-    pFP->set( -1500+200,-200-300 );
-    pFP->setOption( eFILL_OPTION_POINT_BRIGHT );
+    pFP->set( -1500,1300 );
+    pFP->setOption( eFILL_OPTION_POINT_AFTER_FILL, +3 );   // 暗く
+    pFP->setOptionStroke( 15, 0 );      // 最大15：[基本ストローク最大＝５]×[倍率最大＝３００％]
+    pPOD->addData( pFP );
+
+    // ポイント（目玉：ハイライト）：塗り２
+    pFP = CFillPointData::Alloc();
+    pFP->set( -1500+200,1300-200 );
+    pFP->setOption( eFILL_OPTION_POINT_AFTER_FILL, -2 );   // 明るく
     pFP->setOptionStroke( 10, 0 );
     pPOD->addData( pFP );
     
-    // 塗り２：ポイント（瞳孔）
-    pFP = CFillPointData::Alloc();
-    pFP->set( -1500,-300 );
-    pFP->setOption( eFILL_OPTION_POINT_DARK );
-    pFP->setOptionStroke( 15, 0 );
-    pPOD->addData( pFP );
-
     //------------------------------------
-    // ラインオブジェクト確保＆設定：広域（明るく）
+    // 広域（明るく）：ラインの確保（※左上側）
     //（※範囲目一杯に描いているので拡大厳禁）
     //------------------------------------
     pLOD = CLineObjectData::Alloc();
@@ -766,46 +869,47 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：広域（明るく）
+    // 広域（明るく）：点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,-4000, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点１：広域（明るく）
+    // 広域（明るく）：点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,-4000, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点２：広域（明るく）
+    // 広域（明るく）：点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,+2500, 0,0, -3000,-4000 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点３：広域（明るく）
+    // 広域（明るく）：点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,+2500, +3000,-4000, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
-
+    
     //--------------------------------------
-    // ペイントオブジェクト確保＆設定：広域（明るく）
+    // 広域（明るく）：ペイントの確保
     //--------------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：広域（明るく）
+    // 広域（明るく）：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,-2000, bucketPalOfs );
-    pFP->setOption( eFILL_OPTION_AREA_BRIGHT );
+    pFP->set( 0,-2000 );
+    pFP->setOption( eFILL_OPTION_AREA, -1 );    // 明るく
     pPOD->addData( pFP );
-    
+
     //-----------------------------------
-    // ラインオブジェクト確保＆設定：広域（暗く）
+    // 広域（暗く）：ラインの確保（※右下側）
     //（※範囲目一杯に描いているので拡大厳禁）
     //-----------------------------------
     pLOD = CLineObjectData::Alloc();
@@ -814,188 +918,246 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：広域（暗く）
+    // 広域（暗く）：点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,+4000, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点１：広域（暗く）
+    // 広域（暗く）：点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,+4000, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点２：広域（暗く）
+    // 広域（暗く）：点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( +4000,-1500, 0,0, -3000,+3000 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
-    // 点３：広域（暗く）
+    // 広域（暗く）：点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000,-1500, +3000,+3000, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
     pLOD->addData( pAP );
     
     //------------------------------------
-    // ペイントオブジェクト確保＆設定：広域（暗く）
+    // 広域（暗く）：ペイントの確保
     //------------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：広域（暗く）
+    // 広域（暗く）：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,+2500, bucketPalOfs );
-    pFP->setOption( eFILL_OPTION_AREA_DARK );
+    pFP->set( 0,+2500 );
+    pFP->setOption( eFILL_OPTION_AREA, +1 );    // 暗く
     pPOD->addData( pFP );
 
     //----------------------------------
-    // ペイントオブジェクト確保＆設定：全色
+    // 全体補正（明暗）：ペイントの確保定
     //----------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：全色（明るく）
+    // 全体補正（明）：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->setOption( eFILL_OPTION_COLOR_BRIGHT );
-    pFP->setOptionOfsXY( -10, -10 );
+    pFP->setOption( eFILL_OPTION_COLOR, -1 );   // 明るく
+    pFP->setOptionOfsXY( -5, -5 );            // カラーバッファの左上
     pPOD->addData( pFP );
 
-    // 塗り１：全色（暗く）
+    // 全体補正（暗）：塗り１
     pFP = CFillPointData::Alloc();
-    pFP->setOption( eFILL_OPTION_COLOR_DARK );
-    pFP->setOptionOfsXY( +15, +15 );
+    pFP->setOption( eFILL_OPTION_COLOR, +1 );   // 暗く
+    pFP->setOptionOfsXY( +5, +5 );            // カラーバッファの右下
     pPOD->addData( pFP );
 #endif
     
-#ifdef BASE_STROKE_ON_OUT_TEST
-    //--------------------------
-    // パレット差し替え
-    //--------------------------
-    bucketPalOfs = CHECK_PAL_OFS_OPTION;
+#ifdef FILL_OPTION_TEST_C
+    //====================================
+    // 通常塗りとオプション塗りの確認
+    //====================================
+    // ブラシ＆パレット指定
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS;   // テストパレット
 
     //---------------------------------
-    // ラインオブジェクト確保＆設定：矩形（内）
+    // 暗色塗り挙動確認：ラインの確保（領域上）
+    //（※テスト指定での塗りの確認）
     //---------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：矩形（内）
+    // 暗色塗り挙動確認：点０
     pAP = CAnchorPointData::Alloc();
-    pAP->set( 0,-3000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->set( -5000+100,-5000+100, 0,0, 0,0 );
     pLOD->addData( pAP );
     
-    // 点１：矩形（内）
+    // 暗色塗り挙動確認：点１
     pAP = CAnchorPointData::Alloc();
-    pAP->set( +3000,-3000, 0,0, 0,0 );
+    pAP->set( +0-2000,-5000+100, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
-    pLOD->addData( pAP );
-
-    // 点２：矩形（内）
-    pAP = CAnchorPointData::Alloc();
-    pAP->set( +3000,0, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_C );   // 歯の中央左を横断する線
     pLOD->addData( pAP );
     
-    // 点３：矩形（内）
+    // 暗色塗り挙動確認：点２
     pAP = CAnchorPointData::Alloc();
-    pAP->set( 0,0, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->set( +0-1000,+5000-100, 0,0, 0,0 );
+    pLOD->addData( pAP );
+    
+    // 暗色塗り挙動確認：点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -5000+100,+5000-100, 0,0, 0,0 );
     pLOD->addData( pAP );
     
     //----------------------------------
-    // ペイントオブジェクト確保＆設定：矩形（内）
+    // 暗色塗り挙動確認：ペイントの確保
     //----------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs, +3 );  // 暗く
+    pPOD->setTestPalOfsId( bucketPalOfs );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：矩形（内）
+    // 暗色塗り挙動確認：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( +2000,-2000, bucketPalOfs );
-#ifdef BASE_FOR_MASK_TEST
-    // マスクのクリア（塗り）
-    pPOD->setFlagOn( ePOD_FLAG_GUIDE_RESET_FULL );
-#endif
+    pFP->set( -2500,0 );
     pPOD->addData( pFP );
+    
+    #ifdef FILL_OPTION_TEST_C_WITH_ANTI
+    // 暗色塗り挙動確認：アンチ（※座標に意味はない）
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, +3 );
+    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_C );
+    pFP->setOptionStroke( 1, 0 );
+    pPOD->addData( pFP );
+    #endif
 
-    //---------------------------------
-    // ラインオブジェクト確保＆設定：矩形（外）
-    //---------------------------------
+    //------------------------------------
+    // 広域塗り挙動確認：ラインの確保（領域下）
+    //（※エリア指定での塗りの確認）
+    //------------------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
     m_pLayerBase->addData( pLOD );
     
-    // 点０：矩形（外）
+    // 広域塗り挙動確認：点０
     pAP = CAnchorPointData::Alloc();
-    pAP->set( +1000,-4000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->set( +5000-100,-5000+100, 0,0, 0,0 );
     pLOD->addData( pAP );
     
-    // 点１：矩形（外）
+    // 広域塗り挙動確認：点１
     pAP = CAnchorPointData::Alloc();
-    pAP->set( +4000,-4000, 0,0, 0,0 );
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
+    pAP->set( +0+2000,-5000+100, 0,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_D );   // 歯の中央右を横断する線
     pLOD->addData( pAP );
     
-    // 点２：矩形（外）
+    // 広域塗り挙動確認：点２
     pAP = CAnchorPointData::Alloc();
-    pAP->set( +4000,-1000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->set( +0+1000,+5000-100, 0,0, 0,0 );
     pLOD->addData( pAP );
     
-    // 点３：矩形（外）
+    // 広域塗り挙動確認：点３
     pAP = CAnchorPointData::Alloc();
-    pAP->set( +1000,-1000, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->set( +5000-100,+5000-100, 0,0, 0,0 );
     pLOD->addData( pAP );
     
-    //----------------------------------
-    // ペイントオブジェクト確保＆設定：矩形（外）
-    //----------------------------------
+    //--------------------------------------
+    // 広域塗り挙動確認：ペイントの確保
+    //--------------------------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
-    pPOD->setFlagOn( ePOD_FLAG_STAY_GUIDE_AFTER_FILL );
     m_pLayerBase->addData( pPOD );
     
-    // 塗り０：矩形（外）
+    // 広域塗り挙動確認：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( +2000,-2000, bucketPalOfs );
+    pFP->set( +2500,0 );
+    pFP->setOption( eFILL_OPTION_AREA, -2 );    // 明るく
     pPOD->addData( pFP );
+
+    #ifdef FILL_OPTION_TEST_C_WITH_ANTI
+    // 広域塗り挙動確認：アンチ（※座標に意味はない）
+    pFP = CFillPointData::Alloc();
+    pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, -2 );
+    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_D );
+    pFP->setOptionStroke( 4, 4 );
+    pPOD->addData( pFP );
+    #endif
+#endif
     
-    //------------------------------
-    // タッチ確保＆設定
-    //------------------------------
+#ifdef GUIDE_TEST
+    //==================================
+    // ガイド登録：左下領域の矩形
+    //==================================
+    // ブラシ＆パレット
+    brush = CHECK_BRUSH;
+    bucketPalOfs = CHECK_PAL_OFS;
+
+    //--------------------------
+    // 補正矩形：ラインの確保
+    //--------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
-    pLOD->setFlagOn( eLOD_FLAG_TOUCH );
-    pLOD->setFlagOn( eLOD_FLAG_GUIDE_RESET_AFTER_STROKE );
-    pLOD->setTestPalOfsId( bucketPalOfs );
+    pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
+    #ifndef GUIDE_TEST_AT_PAINT
+    pLOD->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    #endif
     m_pLayerBase->addData( pLOD );
     
-    //-----------------------------
-    // [タッチ]:点Ａ０
-    //-----------------------------
+    // 点０
     pAP = CAnchorPointData::Alloc();
-    pAP->set( 0,0, 0,0, 0,-500 );
-    pAP->setFlagOn( eAPD_FLAG_DOT_PUT_ON_FILL_OUT );
-    pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
-    pAP->setTouchBase( 0, 10000, 0 );                   // ０％開始（※後方のみ）
-    pAP->setTouchBack( 10000, 5000, 0, 100, 200, 0 );   // 後方１００％まで１＋２％のステップで５０％の長さまで
+    pAP->set( -2000,+4000, 0,0, 0,0 );
+    #ifdef GUIDE_TEST_AT_PAINT
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    #endif
     pLOD->addData( pAP );
     
-    // 点Ａ１
+    // 点１
     pAP = CAnchorPointData::Alloc();
-    pAP->set( -2000,200, 200,0, 0,0 );
+    pAP->set( 0,+4000, 0,0, 0,0 );
+    #ifdef GUIDE_TEST_AT_PAINT
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    #endif
     pLOD->addData( pAP );
+    
+    // 点２
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 0,+2000, 0,0, 0,0 );
+    #ifdef GUIDE_TEST_AT_PAINT
+    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    #endif
+    pLOD->addData( pAP );
+    
+    // 点３
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( -2000,+2000, 0,0, 0,0 );
+    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
+    pAP->setFlagOn( eAPD_FLAG_NO_FILL_GUIDE );
+    pLOD->addData( pAP );
+    
+    //----------------------
+    // マスク：ペイントの確保
+    //----------------------
+    pPOD = CPaintObjectData::Alloc();
+    pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
+    #ifdef GUIDE_TEST_AT_PAINT
+    pPOD->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
+    #endif
+    m_pLayerBase->addData( pPOD );
+    
+    // 塗り０
+    pFP = CFillPointData::Alloc();
+    pFP->set( -3000,+3000 );
+    pPOD->addData( pFP );
 #endif
+
 }

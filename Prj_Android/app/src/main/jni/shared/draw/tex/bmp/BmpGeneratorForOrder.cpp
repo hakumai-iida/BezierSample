@@ -41,19 +41,30 @@ bool CBmpGenerator::RegistOrder( CLayerOrderList* pOrderList, eBD_FORM form, boo
     
     CBmpDotOrderData orderData;
     orderData.setDefault( form, isSuited );
-    
-    // 最前面
-    pOrderList->getOrderCell( eBD_SLOT_LyFront, 0, true );
 
+    //-----------------------------------
+    // 最前面
+    //-----------------------------------
+    pOrderList->getOrderCell( eBD_SLOT_LyFront, 0, true );
+    
+    //-----------------------------------
     // 登録
+    //-----------------------------------
     for( int i=0; i<BMP_DOT_ORDER_DATA_CELL_MAX; i++ ){
         stBMP_DOT_ORDER_DATA_CELL* pCell = orderData.getCellAt( i );
-        if( pCell->slot >= 0 && pCell->slot < eBD_SLOT_MAX ){
+        if( IS_BD_SLOT_VALID( pCell->slot ) ){
+            // 中間層（※頭頂の直後）
+            if( pCell->slot == eBD_SLOT_HdTop ){
+                pOrderList->getOrderCell( eBD_SLOT_LyMiddle, 0, true );
+            }
+
             pOrderList->getOrderCell( pCell->slot, pCell->slotIndex, true );
         }
     }
     
-    // 最後面
+    //-----------------------------------
+    // 最背面
+    //-----------------------------------
     pOrderList->getOrderCell( eBD_SLOT_LyBack, 0, true );
     
     return( true );
@@ -81,14 +92,14 @@ bool CBmpGenerator::RegistJointPoint( stBEZIER_BASE_PARAM* pBaseParam, stBMP_GEN
     // IDの検出：FROM（※指定がなければ無視）
     eJOINT_POINT jointIdFrom0 = pSlotAdj->getJointPointIdForFrom( slotIndex );
     eJOINT_POINT jointIdFrom1 = (eJOINT_POINT)(jointIdFrom0+JOINT_POINT_OFS_FOR_OTHER_SIDE);
-    if( jointIdFrom0 < 0 || jointIdFrom0 >= eJOINT_POINT_MAX || jointIdFrom1 < 0 || jointIdFrom1 >= eJOINT_POINT_MAX ){
+    if( !IS_JOINT_POINT_VALID( jointIdFrom0) || !IS_JOINT_POINT_VALID( jointIdFrom1 ) ){
         return( false );
     }
 
     // IDの検出：TO（※指定がなければ無視）
     eJOINT_POINT jointIdTo0 = pSlotAdj->getJointPointIdForTo( slotIndex );
     eJOINT_POINT jointIdTo1 = (eJOINT_POINT)(jointIdTo0+JOINT_POINT_OFS_FOR_OTHER_SIDE);
-    if( jointIdTo0 < 0 || jointIdTo0 >= eJOINT_POINT_MAX || jointIdTo1 < 0 || jointIdTo1 >= eJOINT_POINT_MAX ){
+    if( !IS_JOINT_POINT_VALID( jointIdTo0) || !IS_JOINT_POINT_VALID( jointIdTo1 ) ){
         return( false );
     }
     
@@ -98,16 +109,20 @@ bool CBmpGenerator::RegistJointPoint( stBEZIER_BASE_PARAM* pBaseParam, stBMP_GEN
     CJointPoint* pJointPoint = pBaseParam->pJointPoint;
     float bdpdScaleAbs = (bdpdScale < 0 )? -bdpdScale: bdpdScale;
     float rotBase = CConst::ConvBezierRotationRate( pSlotAdj->getJointRateRotOfs() );
-    float fixedAdjustRateH = pBaseParam->adjustRateH;
+    float fixedAdjustRateH = pBaseParam->adjustRateH;   // ジョイントは[幅調整値]により補正される
     FIX_ADJUST_RATE( fixedAdjustRateH );
 
     int jointR, jointOfsR;
     CAdjustCalc::CalcRateRForH( &jointR, &jointOfsR, pSlotAdj->getJointRateRotR(), pSlotAdj->getJointRateOfsForRotCenter(),
                                 pSlotAdj, fixedAdjustRateH );
 
-    int ofsForX = CMath::RotX( 0, jointOfsR, rotBase );
-    int ofsForY = CMath::RotY( 0, jointOfsR, rotBase );
-    
+    // [ofsForRotCenter]からの影響（※回転の中心をずらす）
+    int ofs0ForX = CMath::RotX( 0, jointOfsR, rotBase );
+    int ofs0ForY = CMath::RotY( 0, jointOfsR, rotBase );
+    int ofs1ForX = CMath::RotX( 0, -jointOfsR, rotBase );
+    int ofs1ForY = CMath::RotY( 0, -jointOfsR, rotBase );
+
+    // 反転により回転方向を変える
     float fixedApplyRot = ((isFlipH != isFlipV)?-applyRot:applyRot);
 
     //--------------------------------------------------------
@@ -120,17 +135,17 @@ bool CBmpGenerator::RegistJointPoint( stBEZIER_BASE_PARAM* pBaseParam, stBMP_GEN
     float rot1_0 = rotBase + 90;
 
     // 座標算出
-    float fromX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofsForX;
-    float fromY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofsForY;
-    float fromX0_0 = CMath::RotX( jointR+jointOfsR, 0, rot0_0 ) + ofsForX;
-    float fromY0_0 = CMath::RotY( jointR+jointOfsR, 0, rot0_0 ) + ofsForY;
+    float fromX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofs0ForX;
+    float fromY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofs0ForY;
+    float fromX0_0 = CMath::RotX( jointR+jointOfsR, 0, rot0_0 ) + ofs0ForX;
+    float fromY0_0 = CMath::RotY( jointR+jointOfsR, 0, rot0_0 ) + ofs0ForY;
     pJointPoint->registJointPointFrom( jointIdFrom0, (int)fromX0, (int)fromY0, (int)fromX0_0, (int)fromY0_0,
                                        rateOfsX, rateOfsY, applyScale*bdpdScaleAbs, rotBase, isFlipH, isFlipV );
     
-    float fromX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) + ofsForX;
-    float fromY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) + ofsForY;
-    float fromX1_0 = CMath::RotX( jointR-jointOfsR, 0, rot1_0 ) + ofsForX;
-    float fromY1_0 = CMath::RotY( jointR-jointOfsR, 0, rot1_0 ) + ofsForY;
+    float fromX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) - ofs1ForX;
+    float fromY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) - ofs1ForY;
+    float fromX1_0 = CMath::RotX( jointR-jointOfsR, 0, rot1_0 ) - ofs1ForX;
+    float fromY1_0 = CMath::RotY( jointR-jointOfsR, 0, rot1_0 ) - ofs1ForY;
     pJointPoint->registJointPointFrom( jointIdFrom1, (int)fromX1, (int)fromY1, (int)fromX1_0, (int)fromY1_0,
                                        rateOfsX, rateOfsY, applyScale*bdpdScaleAbs, rotBase, isFlipH, isFlipV );
         
@@ -144,17 +159,17 @@ bool CBmpGenerator::RegistJointPoint( stBEZIER_BASE_PARAM* pBaseParam, stBMP_GEN
     rot1_0 = rotBase + 90;
     
     // 座標算出
-    float toX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofsForX;
-    float toY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofsForY;
-    float toX0_0 = CMath::RotX( jointR+jointOfsR, 0, rot0_0 ) + ofsForX;
-    float toY0_0 = CMath::RotY( jointR+jointOfsR, 0, rot0_0 ) + ofsForY;
+    float toX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofs0ForX;
+    float toY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofs0ForY;
+    float toX0_0 = CMath::RotX( jointR+jointOfsR, 0, rot0_0 ) + ofs0ForX;
+    float toY0_0 = CMath::RotY( jointR+jointOfsR, 0, rot0_0 ) + ofs0ForY;
     pJointPoint->registJointPointTo( jointIdTo0, (int)toX0, (int)toY0, (int)toX0_0, (int)toY0_0,
                                      rateOfsX, rateOfsY, bdpdScaleAbs, applyRot+rotBase, isFlipH, isFlipV );
     
-    float toX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) + ofsForX;
-    float toY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) + ofsForY;
-    float toX1_0 = CMath::RotX( jointR-jointOfsR, 0, rot1_0 ) + ofsForX;
-    float toY1_0 = CMath::RotY( jointR-jointOfsR, 0, rot1_0 ) + ofsForY;
+    float toX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) - ofs1ForX;
+    float toY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) - ofs1ForY;
+    float toX1_0 = CMath::RotX( jointR-jointOfsR, 0, rot1_0 ) - ofs1ForX;
+    float toY1_0 = CMath::RotY( jointR-jointOfsR, 0, rot1_0 ) - ofs1ForY;
     pJointPoint->registJointPointTo( jointIdTo1, (int)toX1, (int)toY1, (int)toX1_0, (int)toY1_0,
                                      rateOfsX, rateOfsY, bdpdScaleAbs, applyRot+rotBase, isFlipH, isFlipV );
     
@@ -167,59 +182,51 @@ bool CBmpGenerator::RegistJointPoint( stBEZIER_BASE_PARAM* pBaseParam, stBMP_GEN
 
     rot0 = rotBase - fixedApplyRot - 90;
     rot1 = rotBase - fixedApplyRot + 90;
-    toX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofsForX;
-    toY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofsForY;
-    toX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) + ofsForX;
-    toY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) + ofsForY;
+    toX0 = CMath::RotX( jointR+jointOfsR, 0, rot0 ) + ofs0ForX;
+    toY0 = CMath::RotY( jointR+jointOfsR, 0, rot0 ) + ofs0ForY;
+    toX1 = CMath::RotX( jointR-jointOfsR, 0, rot1 ) + ofs1ForX;
+    toY1 = CMath::RotY( jointR-jointOfsR, 0, rot1 ) + ofs1ForY;
 #endif
 
     //-------------------------------------------------
     // 方向線調整の算出（※[from-to]の中央の角度で方向線を調整）
     //-------------------------------------------------
-    float dirX, dirY;
-    float dX, dY, len;
-    float fromRate = pSlotAdj->getJointDirRateForFrom();
-    float toRate = pSlotAdj->getJointDirRateForTo();
-    float openRate = pSlotAdj->getJointDirRateForOpen();
-    float closeRate = pSlotAdj->getJointDirRateForClose();
-    
+    // 調整スケールはテンションで決め打ち（※現状、ジョイントの回転はテンションにのみ行われる）
+    // TODO:回転の影響要素が他にも出てきた場合にどうするか？
+    float dirScale = pBGPCell->adjForT;
+    bool isTensionMinus = ( dirScale < 0.0f );
+    float openFromDirX = pSlotAdj->getJointOpenFromScaleDirX( isTensionMinus );
+    float openFromDirY = pSlotAdj->getJointOpenFromScaleDirY( isTensionMinus );
+    float closeFromDirX = pSlotAdj->getJointCloseFromScaleDirX( isTensionMinus );
+    float closeFromDirY = pSlotAdj->getJointCloseFromScaleDirY( isTensionMinus );
+    float openToDirX = pSlotAdj->getJointOpenToScaleDirX( isTensionMinus );
+    float openToDirY = pSlotAdj->getJointOpenToScaleDirY( isTensionMinus );
+    float closeToDirX = pSlotAdj->getJointCloseToScaleDirX( isTensionMinus );
+    float closeToDirY = pSlotAdj->getJointCloseToScaleDirY( isTensionMinus );   
+
+    //-----------------------------------------------------------------------------
     // [0=左側]に対する調整：[from]->[to]の方向で計算
-    dX = toX0 - fromX0;
-    dY = toY0 - fromY0;
-    len = CMath::Len( dX, dY );
-    if( len > 0.0f ){
-        // 呼び出し元への侵入[IN]
-        dirX = dX * fromRate;
-        dirY = dY * fromRate;
-        pJointPoint->setDirRateXY( jointIdFrom0, (int)dirX, (int)dirY, openRate, closeRate );
+    //-----------------------------------------------------------------------------
+    // ４つのAPで矩形を描いた際、[from]側が[AP:0->1]、[to]側が[AP:0->1]の並びになっている想定
+    //（※向きが逆になる場合はAP毎に[SWAP]フラグを立てること）
+    //-----------------------------------------------------------------------------
+    // 呼び出し元への侵入[IN]
+    pJointPoint->setDirRateXY( jointIdFrom0, openFromDirX*dirScale, openFromDirY*dirScale, closeFromDirX*dirScale, closeFromDirY*dirScale );
         
-        // 呼び出し先からの出立[OUT]（※描画時に打ち消されるように逆回転）
-        dirX = CMath::RotX( dX, dY, -fixedApplyRot ) * toRate;
-        dirY = CMath::RotY( dX, dY, -fixedApplyRot ) * toRate;
-        pJointPoint->setDirRateXY( jointIdTo0, (int)-dirX, (int)-dirY, openRate, closeRate );
-    }else{
-        pJointPoint->setDirRateXY( jointIdFrom0, 0, 0, 0.0f, 0.0f );
-        pJointPoint->setDirRateXY( jointIdTo0, 0, 0, 0.0f, 0.0f );
-    }
+    // 呼び出し先からの出立[OUT]
+    pJointPoint->setDirRateXY( jointIdTo0, openToDirX*dirScale, openToDirY*dirScale, closeToDirX*dirScale, closeToDirY*dirScale );
     
+    //-----------------------------------------------------------------------------
     // [1=右側]に対する調整：[to]->[from]の方向で計算
-    dX = fromX1 - toX1;
-    dY = fromY1 - toY1;
-    len = CMath::Len( dX, dY );
-    if( len > 0.0f ){
-        // 呼び出し元からの出立[OUT]
-        dirX = dX * fromRate;
-        dirY = dY * fromRate;
-        pJointPoint->setDirRateXY( jointIdFrom1, (int)dirX, (int)dirY, openRate, closeRate );
-        
-        // 呼び出し先への侵入[0]（※描画時に打ち消されるように逆回転）
-        dirX = CMath::RotX( dX, dY, -fixedApplyRot ) * toRate;
-        dirY = CMath::RotY( dX, dY, -fixedApplyRot ) * toRate;
-        pJointPoint->setDirRateXY( jointIdTo1, (int)-dirX, (int)-dirY, openRate, closeRate );
-    }else{
-        pJointPoint->setDirRateXY( jointIdFrom1, 0, 0, 0.0f, 0.0f );
-        pJointPoint->setDirRateXY( jointIdTo1, 0, 0, 0.0f, 0.0f );
-    }
+    //-----------------------------------------------------------------------------
+    // ４つのAPで矩形を描いた際、[to]側が[AP:2->3]、[from]側が[AP:2->3]の並びになっている想定
+    //（※向きが逆になる場合はAP毎に[SWAP]フラグを立てること）
+    //-----------------------------------------------------------------------------
+    // 呼び出し元からの出立[OUT]（※[IN]と同じ値）
+    pJointPoint->setDirRateXY( jointIdFrom1, openFromDirX*dirScale, openFromDirY*dirScale, closeFromDirX*dirScale, closeFromDirY*dirScale );
+
+    // 呼び出し先への侵入[0]（※[IN]と同じ値）
+    pJointPoint->setDirRateXY( jointIdTo1, openToDirX*dirScale, openToDirY*dirScale, closeToDirX*dirScale, closeToDirY*dirScale );
     
     // ここまできたら登録完了
     return( true );
@@ -284,7 +291,7 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
         // 処理済みであれば無視（※[SlotA]→[SlotB]→[SLotA]→[SlotB]...のような循環をしてしまわないよう用心）
         if( pBGPCell->isDone ){
 #ifdef BMP_GEN_LOG
-            LOGD( "@ setOrderListForBmpGen: ALREADY DONE SLOT: slot=%d, slotIndex=%d\n", slot, slotIndex );
+            LOGD( "@ CBmpGenerator::SetOrderList: ALREADY DONE SLOT: slot=%d, slotIndex=%d\n", slot, slotIndex );
 #endif
             return;
         }
@@ -331,9 +338,9 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
     rop.rot += applyRot;
    
     // 回転補正
-    float powRate = pBDPD->getRotPow();
-    rop.rot = s_stBaseParam.rot + powRate*(rop.rot-s_stBaseParam.rot);
-    applyRot *= powRate;
+    float rotPow = pBDPD->getRotPow();
+    rop.rot = s_stBaseParam.rot + rotPow*(rop.rot-s_stBaseParam.rot);
+    applyRot *= rotPow;
 
     //--------------------------------------------
     // 拡縮（※以降のスロットにも影響）
@@ -355,7 +362,7 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
     // サイズ調整による補正
     int rateScale;
     CAdjustCalc::CalcRateScaleForS( &rateScale, pSA, pBGPCell->adjForS );
-    bdpdScale *= CConst::ConvBezierRateScale( rateScale );
+    bdpdScale *= CConst::ConvBezierScaleRate( rateScale );
 
     // 作業スケールによる補正
     if( rop.isWorkScale ){
@@ -403,25 +410,61 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
             pLD = pLD->getNext();
             continue;
         }
-        
-        // オプション設定のレイヤーで指定が無い場合は無視
-        eBD_OPTION option = pLD->getOption();
-        if( IS_BD_OPTION_VALID( option ) ){
-            if( ! pBaseParam->arrOption[option] ){
+         
+        // [Suited]による分岐：スーツ時有効化
+        if( pLD->checkFlag( eLAYER_FLAG_VALID_FOR_SUITED ) ){
+            if( ! pGenParam->isSuited() ){
                 // 次のレイヤーへ
                 pLD = pLD->getNext();
                 continue;
             }
         }
-       
-        // 遅延によるレイヤーの回転
-        int rateRot;
+
+        // [Suited]による分岐：スーツ時無効化
+        if( pLD->checkFlag( eLAYER_FLAG_INVALID_FOR_SUITED ) ){
+            if( pGenParam->isSuited() ){
+                // 次のレイヤーへ
+                pLD = pLD->getNext();
+                continue;
+            }
+        }
+
+        // オプション設定のレイヤーで指定が無い場合は無視（※フォーカス時は表示する）
+        eBD_OPTION option = pLD->getOption();
+        if( IS_BD_OPTION_VALID( option ) && !rop.isSlotIgnore ){
+            if( ! pBaseParam->arrOption[option][slotIndex] ){
+                // 次のレイヤーへ
+                pLD = pLD->getNext();
+                continue;
+            }
+        }
+
+        //----------------------------------
+        // レイヤー調整値
+        //----------------------------------
+        int rate, rateX, rateY;
         bool isReverseH = false;
         bool isReverseV = (slotIndex%2)!=0; // 対の要素（おさげの片方等）であれば縦反転
-        CAdjustCalc::CalcRateRotForDelayLog( &rateRot, isReverseH, isReverseV, pLD, pBaseParam->pDelayLog );
-        float rotByDelay = CConst::ConvBezierRotationRate( rateRot );
 
+        // 回転補正
+        float rotPowForLayer = pLD->getRotPow();
+
+        // 遅延：座標（※反転は無視＝移動値の方向そのままを受け取る）
+        CAdjustCalc::CalcRateOfsXYForDelayLog( &rateX, &rateY, false, false, pLD, pBaseParam->pDelayLog );
+        float xForLayer = CConst::ConvBezierPositionRate( pBaseParam->texW0, rateX );
+        float yForLayer = CConst::ConvBezierPositionRate( pBaseParam->texH0, rateY );
+        
+        // 遅延：回転
+        CAdjustCalc::CalcRateRotForDelayLog( &rate, isReverseH, isReverseV, pLD, pBaseParam->pDelayLog );
+        float rotForLayer = CConst::ConvBezierRotationRate( rate );
+
+        // 遅延：スケール
+        CAdjustCalc::CalcRateScaleForDelayLog( &rate, pLD, pBaseParam->pDelayLog );
+        float scaleForLayer = CConst::ConvBezierScaleRate( rate );
+                
+        //----------------------------------
         // レイヤー内部のオブジェクトを走査
+        //----------------------------------
         CLayerObject* pLO = pLD->getDataHead();
         while( pLO != NULL ){
             // スロットであれば解釈（※編集調整中は無視／参照時は指定がなければ無視）
@@ -433,11 +476,11 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
                     // レイヤーパラメータの設定
                     stBEZIER_LAYER_PARAM stLayerParam;
                     CLEAR_BEZIER_LAYER_PARAM( &stLayerParam );
-                    stLayerParam.pixelOfsX = rop.baseX;
-                    stLayerParam.pixelOfsY = rop.baseY;
-                    stLayerParam.pixelScaleX = bdpdScaleX;
-                    stLayerParam.pixelScaleY = bdpdScaleY;
-                    stLayerParam.pixelRot = rop.rot + rotByDelay;
+                    stLayerParam.pixelOfsX = rop.baseX + xForLayer;
+                    stLayerParam.pixelOfsY = rop.baseY + yForLayer;
+                    stLayerParam.pixelScaleX = bdpdScaleX * scaleForLayer;
+                    stLayerParam.pixelScaleY = bdpdScaleY * scaleForLayer;
+                    stLayerParam.pixelRot = s_stBaseParam.rot + rotPowForLayer*(rop.rot-s_stBaseParam.rot) + rotForLayer;
                     stLayerParam.fixedAdjustRateH = pBaseParam->adjustRateH;
                     stLayerParam.fixedAdjustRateV = pBaseParam->adjustRateV;
 
@@ -459,18 +502,18 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
                         // オーダー登録パラメータの設定
                         tmpRop.isFlipH = pBSPNode->isFlipH ^ rop.isFlipH;
                         tmpRop.isFlipV = pBSPNode->isFlipV ^ rop.isFlipV;;
-                        tmpRop.baseX = pBSPNode->x;
-                        tmpRop.baseY = pBSPNode->y;
+                        tmpRop.baseX = pBSPNode->x + xForLayer;
+                        tmpRop.baseY = pBSPNode->y + yForLayer;
                         tmpRop.rateOfsX = pBSPNode->rateOfsX;
                         tmpRop.rateOfsY = pBSPNode->rateOfsY;
-                        tmpRop.rot = rop.rot + rotByDelay;
+                        tmpRop.rot = s_stBaseParam.rot + rotPowForLayer*(rop.rot-s_stBaseParam.rot) + rotForLayer;
                         tmpRop.scale = rop.scale;
 
                         // オーダー登録
                         SetOrderList( pOrderList, pGenParam, pBSPNode->slot, slotId, false, pBaseParam, tmpRop, isWorkPath );
                         
                         // 次へ
-                        pBSPNode = (stBEZIER_SLOT_POINT*) pBSPNode->pNext;
+                        pBSPNode = pBSPNode->pNext;
                     }
                     
                     // 解放
@@ -505,7 +548,7 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
 #endif
                         
             //--------------------------------------------------
-            // オーダーリストへ登録（※これでレイヤーが表示されることになる）
+            // オーダーリストへ登録
             //--------------------------------------------------
             // 制御情報
             bool isTargetDone = false;
@@ -524,35 +567,42 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
                 adjRotForLayer = 0.0f;
                 adjScaleForLayer = 1.0f;
                 
-                // カバー開始要求があれば
+                // [pLD]に先立って開始カバーレイヤーの検出
                 if( isCoverOpenRequired ){
                     if( GetCoverLayerAt( pGenParam, slot, slotIndex, false, coverOpenLayerAt, &pCurLayer, &adjRotForLayer, &adjScaleForLayer ) ){
                         coverOpenLayerAt++;
                     }
                 }
 
-                // レイヤーが未設定なら対象の設定
-                if( pCurLayer==NULL && !isTargetDone ){
+                // この時点で[pCurLayer]無効なら[pLD]の検出
+                if( pCurLayer == NULL && !isTargetDone ){
                     pCurLayer = pLD;
                     isTargetDone = true;
                 }
 
-                // カバー終了要求があれば
-                if( pCurLayer==NULL && isCoverCloseRequired ){
+                // [pLD]の終了に合わせて終了カバーレイヤーの検出
+                if( pCurLayer == NULL && isCoverCloseRequired ){
                     if( GetCoverLayerAt( pGenParam, slot, slotIndex, true, coverCloseLayerAt, &pCurLayer, &adjRotForLayer, &adjScaleForLayer ) ){
                         coverCloseLayerAt++;
                     }
                 }
                 
-                // この時点で対象が無効なら終了
+                // この時点で処理対象が無効なら終了
                 if( pCurLayer == NULL ){
                     break;
                 }
                 
-                // レイヤーの登録（※返値が登録内容となる）
+                // ここまできたらレイヤーの登録（※これで[pCurLayer]が表示されることになる）
                 stLAYER_ORDER_CELL_NODE* pNode = pOrderList->addLayerData( pCurLayer, orderType, orderSlot, orderSlotIndex );
                 
-                // 登録が成功したらレイヤーに対する表示情報の設定
+                // 用心（※ここでエラーが出た場合、おそらく登録枠不足）
+                if( pNode == NULL ){
+                    LOGE( "@ CBmpGenerator::SetOrderList: FAILED[pOrderList->addLayerData]: orderSlot=%d, orderSlotIndex=%d\n",
+                          orderSlot, orderSlotIndex );
+                    return;
+                }
+                
+                // 登録に成功したら表示情報の設定
                 if( pNode != NULL ){
                     // カバーの角度調整
                     if( rop.isFlipH != rop.isFlipV ){
@@ -582,24 +632,18 @@ void CBmpGenerator::SetOrderList( CLayerOrderList* pOrderList, CBmpGenParam* pGe
                     // 傾き：左右
                     pLP->fixedAngleRateLR = pBaseParam->adjustRateLR;
                     FIX_ADJUST_RATE( pLP->fixedAngleRateLR );
-                    if( pBDPD->checkFlag( eBDPD_FLAG_ANGLE_FLIP_H ) ){
-                        pLP->fixedAngleRateLR *= -1;
-                    }
 
                     // 傾き：上下
                     pLP->fixedAngleRateUD = pBaseParam->adjustRateUD;
                     FIX_ADJUST_RATE( pLP->fixedAngleRateUD );
-                    if( pBDPD->checkFlag( eBDPD_FLAG_ANGLE_FLIP_V ) ){
-                        pLP->fixedAngleRateUD *= -1;
-                    }
 
                     // 位置／拡縮
-                    pLP->pixelOfsX = rop.baseX;
-                    pLP->pixelOfsY = rop.baseY;
-                    pLP->pixelScaleX = bdpdScaleX * adjScaleForLayer;
-                    pLP->pixelScaleY = bdpdScaleY * adjScaleForLayer;
-                    pLP->pixelRot = rop.rot + rotByDelay + adjRotForLayer;
-                    
+                    pLP->pixelOfsX = rop.baseX + xForLayer;
+                    pLP->pixelOfsY = rop.baseY + yForLayer;
+                    pLP->pixelScaleX = bdpdScaleX * adjScaleForLayer * scaleForLayer;
+                    pLP->pixelScaleY = bdpdScaleY * adjScaleForLayer * scaleForLayer;
+                    pLP->pixelRot = s_stBaseParam.rot + rotPowForLayer*(rop.rot-s_stBaseParam.rot) + rotForLayer + adjRotForLayer;
+
                     // 結合ポイント算出用にBDP関連情報を保持
                     pLP->scaleForBdpd = bdpdScale * adjScaleForLayer;
                     pLP->rateXForBdpd = -rop.rateOfsX;
@@ -640,11 +684,11 @@ bool CBmpGenerator::GetCoverLayerAt( CBmpGenParam* pGenParam, eBD_SLOT parentSlo
     // 検索対象：ジョイント
     eBD_SLOT targetSlot = eBD_SLOT_INVALID;
     if( parentSlot == eBD_SLOT_HdBase ){
-        targetSlot = eBD_SLOT_CvHead;
+        targetSlot = eBD_SLOT_HdCover;
     }else if( parentSlot == eBD_SLOT_AmBase ){
-        targetSlot = eBD_SLOT_CvArm;
+        targetSlot = eBD_SLOT_AmCover;
     }else if( parentSlot == eBD_SLOT_LgBase ){
-        targetSlot = eBD_SLOT_CvLeg;
+        targetSlot = eBD_SLOT_LgCover;
     }
     
     // 検索対象が無効なら失敗
@@ -660,7 +704,7 @@ bool CBmpGenerator::GetCoverLayerAt( CBmpGenParam* pGenParam, eBD_SLOT parentSlo
         return( false );
     }
     
-    // カバーBDPDの取得（※夢応であれば終了＝登録がないケースはありうる）
+    // カバーBDPDの取得（※無効であれば終了＝登録がないケースはありうる）
     CBmpDotPartData* pBdpd = pCell->pData;
     if( pBdpd == NULL ){
         return( false );
@@ -700,28 +744,26 @@ bool CBmpGenerator::GetCoverLayerAt( CBmpGenParam* pGenParam, eBD_SLOT parentSlo
     if( pLD == NULL ){
         return( false );
     }
-    
-    //-----------------------------------------------------
-    // 基本角度の抽出（※ジョイントで管理されるパーツは角度を持つ）
-    //-----------------------------------------------------
-    float rotBase = 0.0f;
+
+    // TODO:体型をどう反映するか？
+    float baseR = 100;
+    float rotBase = 0;
     float scaleBase = 1.0f;
-    float baseR = 250;
 
     // 検索対象：ジョイント
     targetSlot = eBD_SLOT_INVALID;
     if( parentSlot == eBD_SLOT_HdBase ){
         // 頭にはジョイントがない
+        baseR = 1500;   // カバー作成時の基本サイズ
     }else if( parentSlot == eBD_SLOT_AmBase ){
         targetSlot = eBD_SLOT_UpJointSholder;
-        rotBase = 30;  // 基準となる角度（やや外を向かせる）
-        baseR = 250;    // 基準となる穴の半径
+        baseR = 250;    // カバー作成時の基本サイズ
     }else if( parentSlot == eBD_SLOT_LgBase ){
         targetSlot = eBD_SLOT_LwJointLeg;
-        rotBase = 10;  // 基準となる角度（やや外を向かせる）
-        baseR = 400;    // 基準となる足の半径
+        baseR = 400;    // カバー作成時の基本サイズ
     }
 
+    // 対象が有効であればスロット調整
     if( targetSlot != eBD_SLOT_INVALID ){
         pCell = pGenParam->searchCell( targetSlot, parentSlotIndex );
 
@@ -729,12 +771,16 @@ bool CBmpGenerator::GetCoverLayerAt( CBmpGenParam* pGenParam, eBD_SLOT parentSlo
              pBdpd = pCell->pData;
             if( pBdpd != NULL ){
                 CSlotAdjuster* pSA = pBdpd->getSlotAdjuster();
+                
                 rotBase += CConst::ConvBezierRotationRate( pSA->getJointRateRotOfs() );
+                rotBase += pSA->getCoverRot();
+
                 scaleBase *= pSA->getJointRateRotR()/baseR;
+                scaleBase *= pSA->getCoverScale();
             }
         }
     }
-
+    
     // ここまできたら出力（成功）
     *ppOutLayer = pLD;
     *pBaseRot = rotBase;

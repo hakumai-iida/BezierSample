@@ -34,17 +34,38 @@ int CBmpGenerator::s_nBaseTexSizeW;
 int CBmpGenerator::s_nBaseTexSizeH;
 float CBmpGenerator::s_fBaseStrokeScale;
 
-BYTE* CBmpGenerator::s_pBufLine;
-BYTE* CBmpGenerator::s_pBufColor;
-BYTE* CBmpGenerator::s_pBufFillGuide;
-BYTE* CBmpGenerator::s_pBufFillGuard;
-
 int CBmpGenerator::s_nTexMargin;
 int CBmpGenerator::s_nTexW0;
 int CBmpGenerator::s_nTexH0;
 int CBmpGenerator::s_nTexW;
 int CBmpGenerator::s_nTexH;
 int CBmpGenerator::s_nSizeBuf;
+
+BYTE* CBmpGenerator::s_pBufLine;
+BYTE* CBmpGenerator::s_pBufColor;
+BYTE* CBmpGenerator::s_pBufFillGuide;
+BYTE* CBmpGenerator::s_pBufFillGuard;
+BYTE* CBmpGenerator::s_pBufTemp;
+
+int CBmpGenerator::s_nLeftForLineBuf;
+int CBmpGenerator::s_nRightForLineBuf;
+int CBmpGenerator::s_nTopForLineBuf;
+int CBmpGenerator::s_nBottomForLineBuf;
+
+int CBmpGenerator::s_nLeftForColorBuf;
+int CBmpGenerator::s_nRightForColorBuf;
+int CBmpGenerator::s_nTopForColorBuf;
+int CBmpGenerator::s_nBottomForColorBuf;
+
+int CBmpGenerator::s_nLeftForFillGuideBuf;
+int CBmpGenerator::s_nRightForFillGuideBuf;
+int CBmpGenerator::s_nTopForFillGuideBuf;
+int CBmpGenerator::s_nBottomForFillGuideBuf;
+
+int CBmpGenerator::s_nLeftForTempBuf;
+int CBmpGenerator::s_nRightForTempBuf;
+int CBmpGenerator::s_nTopForTempBuf;
+int CBmpGenerator::s_nBottomForTempBuf;
 
 stBEZIER_BASE_PARAM CBmpGenerator::s_stBaseParam;
 
@@ -66,9 +87,9 @@ float CBmpGenerator::s_fTexFocusY0;
 /*+----------------------------------------------------------------+
   |	Program		プログラム実装
   +----------------------------------------------------------------+*/
-//------------------------
+//--------------------------
 // 初期化
-//------------------------
+//--------------------------
 bool CBmpGenerator::OnCreate( void ){
 #ifdef MGR_INIT_LOG
     LOGD( "@ CBmpGenerator::OnCreate()\n" );
@@ -79,18 +100,18 @@ bool CBmpGenerator::OnCreate( void ){
     return( true );
 }
 
-//------------------------
+//--------------------------
 // 終了
-//------------------------
+//--------------------------
 void CBmpGenerator::OnDestroy( void ){
 #ifdef MGR_INIT_LOG
     LOGD( "@ BmpGenerator::OnDestroy()\n" );
 #endif
 }
 
-//------------------------
+//--------------------------
 // リセット
-//------------------------
+//--------------------------
 void CBmpGenerator::Reset( void ){
     s_nTexResolution = GM_P_RATE;
     s_nBaseTexMargin = BMP_GEN_DEFAULT_MARGIN;
@@ -99,20 +120,114 @@ void CBmpGenerator::Reset( void ){
     s_fBaseStrokeScale = BMP_GEN_DEFAULT_STROKE_SCALE;
 }
 
-//------------------------
-// ガイドのリセット
-//------------------------
-// ガイドのリセット
-void CBmpGenerator::ResetGuide( bool isFullReset ){
-    memset( s_pBufFillGuide, 0, s_nSizeBuf );
-    if( isFullReset ){
-        memset( s_pBufFillGuard, 0, s_nSizeBuf );
-    }
+//--------------------------
+// リセット：各種バッファ
+//--------------------------
+// 線のリセット
+void CBmpGenerator::ResetLineBuf( void ){
+    memset( s_pBufLine, 0, s_nSizeBuf );
+    ResetLineBufInfo();
 }
 
-//------------------------
+// 色のリセット
+void CBmpGenerator::ResetColorBuf( void ){
+    // 基本明度による初期化
+    memset( s_pBufColor, BEZIER_PAL_VAL_BASE, s_nSizeBuf );
+    ResetColorBufInfo();
+}
+
+// 塗りガイドのリセット
+void CBmpGenerator::ResetFillGuideBuf( void ){
+    // クリア色による初期化
+    memset( s_pBufFillGuide, BEZIER_FILL_GUIDE_CLEAR_COL, s_nSizeBuf );
+    ResetFillGuideBufInfo();
+}
+
+// 塗りガード（マスク）のリセット
+void CBmpGenerator::ResetFillGuardBuf( void ){
+    memset( s_pBufFillGuard, 0, s_nSizeBuf );
+    // ガイドには利用状況の概念がない
+}
+
+// テンポラリのリセット
+void CBmpGenerator::ResetTempBuf( void ){
+    memset( s_pBufTemp, 0, s_nSizeBuf );
+    ResetTempBufInfo();
+}
+
+//---------------------------------------
+// バッファ情報リセット
+//---------------------------------------
+// 線
+void CBmpGenerator::ResetLineBufInfo( void ){
+    s_nLeftForLineBuf = 99999;
+    s_nRightForLineBuf = -1;
+    s_nTopForLineBuf = 99999;
+    s_nBottomForLineBuf = -1;
+}
+
+// 色
+void CBmpGenerator::ResetColorBufInfo( void ){
+    s_nLeftForColorBuf = 99999;
+    s_nRightForColorBuf = -1;
+    s_nTopForColorBuf = 99999;
+    s_nBottomForColorBuf = -1;
+}
+
+// 塗りガイド
+void CBmpGenerator::ResetFillGuideBufInfo( void ){
+    s_nLeftForFillGuideBuf = 99999;
+    s_nRightForFillGuideBuf = -1;
+    s_nTopForFillGuideBuf = 99999;
+    s_nBottomForFillGuideBuf = -1;
+}
+
+// テンポラリ
+void CBmpGenerator::ResetTempBufInfo( void ){
+    s_nLeftForTempBuf = 99999;
+    s_nRightForTempBuf = -1;
+    s_nTopForTempBuf = 99999;
+    s_nBottomForTempBuf = -1;
+}
+
+//---------------------------------------
+// バッファ情報更新
+//---------------------------------------
+// 線
+void CBmpGenerator::UpdateLineBufInfo( int x, int y ){
+    if( s_nLeftForLineBuf > x ){ s_nLeftForLineBuf = x; }
+    if( s_nRightForLineBuf < x ){ s_nRightForLineBuf = x; }
+    if( s_nTopForLineBuf > y ){ s_nTopForLineBuf = y; }
+    if( s_nBottomForLineBuf < y ){ s_nBottomForLineBuf = y; }
+}
+
+// 色
+void CBmpGenerator::UpdateColorBufInfo( int x, int y ){
+    if( s_nLeftForColorBuf > x ){ s_nLeftForColorBuf = x; }
+    if( s_nRightForColorBuf < x ){ s_nRightForColorBuf = x; }
+    if( s_nTopForColorBuf > y ){ s_nTopForColorBuf = y; }
+    if( s_nBottomForColorBuf < y ){ s_nBottomForColorBuf = y; }
+}
+
+// 塗り
+void CBmpGenerator::UpdateFillGuideBufInfo( int x, int y ){
+    if( s_nLeftForFillGuideBuf > x ){ s_nLeftForFillGuideBuf = x; }
+    if( s_nRightForFillGuideBuf < x ){ s_nRightForFillGuideBuf = x; }
+    if( s_nTopForFillGuideBuf > y ){ s_nTopForFillGuideBuf = y; }
+    if( s_nBottomForFillGuideBuf < y ){ s_nBottomForFillGuideBuf = y; }
+}
+
+// テンポラリ
+void CBmpGenerator::UpdateTempBufInfo( int x, int y ){
+    if( s_nLeftForTempBuf > x ){ s_nLeftForTempBuf = x; }
+    if( s_nRightForTempBuf < x ){ s_nRightForTempBuf = x; }
+    if( s_nTopForTempBuf > y ){ s_nTopForTempBuf = y; }
+    if( s_nBottomForTempBuf < y ){ s_nBottomForTempBuf = y; }
+}
+
+//--------------------------
 // BMP生成：生成パラメータ指定
-//------------------------
+//--------------------------
 int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
                                           CBmpGenParam* pGenParam, eBD_SLOT slot, int subId, int slotIndex,
                                           stBMP_GEN_CREATE_PARAM* pCreateParam,
@@ -129,9 +244,6 @@ int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
         return( -1 );
     }
 
-    // スーツオプションの上書き
-    s_stBaseParam.arrOption[eBD_OPTION_SUITED] = pGenParam->isSuited();
-    
     // 対象の生成パラメータの取得
     stBMP_GEN_PARAM_CELL *pCell = pGenParam->searchCell( slot, slotIndex );
     if( pCell == NULL || pCell->pData == NULL ){
@@ -172,7 +284,7 @@ int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
         }
         
         if( testPalGrp != 0x00 ){
-            memset( s_pBufColor, BEZIER_CONV_PAL_INFO_TO_DOT(testPalGrp, BEZIER_PAL_VAL_BASE), s_nSizeBuf );
+            memset( s_pBufColor, BP_CONV_PAL_INFO_TO_DOT(testPalGrp, BEZIER_PAL_VAL_BASE), s_nSizeBuf );
         }
     }
     
@@ -244,7 +356,7 @@ int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
 #ifdef BMP_GEN_LOG
                 const char* pLabelForData = "UNKNOWN";
                 eBD_SLOT slotForData = pLayerData->getOrderSlot();
-                if( slotForData >= 0 && slotForData < eBD_SLOT_MAX ){
+                if( IS_BD_SLOT_VALID( slotForData ) ){
                     pLabelForData = g_pArrLabelBdSlot[slotForData];
                 }else if( slotForData == eBD_SLOT_INVALID ){
                     pLabelForData = "INVALID";
@@ -252,7 +364,7 @@ int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
 
                 const char* pLabelForOrder = "UNKNOWN";
                 eBD_SLOT slotForOrder = pOrderCell->getOrderSlot();
-                if( slotForOrder >= 0 && slotForOrder < eBD_SLOT_MAX ){
+                if( IS_BD_SLOT_VALID( slotForOrder ) ){
                     pLabelForOrder = g_pArrLabelBdSlot[slotForOrder];
                 }else if( slotForOrder == eBD_SLOT_INVALID ){
                     pLabelForOrder = "INVALID";
@@ -323,7 +435,7 @@ int CBmpGenerator::CreateTexWithGenParam( CTex* pTexLine, CTex* pTexColor,
 }
 
 //------------------------
-// BMP生成：レイヤーデータ指定
+// BMP生成：レイヤーリスト指定
 //------------------------
 int CBmpGenerator::CreateTexWithLayerList( CTex* pTexLine, CTex* pTexColor,
                                            CList* pLayerDataList,
@@ -383,16 +495,40 @@ int CBmpGenerator::CreateTexWithLayerList( CTex* pTexLine, CTex* pTexColor,
     // 要素の描画
     CLayerData* pLayerData = (CLayerData*) pLayerDataList->getHead();
     while( pLayerData != NULL ){
+        // パラメータの退避
+        float x0 = stLayerParam.pixelOfsX;
+        float y0 = stLayerParam.pixelOfsY;
         float rot0 = stLayerParam.pixelRot;
-        
-        // 遅延によるレイヤーの回転
-        int rateRot;
-        CAdjustCalc::CalcRateRotForDelayLog( &rateRot, false, false, pLayerData, s_stBaseParam.pDelayLog );
-        stLayerParam.pixelRot += CConst::ConvBezierRotationRate( rateRot );
+        float scaleX0 = stLayerParam.pixelScaleX;
+        float scaleY0 = stLayerParam.pixelScaleY;
 
+        // 遅延によるレイヤーの調整
+        int rate, rateX, rateY;
+
+        // オフセット（※反転は無視＝移動値の方向そのままを受け取る）
+        CAdjustCalc::CalcRateOfsXYForDelayLog( &rateX, &rateY, false, false, pLayerData, s_stBaseParam.pDelayLog );
+        stLayerParam.pixelOfsX += CConst::ConvBezierPositionRate( s_nTexW0, rateX );
+        stLayerParam.pixelOfsY += CConst::ConvBezierPositionRate( s_nTexH0, rateY );
+
+        // 回転
+        CAdjustCalc::CalcRateRotForDelayLog( &rate, false, false, pLayerData, s_stBaseParam.pDelayLog );
+        stLayerParam.pixelRot += CConst::ConvBezierRotationRate( rate );
+
+        // スケール
+        CAdjustCalc::CalcRateScaleForDelayLog( &rate, pLayerData, s_stBaseParam.pDelayLog );
+        stLayerParam.pixelScaleX *= CConst::ConvBezierScaleRate( rate );
+        stLayerParam.pixelScaleY *= CConst::ConvBezierScaleRate( rate );
+
+        // 描画
         pLayerData->draw( &s_stBaseParam, &stLayerParam, isWorkPath );
         pLayerData = (CLayerData*) pLayerData->getNext();
+
+        // パラメータの復旧
+        stLayerParam.pixelOfsX = x0;
+        stLayerParam.pixelOfsY = y0;
         stLayerParam.pixelRot = rot0;
+        stLayerParam.pixelScaleX = scaleX0;
+        stLayerParam.pixelScaleY = scaleY0;
     }
     
     // 終了（※テクスチャ生成）
@@ -436,6 +572,7 @@ bool CBmpGenerator::Ready( stBMP_GEN_CREATE_PARAM* pCreateParam ){
     s_stBaseParam.pBufColor = s_pBufColor;
     s_stBaseParam.pBufFillGuide = s_pBufFillGuide;
     s_stBaseParam.pBufFillGuard = s_pBufFillGuard;
+    s_stBaseParam.pBufTemp = s_pBufTemp;
 
     s_stBaseParam.pixelRate = s_nTexResolution;
     s_stBaseParam.texW0 = s_nTexW0;
@@ -445,7 +582,9 @@ bool CBmpGenerator::Ready( stBMP_GEN_CREATE_PARAM* pCreateParam ){
     s_stBaseParam.strokeScale = s_fBaseStrokeScale;
     
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        s_stBaseParam.arrOption[i] = pCreateParam->arrOption[i];
+        for( int j=0; j<BD_SLOT_INDEX_MAX; j++ ){
+            s_stBaseParam.arrOption[i][j] = pCreateParam->arrOption[i][j];
+        }
     }
 
     s_stBaseParam.isFlipH = pCreateParam->isFlipH;
@@ -478,10 +617,9 @@ bool CBmpGenerator::Ready( stBMP_GEN_CREATE_PARAM* pCreateParam ){
     s_fTexFocusY0 = s_nTexH/2;
     
     // ベジェリ関連セット
-    CBezier::ResetBufInfo( s_nTexW, s_nTexH );
     CBezier::ResetHookPoint();
     CBezier::ResetTouchPoint();
-
+    CBezier::ResetGuidePoint();
     return( true );
 }
 
@@ -507,17 +645,20 @@ bool CBmpGenerator::AllocWorkBuf( void ){
     // バッファサイズ算出（※[P8D]なので１画素１バイト）
     s_nSizeBuf = 1 * s_nTexW * s_nTexH;
     
-    // サイズ確認（※４枚分確保したい）
-    if( 4*s_nSizeBuf > sizeBuf ){
-        LOGE( "@ CBmpGenerator::AllocWorkBuf: BUF SHORTAGE: required=4*%d > allocted=%d\n", s_nSizeBuf, sizeBuf );
+    // サイズ確認（※５枚分確保したい）
+    int required = 5*s_nSizeBuf;
+    //LOGD( "@ BMP GEN ALLOCATE %d/%d(%.1f%%)\n", required, sizeBuf, CConst::CalcUseRate(required,sizeBuf) );
+    if( required > sizeBuf ){
+        LOGE( "@ CBmpGenerator::AllocWorkBuf: BUF SHORTAGE: required=%d > allocted=%d\n", 5*s_nSizeBuf, sizeBuf );
         return( false );
     }
     
     // バッファ確保
     s_pBufLine = &pBuf[0*s_nSizeBuf];           // 線画像バッファ
-    s_pBufFillGuide = &pBuf[1*s_nSizeBuf];      // ガイドバッファ
-    s_pBufFillGuard = &pBuf[2*s_nSizeBuf];      // ガードバッファ
-    s_pBufColor = &pBuf[3*s_nSizeBuf];          // 塗り画像バッファ
+    s_pBufColor = &pBuf[1*s_nSizeBuf];          // 色画像バッファ
+    s_pBufFillGuide = &pBuf[2*s_nSizeBuf];      // 塗りガイドバッファ
+    s_pBufFillGuard = &pBuf[3*s_nSizeBuf];      // 塗りガードバッファ
+    s_pBufTemp = &pBuf[4*s_nSizeBuf];           // テンポラリバッファ
 
     return( true );
 }
@@ -526,23 +667,15 @@ bool CBmpGenerator::AllocWorkBuf( void ){
 // ワークバッファリセット
 //----------------------------------------------------------
 void CBmpGenerator::ResetWorkBuf( void ){
-    //------------------------
-    // 各種描画バッファクリア
-    //------------------------
-    memset( s_pBufLine, 0, s_nSizeBuf );
+    // バッファクリア
+    ResetLineBuf();
+    ResetColorBuf();
+    ResetFillGuideBuf();
+    ResetFillGuardBuf();
+    ResetTempBuf();
 
-    // 塗りバッファの初期値は基本パレット値（※０ではないので注意）
-    memset( s_pBufColor, BEZIER_PAL_VAL_BASE, s_nSizeBuf );
-
-    memset( s_pBufFillGuide, 0, s_nSizeBuf );
-
-    memset( s_pBufFillGuard, 0, s_nSizeBuf );
-
-    //------------------------
     // ワーククリア
-    //------------------------
     CLEAR_BEZIER_BASE_PARAM( &s_stBaseParam );
-
     s_oJointPoint.clear();
     s_oAnglePlane.clear();
 }
@@ -668,15 +801,15 @@ void CBmpGenerator::CopyTexWithBezierBufInfo( BYTE* pBuf, BYTE* pBufSrc, int* pO
     int ofsB = 0;
     
     if( isColor ){
-        ofsL = CBezier::GetLeftForColorBuf();
-        ofsR = s_nTexW - (CBezier::GetRightForColorBuf()+1);
-        ofsT = CBezier::GetTopForColorBuf();
-        ofsB = s_nTexH - (CBezier::GetBottomForColorBuf()+1);
+        ofsL = GetLeftForColorBuf();
+        ofsR = s_nTexW - (GetRightForColorBuf()+1);
+        ofsT = GetTopForColorBuf();
+        ofsB = s_nTexH - (GetBottomForColorBuf()+1);
     }else{
-        ofsL = CBezier::GetLeftForStrokeBuf();
-        ofsR = s_nTexW - (CBezier::GetRightForStrokeBuf()+1);
-        ofsT = CBezier::GetTopForStrokeBuf();
-        ofsB = s_nTexH - (CBezier::GetBottomForStrokeBuf()+1);
+        ofsL = GetLeftForLineBuf();
+        ofsR = s_nTexW - (GetRightForLineBuf()+1);
+        ofsT = GetTopForLineBuf();
+        ofsB = s_nTexH - (GetBottomForLineBuf()+1);
     }
     
     // オフセットは４の倍数にしておく（※画像コンバータと挙動を同じにしておく）

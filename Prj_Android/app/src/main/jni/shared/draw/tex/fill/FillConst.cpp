@@ -27,18 +27,14 @@ const char* g_pArrLabelFillType[] = {
 };
 
 const char* g_pArrLabelFillOption[] = {
-    "BRIGHT",
-    "DARK",
-    "POINT_BRIGHT",
-    "POINT_DARK",
-    "AREA_BRIGHT",
-    "AREA_DARK",
-    "COLOR_BRIGHT",
-    "COLOR_DARK",
-    "RESERVE_BRIGHT",
-    "RESERVE_DARK",
+    "POINT_AFTER_FILL",
+    "ANTI_STROKE_AFTER_FILL",
+    "AREA",
+    "RESERVE",
+    "INTO",
+    "COLOR",
     "MASK",
-
+    
     NULL,
 };
 

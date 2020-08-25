@@ -26,6 +26,7 @@ enum eDELAY_LOG{
     eDELAY_LOG_INVALID = -1,    // 無効値
 
     eDELAY_LOG_CLOTH,           // 布
+    eDELAY_LOG_FRILL,           // フリル
     eDELAY_LOG_HAIR,            // 髪
     eDELAY_LOG_SKIN,            // 肌
     eDELAY_LOG_BUST,            // 胸（※肌よりも柔らかい＆高反発）

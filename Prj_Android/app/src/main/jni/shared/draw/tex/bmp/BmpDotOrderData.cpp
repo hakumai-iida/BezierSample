@@ -293,7 +293,7 @@ void CBmpDotOrderData::setDefaultForFront( void ){
     int at = 0;
     
     //---------------------------------
-    // 管理系（※表示要素を想定しないもの）
+    // 呼び出し元
     //---------------------------------
     setCellAt( at++, eBD_SLOT_FgTop,            0 );        // S:姿形
     
@@ -301,7 +301,6 @@ void CBmpDotOrderData::setDefaultForFront( void ){
     // 頭（顔の前にくる部分）
     //---------------------------------
     setCellAt( at++, eBD_SLOT_HdFront,          0 );        // S:頭：前髪
-    
     setCellAt( at++, eBD_SLOT_HdAccentTop,      0 );        // S:頭：アクセント（上）
     setCellAt( at++, eBD_SLOT_HdAccentSide,     1 );        // M:頭：アクセント（横／右）
     setCellAt( at++, eBD_SLOT_HdAccentSide,     0 );        // M:頭：アクセント（横／左）
@@ -312,7 +311,9 @@ void CBmpDotOrderData::setDefaultForFront( void ){
     //---------------------------------
     // 顔
     //---------------------------------
-    setCellAt( at++, eBD_SLOT_FcOption,         0 );        // S:オプション（メガネ等）
+    // 各種パーツ
+    setCellAt( at++, eBD_SLOT_FcGlasses,        0 );        // S:メガネ
+    setCellAt( at++, eBD_SLOT_FcDeco,           0 );        // S:装飾品
     setCellAt( at++, eBD_SLOT_FcNose,           0 );        // S:鼻
 
     setCellAt( at++, eBD_SLOT_FcBrows,          1 );        // M:頭：まゆげ（右）
@@ -325,15 +326,14 @@ void CBmpDotOrderData::setDefaultForFront( void ){
 
     setCellAt( at++, eBD_SLOT_MoBase,           0 );        // S:口
 
+    // 輪郭
     setCellAt( at++, eBD_SLOT_FcHairLine,       0 );        // S:生え際
     setCellAt( at++, eBD_SLOT_FcBase,           0 );        // S:顔土台（※輪郭＆塗りつぶし）
 
-    setCellAt( at++, eBD_SLOT_EyOption,         1 );        // M:目オプション（※顔の土台に対するテスト）（右）
     setCellAt( at++, eBD_SLOT_FcCheek,          1 );        // S:ほっぺた（※顔の土台に対するテスト）（右）
-
-    setCellAt( at++, eBD_SLOT_EyOption,         0 );        // M:目オプション（※顔の土台に対するテスト）（左）
     setCellAt( at++, eBD_SLOT_FcCheek,          0 );        // S:ほっぺた（※顔の土台に対するテスト）（左）
 
+    // 耳
     setCellAt( at++, eBD_SLOT_HdSide,           1 );        // M:顔：もみあげ（右）
     setCellAt( at++, eBD_SLOT_FcEar,            1 );        // M:顔：耳（右）
 
@@ -343,74 +343,97 @@ void CBmpDotOrderData::setDefaultForFront( void ){
     //---------------------------------
     // 体
     //---------------------------------
-    setCellAt( at++, eBD_SLOT_UpSymbol,         0 );        // S:襟元のシンボル
-    setCellAt( at++, eBD_SLOT_UpRibbon,         0 );        // S:襟元のリボン
-    
+    setCellAt( at++, eBD_SLOT_BdOptionJointA,   1 );        // M:汎用オプション結合Ａ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionJointA,   0 );        // M:汎用オプション結合Ａ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionJointB,   1 );        // M:汎用オプション結合Ｂ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionJointB,   0 );        // M:汎用オプション結合Ｂ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionA,        1 );        // M:汎用オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionA,        0 );        // M:汎用オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionB,        1 );        // M:汎用オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionB,        0 );        // M:汎用オプションＢ（左）
+
+    // 腹
+    setCellAt( at++, eBD_SLOT_BlOptionA,        1 );        // M:腹オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_BlOptionA,        0 );        // M:腹オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_BlOptionB,        1 );        // M:腹オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_BlOptionB,        0 );        // M:腹オプションＢ（左）
     setCellAt( at++, eBD_SLOT_BlJointUpBody,    0 );        // S:上半身の結合
     setCellAt( at++, eBD_SLOT_BlJointLowBody,   0 );        // S:下半身の結合
     setCellAt( at++, eBD_SLOT_BlBase,           0 );        // S:腹土台
-    
+
+    // 上半身
+    setCellAt( at++, eBD_SLOT_UpOptionA,        1 );        // M:上半身オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_UpOptionA,        0 );        // M:上半身オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_UpOptionB,        1 );        // M:上半身オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_UpOptionB,        0 );        // M:上半身オプションＢ（左）
     setCellAt( at++, eBD_SLOT_UpJointNeck,      0 );        // S:首の結合
     setCellAt( at++, eBD_SLOT_UpBase,           0 );        // S:上半身土台
     setCellAt( at++, eBD_SLOT_NkBase,           0 );        // S:首土台
 
+    // 下半身
+    setCellAt( at++, eBD_SLOT_LwOptionA,        1 );        // M:下半身オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_LwOptionA,        0 );        // M:下半身オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_LwOptionB,        1 );        // M:下半身オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_LwOptionB,        0 );        // M:下半身オプションＢ（左）
     setCellAt( at++, eBD_SLOT_LwBase,           0 );        // S:下半身土台
-    setCellAt( at++, eBD_SLOT_LwSymbol,         0 );        // S:エプロンのシンボル（※下半身の土台に対するテスト）
 
     //---------------------------------
-    // 足
+    // 脚
     //---------------------------------
+    // 右脚
+    setCellAt( at++, eBD_SLOT_LgOptionA,        1 );        // M:足オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_LgOptionB,        1 );        // M:足オプションＢ（右）
     setCellAt( at++, eBD_SLOT_KnJointAnkle,     1 );        // M:足首の結合（右）
     setCellAt( at++, eBD_SLOT_FoBase,           1 );        // M:足先の土台（右）
     setCellAt( at++, eBD_SLOT_LgJointKnee,      1 );        // M:膝の結合（右）
     setCellAt( at++, eBD_SLOT_KnBase,           1 );        // M:膝下の土台（右）
     setCellAt( at++, eBD_SLOT_LwJointLeg,       1 );        // M:脚の結合（右）
-    setCellAt( at++, eBD_SLOT_CvLeg,            1 );        // M:カバー足（※脚の直前）（右）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_LgCover,          1 );        // M:脚カバー（※脚の直前）（右）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_LgBase,           1 );        // M:脚の土台（右）
 
+    // 左脚
+    setCellAt( at++, eBD_SLOT_LgOptionA,        0 );        // M:足オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_LgOptionB,        0 );        // M:足オプションＢ（左）
     setCellAt( at++, eBD_SLOT_KnJointAnkle,     0 );        // M:足首の結合（左）
     setCellAt( at++, eBD_SLOT_FoBase,           0 );        // M:足先の土台（左）
     setCellAt( at++, eBD_SLOT_LgJointKnee,      0 );        // M:膝の結合（左）
     setCellAt( at++, eBD_SLOT_KnBase,           0 );        // M:膝下の土台（左）
     setCellAt( at++, eBD_SLOT_LwJointLeg,       0 );        // M:脚の結合（左）
-    setCellAt( at++, eBD_SLOT_CvLeg,            0 );        // M:カバー足（※脚の直前）（左）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_LgCover,          0 );        // M:脚カバー（※脚の直前）（左）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_LgBase,           0 );        // M:脚の土台（左）
 
     //---------------------------------
-    // 手〜肩
+    // 腕
     //---------------------------------
+    // 右腕
+    setCellAt( at++, eBD_SLOT_AmOptionA,        1 );        // M:腕オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_AmOptionB,        1 );        // M:腕オプションＢ（右）
     setCellAt( at++, eBD_SLOT_ElJointWrist,     1 );        // M:手首の結合（右）
     setCellAt( at++, eBD_SLOT_HnBase,           1 );        // M:手の土台（右）
     setCellAt( at++, eBD_SLOT_AmJointElbow,     1 );        // M:肘の結合（右）
     setCellAt( at++, eBD_SLOT_ElBase,           1 );        // M:肘下の土台（右）
     setCellAt( at++, eBD_SLOT_UpJointSholder,   1 );        // M:肩の結合（右）
-    setCellAt( at++, eBD_SLOT_CvArm,            1 );        // M:カバー腕（※腕の直前）（右）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_AmCover,            1 );        // M:腕カバー（※腕の直前）（右）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_AmBase,           1 );        // M:腕の土台（右）
 
+    // 左腕
+    setCellAt( at++, eBD_SLOT_AmOptionA,        0 );        // M:腕オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_AmOptionB,        0 );        // M:腕オプションＢ（左）
     setCellAt( at++, eBD_SLOT_ElJointWrist,     0 );        // M:手首の結合（左）
     setCellAt( at++, eBD_SLOT_HnBase,           0 );        // M:手の土台（左）
     setCellAt( at++, eBD_SLOT_AmJointElbow,     0 );        // M:肘の結合（左）
     setCellAt( at++, eBD_SLOT_ElBase,           0 );        // M:肘下の土台（左）
     setCellAt( at++, eBD_SLOT_UpJointSholder,   0 );        // M:肩の結合（左）
-    setCellAt( at++, eBD_SLOT_CvArm,            0 );        // M:カバー腕（※腕の直前）（左）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_AmCover,          0 );        // M:腕カバー（※腕の直前）（左）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_AmBase,           0 );        // M:腕の土台（左）
 
     //---------------------------------
-    // 背中
+    // 頭（※基本的なシルエットの完成）
     //---------------------------------
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,      1 );        // S:リボン結び目（右）
-    setCellAt( at++, eBD_SLOT_BlRibbonString,   1 );        // S:リボン紐（なびかせる部分）（右）
-
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,      0 );        // S:リボン結び目（左）
-    setCellAt( at++, eBD_SLOT_BlRibbonString,   0 );        // S:リボン紐（なびかせる部分（左）
-
-    setCellAt( at++, eBD_SLOT_LwTail,           0 );        // S:尻尾
-
-    //---------------------------------
-    // 頭（顔の後ろ側）
-    //---------------------------------
+    // ここに[LyMiddle]が差し込まれる
     setCellAt( at++, eBD_SLOT_HdTop,            0 );        // S:頭上
-    setCellAt( at++, eBD_SLOT_CvHead,           0 );        // S:カバー頭（※頭の直前）（※この要素が直接呼ばれることはない想定）
+
+    setCellAt( at++, eBD_SLOT_HdCover,          0 );        // S:頭カバー（※頭の直前）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_HdBase,           0 );        // S:頭土台
 
     setCellAt( at++, eBD_SLOT_HdHairSideKnot,   1 );        // S:結び目（横）（右）
@@ -439,7 +462,7 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
     int at = 0;
     
     //---------------------------------
-    // 管理系（※表示要素を想定しないもの）
+    // 呼び出し元
     //---------------------------------
     setCellAt( at++, eBD_SLOT_FgTop,            0 );        // S:姿形
 
@@ -447,7 +470,6 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
     // 頭（顔の前にくる部分）
     //---------------------------------
     setCellAt( at++, eBD_SLOT_HdFront,          0 );        // S:頭：前髪
-    
     setCellAt( at++, eBD_SLOT_HdAccentTop,      0 );        // S:頭：アクセント（上）
     setCellAt( at++, eBD_SLOT_HdAccentSide,     1 );        // M:頭：アクセント（横／右）
     setCellAt( at++, eBD_SLOT_HdAccentSide,     0 );        // M:頭：アクセント（横／左）
@@ -458,7 +480,9 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
     //---------------------------------
     // 顔
     //---------------------------------
-    setCellAt( at++, eBD_SLOT_FcOption,         0 );        // S:オプション（メガネ等）
+    // 顔のパーツ
+    setCellAt( at++, eBD_SLOT_FcGlasses,        0 );        // S:メガネ
+    setCellAt( at++, eBD_SLOT_FcDeco,           0 );        // S:装飾品
     setCellAt( at++, eBD_SLOT_FcNose,           0 );        // S:鼻
 
     setCellAt( at++, eBD_SLOT_FcBrows,          1 );        // M:頭：まゆげ（右）
@@ -471,15 +495,14 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
 
     setCellAt( at++, eBD_SLOT_MoBase,           0 );        // S:口
 
+    // 輪郭
     setCellAt( at++, eBD_SLOT_FcHairLine,       0 );        // S:生え際
     setCellAt( at++, eBD_SLOT_FcBase,           0 );        // S:顔土台（※輪郭＆塗りつぶし）
 
-    setCellAt( at++, eBD_SLOT_EyOption,         1 );        // M:目オプション（※顔の土台に対するテスト）（右）
     setCellAt( at++, eBD_SLOT_FcCheek,          1 );        // S:ほっぺた（※顔の土台に対するテスト）（右）
-
-    setCellAt( at++, eBD_SLOT_EyOption,         0 );        // M:目オプション（※顔の土台に対するテスト）（左）
     setCellAt( at++, eBD_SLOT_FcCheek,          0 );        // S:ほっぺた（※顔の土台に対するテスト）（左）
 
+    // 耳
     setCellAt( at++, eBD_SLOT_HdSide,           1 );        // M:顔：もみあげ（右）
     setCellAt( at++, eBD_SLOT_FcEar,            1 );        // M:顔：耳（右）
 
@@ -487,77 +510,106 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
     setCellAt( at++, eBD_SLOT_FcEar,            0 );        // M:顔：耳（左）
 
     //---------------------------------
-    // 手〜肩
+    // 腕
     //---------------------------------
+    // 右腕
+    setCellAt( at++, eBD_SLOT_AmOptionA,        1 );        // M:腕のオプションＡ（右）
+    setCellAt( at++, eBD_SLOT_AmOptionB,        1 );        // M:腕のオプションＢ（右）
     setCellAt( at++, eBD_SLOT_ElJointWrist,     1 );        // M:手首の結合（右）
     setCellAt( at++, eBD_SLOT_HnBase,           1 );        // M:手の土台（右）
     setCellAt( at++, eBD_SLOT_AmJointElbow,     1 );        // M:肘の結合（右）
     setCellAt( at++, eBD_SLOT_ElBase,           1 );        // M:肘下の土台（右）
     setCellAt( at++, eBD_SLOT_UpJointSholder,   1 );        // M:肩の結合（右）
-    setCellAt( at++, eBD_SLOT_CvArm,            1 );        // M:カバー腕（※腕の直前）（右）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_AmCover,          1 );        // M:腕カバー（※腕の直前）（右）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_AmBase,           1 );        // M:腕の土台（右）
 
+    // 左腕
+    setCellAt( at++, eBD_SLOT_AmOptionA,        0 );        // M:腕のオプションＡ（左）
+    setCellAt( at++, eBD_SLOT_AmOptionB,        0 );        // M:腕のオプションＢ（左）
     setCellAt( at++, eBD_SLOT_ElJointWrist,     0 );        // M:手首の結合（左）
     setCellAt( at++, eBD_SLOT_HnBase,           0 );        // M:手の土台（左）
     setCellAt( at++, eBD_SLOT_AmJointElbow,     0 );        // M:肘の結合（左）
     setCellAt( at++, eBD_SLOT_ElBase,           0 );        // M:肘下の土台（左）
     setCellAt( at++, eBD_SLOT_UpJointSholder,   0 );        // M:肩の結合（左）
-    setCellAt( at++, eBD_SLOT_CvArm,            0 );        // M:カバー腕（※腕の直前）（左）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_AmCover,          0 );        // M:腕カバー（※腕の直前）（左）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_AmBase,           0 );        // M:腕の土台（左）
 
     //---------------------------------
-    // 足
+    // オプション
     //---------------------------------
+    setCellAt( at++, eBD_SLOT_BdOptionJointA,   1 );        // M:汎用オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionJointA,   0 );        // M:汎用オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionJointB,   1 );        // M:汎用オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionJointB,   0 );        // M:汎用オプションＢ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionA,        1 );        // M:汎用オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionA,        0 );        // M:汎用オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_BdOptionB,        1 );        // M:汎用オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_BdOptionB,        0 );        // M:汎用オプションＢ（左）
+
+    setCellAt( at++, eBD_SLOT_BlOptionA,        1 );        // M:腹オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_BlOptionA,        0 );        // M:腹オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_BlOptionB,        1 );        // M:腹オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_BlOptionB,        0 );        // M:腹オプションＢ（左）
+
+    setCellAt( at++, eBD_SLOT_UpOptionA,        1 );        // M:上半身オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_UpOptionA,        0 );        // M:上半身オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_UpOptionB,        1 );        // M:上半身オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_UpOptionB,        0 );        // M:上半身オプションＢ（左）
+
+    setCellAt( at++, eBD_SLOT_LwOptionA,        1 );        // M:下半身オプションＡ（右）
+    setCellAt( at++, eBD_SLOT_LwOptionA,        0 );        // M:下半身オプションＡ（左）
+    setCellAt( at++, eBD_SLOT_LwOptionB,        1 );        // M:下半身オプションＢ（右）
+    setCellAt( at++, eBD_SLOT_LwOptionB,        0 );        // M:下半身オプションＢ（左）
+    
+    //---------------------------------
+    // 脚
+    //---------------------------------
+    // 右脚
+    setCellAt( at++, eBD_SLOT_LgOptionA,        1 );        // M:脚のオプションＡ（右）
+    setCellAt( at++, eBD_SLOT_LgOptionB,        1 );        // M:脚のオプションＢ（右）
     setCellAt( at++, eBD_SLOT_KnJointAnkle,     1 );        // M:足首の結合（右）
     setCellAt( at++, eBD_SLOT_FoBase,           1 );        // M:足先の土台（右）
     setCellAt( at++, eBD_SLOT_LgJointKnee,      1 );        // M:膝の結合（右）
     setCellAt( at++, eBD_SLOT_KnBase,           1 );        // M:膝下の土台（右）
     setCellAt( at++, eBD_SLOT_LwJointLeg,       1 );        // M:脚の結合（右）
-    setCellAt( at++, eBD_SLOT_CvLeg,            1 );        // M:カバー足（※脚の直前）（右）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_LgCover,          1 );        // M:脚カバー（※脚の直前）（右）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_LgBase,           1 );        // M:脚の土台（右）
 
+    // 左脚
+    setCellAt( at++, eBD_SLOT_LgOptionA,        0 );        // M:脚のオプションＡ（左）
+    setCellAt( at++, eBD_SLOT_LgOptionB,        0 );        // M:脚のオプションＢ（左）
     setCellAt( at++, eBD_SLOT_KnJointAnkle,     0 );        // M:足首の結合（左）
     setCellAt( at++, eBD_SLOT_FoBase,           0 );        // M:足先の土台（左）
     setCellAt( at++, eBD_SLOT_LgJointKnee,      0 );        // M:膝の結合（左）
     setCellAt( at++, eBD_SLOT_KnBase,           0 );        // M:膝下の土台（左）
     setCellAt( at++, eBD_SLOT_LwJointLeg,       0 );        // M:脚の結合（左）
-    setCellAt( at++, eBD_SLOT_CvLeg,            0 );        // M:カバー足（※脚の直前）（左）（※この要素が直接呼ばれることはない想定）
+    setCellAt( at++, eBD_SLOT_LgCover,          0 );        // M:脚カバー（※脚の直前）（左）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_LgBase,           0 );        // M:脚の土台（左）
 
     //---------------------------------
     // 頭（※ハリボテの前に来る部分）
     //---------------------------------
+    // ここに[LyMiddle]が差し込まれる
     setCellAt( at++, eBD_SLOT_HdTop,            0 );        // S:頭上
-    setCellAt( at++, eBD_SLOT_CvHead,           0 );        // S:カバー頭（※頭の直前）（※この要素が直接呼ばれることはない想定）
+
+    setCellAt( at++, eBD_SLOT_HdCover,          0 );        // S:頭カバー（※頭の直前）（※この要素が直接呼ばれることはない想定）
     setCellAt( at++, eBD_SLOT_HdBase,           0 );        // S:頭土台
 
     //---------------------------------
     // 体
     //---------------------------------
-    setCellAt( at++, eBD_SLOT_UpSymbol,         0 );        // S:襟元のシンボル
-    setCellAt( at++, eBD_SLOT_UpRibbon,         0 );        // S:襟元のリボン
-    
+    // 腹
     setCellAt( at++, eBD_SLOT_BlJointUpBody,    0 );        // S:上半身の結合
     setCellAt( at++, eBD_SLOT_BlJointLowBody,   0 );        // S:下半身の結合
     setCellAt( at++, eBD_SLOT_BlBase,           0 );        // S:腹土台
-    
+
+    // 上半身
     setCellAt( at++, eBD_SLOT_UpJointNeck,      0 );        // S:首の結合
     setCellAt( at++, eBD_SLOT_UpBase,           0 );        // S:上半身土台
     setCellAt( at++, eBD_SLOT_NkBase,           0 );        // S:首土台
 
+    // 下半身
     setCellAt( at++, eBD_SLOT_LwBase,           0 );        // S:下半身土台
-    setCellAt( at++, eBD_SLOT_LwSymbol,         0 );        // S:エプロンのシンボル（※下半身の土台に対するテスト）
-
-    //---------------------------------
-    // 背中
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,      1 );        // S:リボン結び目（右）
-    setCellAt( at++, eBD_SLOT_BlRibbonString,   1 );        // S:リボン紐（なびかせる部分）（右）
-
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,      0 );        // S:リボン結び目（左）
-    setCellAt( at++, eBD_SLOT_BlRibbonString,   0 );        // S:リボン紐（なびかせる部分（左）
-
-    setCellAt( at++, eBD_SLOT_LwTail,           0 );        // S:尻尾
 
     //---------------------------------
     // 頭（顔の後ろ側）
@@ -583,157 +635,14 @@ void CBmpDotOrderData::setDefaultForFrontSuited( void ){
 // TODO:エクセルで管理するか？
 //-----------------------------------
 void CBmpDotOrderData::setDefaultForQuater( void ){
-    // 一旦クリア
-    clear();
-    
-    int at = 0;
-    
-    //---------------------------------
-    // 管理系（※表示要素のないもの）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_FgTop,           0 );         // S:姿形
-    setCellAt( at++, eBD_SLOT_FoGround,        1 );         // S:接地点（右）
-    setCellAt( at++, eBD_SLOT_FoGround,        0 );         // S:接地点（左）
-
-    //---------------------------------
-    // 髪（右）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_HdHairSideKnot,  1 );         // S:結び目（横／右）
-    setCellAt( at++, eBD_SLOT_HdHairSide,      1 );         // S:おさげ（横／右）
-
-    //---------------------------------
-    // 手〜肩（右）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_ElJointWrist,    1 );         // M:手首の結合
-    setCellAt( at++, eBD_SLOT_HnBase,          1 );         // M:手の土台
-    setCellAt( at++, eBD_SLOT_AmJointElbow,    1 );         // M:肘の結合
-    setCellAt( at++, eBD_SLOT_ElBase,          1 );         // M:肘下の土台
-    setCellAt( at++, eBD_SLOT_UpJointSholder,  1 );         // M:肩の結合
-    setCellAt( at++, eBD_SLOT_AmBase,          1 );         // M:腕の土台
-
-    //---------------------------------
-    // 頭（顔の前にくる部分）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_HdAccentSide,    1 );         // M:頭：アクセント（横／右）
-    
-    setCellAt( at++, eBD_SLOT_HdAccentTop,     0 );         // S:頭：アクセント（上）
-    setCellAt( at++, eBD_SLOT_HdFront,         0 );         // S:頭：前髪
-    setCellAt( at++, eBD_SLOT_HdCap,           0 );         // S:頭：帽子
-    
-    setCellAt( at++, eBD_SLOT_HdRibbon,        0 );         // S:頭：リボン
-
-    //---------------------------------
-    // 顔
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_HdSide,          1 );         // M:顔：もみあげ（右）
-    setCellAt( at++, eBD_SLOT_FcEar,           1 );         // M:顔：耳（右）
-
-    setCellAt( at++, eBD_SLOT_FcOption,        0 );         // S:オプション
-    setCellAt( at++, eBD_SLOT_FcNose,          0 );         // S:鼻
-
-    setCellAt( at++, eBD_SLOT_FcBrows,         1 );         // S:頭：まゆげ（右）
-    setCellAt( at++, eBD_SLOT_EyBase,          1 );         // M:目土台（右）
-    setCellAt( at++, eBD_SLOT_EyBall,          1 );         // M:目玉（右）
-
-    setCellAt( at++, eBD_SLOT_MoBase,          0 );         // S:口土台
-
-    setCellAt( at++, eBD_SLOT_FcBrows,         0 );         // S:頭：まゆげ（左）
-    setCellAt( at++, eBD_SLOT_EyBase,          0 );         // M:目土台（左）
-    setCellAt( at++, eBD_SLOT_EyBall,          0 );         // M:目玉（左）
-
-    setCellAt( at++, eBD_SLOT_FcHairLine,      0 );         // S:生え際
-    setCellAt( at++, eBD_SLOT_FcBase,          0 );         // S:顔土台
-
-    setCellAt( at++, eBD_SLOT_EyOption,        1 );         // M:目オプション（右）
-    setCellAt( at++, eBD_SLOT_EyOption,        0 );         // M:目オプション（左）
-    setCellAt( at++, eBD_SLOT_FcCheek,         1 );         // S:ほっぺた（右）
-    setCellAt( at++, eBD_SLOT_FcCheek,         0 );         // S:ほっぺた（左）
-
-    setCellAt( at++, eBD_SLOT_HdSide,          0 );         // M:顔：もみあげ（左）
-    setCellAt( at++, eBD_SLOT_FcEar,           0 );         // N:顔：耳（左）
-
-    setCellAt( at++, eBD_SLOT_HdAccentSide,    0 );         // M:頭：アクセント（横／左）
-
-    //---------------------------------
-    // 体
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_UpSymbol,        0 );         // S:襟元のシンボル
-    setCellAt( at++, eBD_SLOT_UpRibbon,        0 );         // S:襟元のリボン
-    setCellAt( at++, eBD_SLOT_BlBase,          0 );         // S:腹土台
-    setCellAt( at++, eBD_SLOT_BlJointUpBody,   0 );         // S:上半身の結合
-    setCellAt( at++, eBD_SLOT_UpBase,          0 );         // S:上半身土台
-    setCellAt( at++, eBD_SLOT_UpJointNeck,     0 );         // S:首の結合
-    setCellAt( at++, eBD_SLOT_NkBase,          0 );         // S:首土台
-    setCellAt( at++, eBD_SLOT_BlJointLowBody,  0 );         // S:下半身の結合
-    setCellAt( at++, eBD_SLOT_LwBase,          0 );         // S:下半身土台
-    setCellAt( at++, eBD_SLOT_LwSymbol,        0 );         // S:エプロンのシンボル
-
-    //---------------------------------
-    // リボン（右）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_BlRibbonString,  1 );         // M:リボン（横／右）
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,     1 );         // M:リボン（横／右）
-
-    //---------------------------------
-    // 足（右）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_KnJointAnkle,    1 );         // M:足首の結合
-    setCellAt( at++, eBD_SLOT_FoBase,          1 );         // M:足先の土台
-    setCellAt( at++, eBD_SLOT_LgJointKnee,     1 );         // M:膝の結合
-    setCellAt( at++, eBD_SLOT_KnBase,          1 );         // M:膝下の土台
-    setCellAt( at++, eBD_SLOT_LwJointLeg,      1 );         // M:脚の結合
-    setCellAt( at++, eBD_SLOT_LgBase,          1 );         // M:脚の土台
-
-    //---------------------------------
-    // 頭（顔の後ろ側）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_HdTop,           0 );         // S:頭上
-    setCellAt( at++, eBD_SLOT_HdBase,          0 );         // S:頭土台
-
-    setCellAt( at++, eBD_SLOT_HdHairBackKnot,  0 );         // S:結び目（後ろ）
-    setCellAt( at++, eBD_SLOT_HdHairBack,      0 );         // S:おさげ（後ろ）
-
-    //---------------------------------
-    // 足（左）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_KnJointAnkle,    0 );         // M:足首の結合
-    setCellAt( at++, eBD_SLOT_FoBase,          0 );         // M:足先の土台
-    setCellAt( at++, eBD_SLOT_LgJointKnee,     0 );         // M:膝の結合
-    setCellAt( at++, eBD_SLOT_KnBase,          0 );         // M:膝下の土台
-    setCellAt( at++, eBD_SLOT_LwJointLeg,      0 );         // M:脚の結合
-    setCellAt( at++, eBD_SLOT_LgBase,          0 );         // M:脚の土台
-
-    //---------------------------------
-    // 手〜肩（左）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_UpJointSholder,  0 );         // M:肩の結合
-    setCellAt( at++, eBD_SLOT_AmBase,          0 );         // M:腕の土台
-    setCellAt( at++, eBD_SLOT_AmJointElbow,    0 );         // M:肘の結合
-    setCellAt( at++, eBD_SLOT_ElBase,          0 );         // M:肘下の土台
-    setCellAt( at++, eBD_SLOT_ElJointWrist,    0 );         // M:手首の結合
-    setCellAt( at++, eBD_SLOT_HnBase,          0 );         // M:手の土台
-
-    //---------------------------------
-    // 尻尾
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_LwTail,          0 );         // S:尻尾
-
-    //---------------------------------
-    // リボン（左）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_BlRibbonString,  0 );         // M:リボン（横／左）
-    setCellAt( at++, eBD_SLOT_BlRibbonTie,     0 );         // M:リボン（横／左）
-
-    //---------------------------------
-    // 髪（左）
-    //---------------------------------
-    setCellAt( at++, eBD_SLOT_HdHairSideKnot,  0 );         // S:結び目（横／左）
-    setCellAt( at++, eBD_SLOT_HdHairSide,      0 );         // S:おさげ（横／左）
+    // TODO:斜めの実装は無理そう？
+    LOGE( "@ CBmpDotOrderData::setDefaultForQuater: NOT SUPPORTED" );
 }
 
 //---------------------------
 // デフォルト設定：斜め（着ぐるみ）
 //---------------------------
 void CBmpDotOrderData::setDefaultForQuaterSuited( void ){
-    setDefaultForQuater();  // とりあえず
+    // TODO:斜めの実装は無理そう？
+    LOGE( "@ CBmpDotOrderData::setDefaultForQuaterSuited: NOT SUPPORTED" );
 }

@@ -350,6 +350,68 @@ bool CTexMgr::CreateAllForCharaColor( void ){
 	s_nArrCharaColorForWordOL    = new uint32[eCHARA_COLOR_MAX];
 	CMemMgr::PopTargetField();
 
+	//-----------------------------------
+	// 初期値設定
+	//-----------------------------------
+#if 0
+	// パレット
+	s_pArrCharaColorPalColor[eCHARA_COLOR_DOG]				=	GetTexPal( eTEX_PAL_DOG_0 );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_DOG]				=	GetTexPal( eTEX_PAL_DOG_0_L );
+	s_pArrCharaColorPalColor[eCHARA_COLOR_DOG_BURNING]		=	GetTexPal( eTEX_PAL_FIRE_0 );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_DOG_BURNING]		=	GetTexPal( eTEX_PAL_FIRE_L );
+	s_pArrCharaColorPalColor[eCHARA_COLOR_ARITH_A]			=	GetTexPal( eTEX_TEST_PAL_COLOR );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_ARITH_A]			=	GetTexPal( eTEX_TEST_PAL_LINE );
+	s_pArrCharaColorPalColor[eCHARA_COLOR_ARITH_B]			=	GetTexPal( eTEX_TEST_PAL_COLOR );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_ARITH_B]			=	GetTexPal( eTEX_TEST_PAL_LINE );
+	s_pArrCharaColorPalColor[eCHARA_COLOR_ARITH_C]			=	GetTexPal( eTEX_TEST_PAL_COLOR );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_ARITH_C]			=	GetTexPal( eTEX_TEST_PAL_LINE );
+	s_pArrCharaColorPalColor[eCHARA_COLOR_ARITH_D]			=	GetTexPal( eTEX_TEST_PAL_COLOR );
+	s_pArrCharaColorPalLine[eCHARA_COLOR_ARITH_D]			=	GetTexPal( eTEX_TEST_PAL_LINE );
+
+	// ワード色：塗り（一文字目）
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_DOG] 				=	0xF8F8FFFF;	// 犬
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_DOG_BURNING]		=	0xFFF8F8FF;	// 犬（バーニング）
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_A]			=	0xFFF8E8FF;	// 羊Ａ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_B]			=	0xE8FFE8FF;	// 羊Ｂ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_C]			=	0xFFFFD8FF;	// 羊Ｃ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_D]			=	0xF8D8FFFF;	// 羊Ｄ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_SUB_A]		=	0xFFFFFFFF;	// 羊サブＡ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_SUB_B]		=	0xFFFFFFFF;	// 羊サブＢ
+	s_nArrCharaColorForWordTop[eCHARA_COLOR_ARITH_SUB_C]		=	0xFFFFFFFF;	// 羊サブＣ
+
+	// ワード色：枠（一文字目）
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_DOG]			=	0x2020A0FF;	// 犬
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_DOG_BURNING]	=	0xA02020FF;	// 犬（バーニング）
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_A]		=	0xA02020FF;	// 羊Ａ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_B]		=	0x20A020FF;	// 羊Ｂ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_C]		=	0x806020FF;	// 羊Ｃ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_D]		=	0x702070FF;	// 羊Ｄ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_SUB_A]	=	0x808080FF;	// 羊サブＡ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_SUB_B]	=	0x808080FF;	// 羊サブＢ
+	s_nArrCharaColorForWordTopOL[eCHARA_COLOR_ARITH_SUB_C]	=	0x808080FF;	// 羊サブＣ
+
+	// ワード色：塗り（二文字目以降）
+	s_nArrCharaColorForWord[eCHARA_COLOR_DOG]					=	0xE0E0FFFF;	// 犬
+	s_nArrCharaColorForWord[eCHARA_COLOR_DOG_BURNING]			=	0xFFE0E0FF;	// 犬（バーニング）
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_A]				=	0xFFE0D8FF;	// 羊Ａ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_B]				=	0xD0FFC8FF;	// 羊Ｂ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_C]				=	0xFFFFC8FF;	// 羊Ｃ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_D]				=	0xE8C0FFFF;	// 羊Ｄ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_SUB_A]			=	0xEFFFFFFF;	// 羊サブＡ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_SUB_B]			=	0xEFFFFFFF;	// 羊サブＢ
+	s_nArrCharaColorForWord[eCHARA_COLOR_ARITH_SUB_C]			=	0xEFFFFFFF;	// 羊サブＣ
+
+	// ワード色：枠（二文字目以降）
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_DOG]				=	0x101090FF;	// 犬
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_DOG_BURNING]		=	0x901010FF;	// 犬（バーニング）
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_A]			=	0x901010FF;	// 羊Ａ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_B]			=	0x109010FF;	// 羊Ｂ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_C]			=	0x705010FF;	// 羊Ｃ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_D]			=	0x601060FF;	// 羊Ｄ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_SUB_A]		=	0x601060FF;	// 羊サブＡ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_SUB_B]		=	0x601060FF;	// 羊サブＢ
+	s_nArrCharaColorForWordOL[eCHARA_COLOR_ARITH_SUB_C]		=	0x601060FF;	// 羊サブＣ
+#endif
 	return( true );
 }
 
@@ -359,6 +421,42 @@ bool CTexMgr::CreateAllForCharaColor( void ){
 CTex* CTexMgr::GetBankTexWithType( eBANK bank, const char*pName, eBMP_TYPE type, eREGIST_TEX_BANK registBank ){
 	// 名前長の取得
 	int len = (int)strlen( pName );
+
+#if 0
+	// キーワード(※２文字)であれば登録テクスチャのチェック
+	if( len == 2 ){
+		eREGIST_TEX registTexId = eREGIST_TEX_INVALID;
+
+		if( pName[0] == 'N' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_N0; }
+		}else if( pName[0] == 'C' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_C0; }
+			if( pName[1] == '1' ){ registTexId = eREGIST_TEX_C1; }
+			if( pName[1] == '2' ){ registTexId = eREGIST_TEX_C2; }
+		}else if( pName[0] == 'J' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_J0; }
+			if( pName[1] == '1' ){ registTexId = eREGIST_TEX_J1; }
+			if( pName[1] == '2' ){ registTexId = eREGIST_TEX_J2; }
+		}else if( pName[0] == 'n' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_n0; }
+		}else if( pName[0] == 'c' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_c0; }
+			if( pName[1] == '1' ){ registTexId = eREGIST_TEX_c1; }
+			if( pName[1] == '2' ){ registTexId = eREGIST_TEX_c2; }
+		}else if( pName[0] == 'j' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_j0; }
+			if( pName[1] == '1' ){ registTexId = eREGIST_TEX_j1; }
+			if( pName[1] == '2' ){ registTexId = eREGIST_TEX_j2; }
+		}else if( pName[0] == 'W' ){
+			if( pName[1] == '0' ){ registTexId = eREGIST_TEX_W0; }
+			if( pName[1] == '1' ){ registTexId = eREGIST_TEX_W1; }
+			if( pName[1] == '2' ){ registTexId = eREGIST_TEX_W2; }
+		}
+
+		CTex* pTex = GetRegistTexWithType( registBank, registTexId, type );
+		if( pTex != NULL ){ return( pTex ); }
+	}
+#endif
 
 	// 接頭子を削除して照会
 	len -= BMP_NAME_HEADER_PIVOT;
@@ -501,6 +599,16 @@ uint32 CTexMgr::GetCharaColorForWordOL( eCHARA_COLOR id ){
 // ID変換
 //--------------------
 eCHARA_COLOR CTexMgr::ConvCharaColorId( eBANK bank, eREGIST_TEX_BANK registBank, bool isBurning ){
+#if 0
+	if( bank == eBANK_SHEEP ){
+		return( (eCHARA_COLOR)(eCHARA_COLOR_ARITH_A + registBank) );
+	}
+	if( isBurning ){
+		return( eCHARA_COLOR_DOG_BURNING );
+	}
+	return( eCHARA_COLOR_DOG );
+#else
     return( eCHARA_COLOR_DUMMY );
+#endif
 }
 

@@ -20,7 +20,7 @@
   |	Global		グローバルデータ型定義
   +----------------------------------------------------------------+*/
 //-----------------
-// 出典ラベル
+// カテゴリラベル
 //-----------------
 const char* g_pArrLabelBdCategory[] = {
     #include "inc/BmpDotCategoryLabel.inc"
@@ -165,16 +165,22 @@ eBD_CATEGORY CBDConst::GetCategoryForSlot( eBD_SLOT slot ){
 //-----------------------
 // BDPD識別名取得
 //-----------------------
-void CBDConst::SetBmpDotPartName( char* pBuf, eBD_SLOT slot, int subId, eBD_DIR dir ){
+void CBDConst::SetBmpDotPartDataName( char* pBuf, eBD_SLOT slot, int subId, eBD_DIR dir ){
     // 確認：スロット
-    if( ! IS_BD_SLOT_VALID( slot ) || ! IS_BD_SUB_ID_VALID( subId ) ){
-        LOGE( "@ CBDConst::SetBmpDotNameShort: INVALID VAL: slot=%d, subId=%d\n", slot, subId );
+    if( ! IS_BD_SLOT_VALID( slot ) ){
+        LOGE( "@ CBDConst::SetBmpDotNameShort: INVALID VAL: slot=%d, subId=%d, dir=%d\n", slot, subId, dir );
+        return;
+    }
+    
+    // 確認：サブID
+    if( ! IS_BD_SUB_ID_VALID( subId ) ){
+        LOGE( "@ CBDConst::SetBmpDotNameShort: INVALID VAL: slot=%d, subId=%d, dir=%d\n", slot, subId, dir );
         return;
     }
     
     // 確認：向き
-    if( dir < (eBD_DIR)0 || dir >= eBD_DIR_MAX ){
-        LOGE( "@ CBDConst::SetBmpDotNameShort: INVALID VAL: dir=%d\n", dir );
+    if( ! IS_BD_DIR_VALID( dir ) ){
+        LOGE( "@ CBDConst::SetBmpDotNameShort: INVALID VAL: slot=%d, subId=%d, dir=%d\n", slot, subId, dir );
         return;
     }
 

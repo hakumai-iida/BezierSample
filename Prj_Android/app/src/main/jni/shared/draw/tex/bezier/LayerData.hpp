@@ -30,12 +30,13 @@ enum eLAYER_FLAG{
 	eLAYER_FLAG_INVALID = -1,           // 無効値
 
 	eLAYER_FLAG_DISABLE,	            // 00:[*] 無効
-    eLAYER_FLAG_STAY_HOOK,              // 01:[sH] フックをクリアしない（※前のレイヤーの一時フックを持ち越す）
-    eLAYER_FLAG_RESET_HOOK_ALL,         // 02:[rH] フックを全てリセットする（※フックのクリア時にテンポラリ以外もクリアする）
-    eLAYER_FLAG_STAY_TOUCH,             // 03:[sT] タッチをクリアしない（※前のレイヤーの一時タッチを持ち越す）
-    eLAYER_FLAG_RESET_TOUCH_ALL,        // 04:[rT] タッチを全てリセットする（※タッチのクリア時にテンポラリ以外もクリアする）
-    eLAYER_FLAG_OPEN_COVER,             // 05:[oC] カバーを開始する（※このレイヤーの描画登録直前に対応カバーBDPDのレイヤーを登録する）
-    eLAYER_FLAG_CLOSE_COVER,            // 06:[cC] カバーを終了する（※このレイヤーの描画登録直後に対応カバーBDPDのレイヤーを登録する）
+    eLAYER_FLAG_STAY_HOOK_TEMP,         // 01:[sH] 一時フックをクリアしない（※レイヤー処理後に一時フックをクリアしない）
+    eLAYER_FLAG_STAY_TOUCH_TEMP,        // 02:[sT] 一時タッチをクリアしない（※レイヤー処理後に一時タッチをクリアしない）
+    eLAYER_FLAG_STAY_GUIDE_TEMP,        // 03:[sG] 一時ガイドをクリアしない（※レイヤー処理後に一時ガイドをクリアしない）
+    eLAYER_FLAG_INVALID_FOR_SUITED,     // 04:[-] スーツ（着ぐるみ）時に無効化する
+    eLAYER_FLAG_VALID_FOR_SUITED,       // 05:[+] スーツ（着ぐるみ）時に有効化する
+    eLAYER_FLAG_OPEN_COVER,             // 06:[oC] カバーを開始する（※このレイヤーの描画登録直前に対応カバーBDPDのレイヤーを登録する）
+    eLAYER_FLAG_CLOSE_COVER,            // 07:[cC] カバーを終了する（※このレイヤーの描画登録直後に対応カバーBDPDのレイヤーを登録する）
 
     eLAYER_FLAG_MAX,		            // 最大（※フラグ変数は[short]なので[00〜15]まで）
     
@@ -90,10 +91,15 @@ protected:
     // オプション（※描画設定に指定がある場合に有効になる）
     eBD_OPTION m_eOption;                       // [enum]: オプション
     
+    // 回転適用率（※０にすることで常に基本角度になる＝接地要素）
+    int m_nRotPowRate;
+    
     // 遅延調整：動きに遅れて着いてくるイメージのオフセット値（※慣性的な調整用）
-    eDELAY_LOG m_eDelayType;                    // [enum]: 遅延タイプ（※遅延配列への参照先）
-    int m_nDelayDepth;                          // [2]: 遅延ログ震度
-    int m_nDelayPowerRateX, m_nDelayPowerRateY; // [2x2]: 遅延の強さ（※移動値への係数）
+    eDELAY_LOG m_eDelayType;    // [enum]: 遅延タイプ（※遅延配列への参照先）
+    int m_nDelayDepth;          // [2]: 遅延ログ震度
+    int m_nDelayPowerRateX, m_nDelayPowerRateY;                 // [2x2]: 移動の強さ
+    int m_nDelayPowerRateXForRot, m_nDelayPowerRateYForRot;     // [2x2]: 回転の強さ
+    int m_nDelayPowerRateXForScale, m_nDelayPowerRateYForScale; // [2x2]: 拡縮の強さ
 
 public:
     // コンストラクタ／デストラクタ
@@ -107,9 +113,13 @@ public:
     inline void setOrder( eLAYER_ORDER_TYPE type, eBD_SLOT target=eBD_SLOT_DEFAULT ){ m_eOrderType = type; m_eOrderSlot = target; }
 
     inline void setOption( eBD_OPTION option ){ m_eOption = option; }
+    
+    inline void setRotPowRate( float rate ){ m_nRotPowRate = rate; }
 
     inline void setDelayType( eDELAY_LOG type, int depth=0 ){ m_eDelayType = type; m_nDelayDepth = depth; }
-    inline void setDelayPowerRate( int rateX, int rateY ){ m_nDelayPowerRateX = rateX; m_nDelayPowerRateY = rateY; }
+    inline void setDelayPowerRateForXY( int rateX, int rateY ){ m_nDelayPowerRateX = rateX; m_nDelayPowerRateY = rateY; }
+    inline void setDelayPowerRateForRot( int rateX, int rateY ){ m_nDelayPowerRateXForRot = rateX; m_nDelayPowerRateYForRot = rateY; }
+    inline void setDelayPowerRateForScale( int rateX, int rateY ){ m_nDelayPowerRateXForScale = rateX; m_nDelayPowerRateYForScale = rateY; }
 
 	//----------------
 	// 取得
@@ -119,11 +129,18 @@ public:
     inline eBD_SLOT getOrderSlot( void ){ return( m_eOrderSlot ); }
 
     inline eBD_OPTION getOption( void ){ return( m_eOption ); }
-    
+
+    inline int  getRotPowRate( void ){ return( m_nRotPowRate ); }
+    inline float getRotPow( void ){ return( CConst::ConvBezierScaleRate( m_nRotPowRate ) ); }
+
     inline eDELAY_LOG getDelayType( void ){ return( m_eDelayType ); }
     inline int getDelayDepth( void ){ return( m_nDelayDepth ); }
     inline int getDelayPowerRateX( void ){ return( m_nDelayPowerRateX ); }
     inline int getDelayPowerRateY( void ){ return( m_nDelayPowerRateY ); }
+    inline int getDelayPowerRateXForRot( void ){ return( m_nDelayPowerRateXForRot ); }
+    inline int getDelayPowerRateYForRot( void ){ return( m_nDelayPowerRateYForRot ); }
+    inline int getDelayPowerRateXForScale( void ){ return( m_nDelayPowerRateXForScale ); }
+    inline int getDelayPowerRateYForScale( void ){ return( m_nDelayPowerRateYForScale ); }
 
     //--------------------------------------------------------------------------------------
     // リスト操作（※アロケータの分岐があるので[IMPLEMENT_DATA_LIST_CONTROL_WITH_ALLOCATOR]は使えない）

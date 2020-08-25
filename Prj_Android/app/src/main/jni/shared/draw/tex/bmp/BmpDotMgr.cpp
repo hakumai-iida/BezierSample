@@ -32,6 +32,10 @@
 const char* CBmpDotMgr::s_pArrBmpDotPackName[] = {
     "AF0000_BASE.bdp",
     "AB0000_BASE.bdp",
+    
+    "AF0001_BASE.bdp",
+    "AB0001_BASE.bdp",
+    
     "AS000000_BASE.bdp",
 
     NULL
@@ -177,7 +181,7 @@ CBmpDotPack* CBmpDotMgr::GetBmpDotPackAt( int at ){
 
     // 無効は無視
     if( at < 0 || at >= numPack ){
-        LOGE( "@ CBmpDotMgr::GetBmpDotPackAt: INVALID at=%d\n", at );
+        LOGE( "@ CBmpDotMgr::GetBmpDotPackAt: INVALID at=%d/%d\n", at, numPack );
         return( NULL );
     }
 

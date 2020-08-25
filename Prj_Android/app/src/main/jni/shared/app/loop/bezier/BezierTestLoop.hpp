@@ -16,12 +16,40 @@
 
 #include "loop/Loop.hpp"
 #include "loop/node/Button.hpp"
+#include "loop/node/PullDownMenu.hpp"
 
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
-// スクショを有効かするか？
+// スクショを有効にするか？
 //#define ENABLE_SS
+
+//-----------------------
+// 機能項目
+//-----------------------
+enum eBEZIER_TEST_MENU_ITEM{
+    // データ選択
+    eBTMI_SELECT_CHARA,         // キャラクタ選択
+    eBTMI_SELECT_COSTUME,       // 着ぐるみ選択
+    eBTMI_SELECT_STROKE,        // ストローク選択
+    eBTMI_SELECT_COLOR,         // 色選択
+
+    // ベジェの機能
+    eBTMI_ENABLE_TOUCH,         // タッチを有効にするか？
+    eBTMI_ENABLE_STRIPE,        // ストライプを有効にするか？
+    eBTMI_ENABLE_FRILL,         // フリルを有効にするか？
+    eBTMI_ENABLE_FILL_EDGE,     // エッジ塗りを有効にするか？
+    eBTMI_ENABLE_FILL_OPTION,   // 塗りオプションを有効にするか？
+    
+    // 表示
+    eBTMI_DISP_WORK_PATH,       // ワークパスを表示するか？
+    eBTMI_DISP_BG,              // 背景を表示するか？
+    eBTMI_DISP_FLIP_H,          // 横反転するか？
+    eBTMI_DISP_FLIP_V,          // 縦反転するか？
+    eBTMI_DISP_ON_GROUND,       // 接地表示するか？
+    
+    eBTMI_MAX,
+};
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体型宣言
@@ -37,16 +65,9 @@ protected:
     // ボタン：基本制御
 	CButton* m_pButtonExit;
 	CButton* m_pButtonReset;
-    CButton* m_pButtonSetRand;
-    CButton* m_pButtonSetRead;
-    CButton* m_pButtonBg;
-    CButton* m_pButtonLine;
-    CButton* m_pButtonColor;
-    CButton* m_pButtonPath;
-    CButton* m_pButtonFlipH;
-    CButton* m_pButtonFlipV;
-    CButton* m_pButtonGround;
+    CButton* m_pButtonRand;
 
+    // ボタン：アニメ制御
     CButton* m_pButtonAnim;
     CButton* m_pButtonAnimH;
     CButton* m_pButtonAnimV;
@@ -83,23 +104,12 @@ protected:
     CButton* m_pButtonDecScale;
     CButton* m_pButtonIncScale;
 
+    // 機能メニュー
+    CPullDownMenu*  m_pMenu;
+    
     //-------------------------
     // ワーク
     //-------------------------
-#ifdef ENABLE_SS
-    bool m_bDumpSS;         // 画像更新時にスクショをダンプするか？
-    int  m_nDumpSkipCount;  // アニメダンプの間引き用
-#endif
-    
-    // 表示タイプ
-    bool m_bDispBg;         // 背景を表示するか？
-    int m_nLineType;        // 線の表示タイプ
-    int m_nColorType;       // 色の表示タイプ
-    bool m_bDispPath;       // ワークパスを表示するか？
-    bool m_bFlipH;          // 横反転するか？
-    bool m_bFlipV;          // 縦反転するか？
-    bool m_bGround;         // 設置するか？
-    
     // 調整値
     float m_fAdjustRateH, m_fAdjustRateVH;
     float m_fAdjustRateV, m_fAdjustRateVV;
@@ -128,33 +138,26 @@ protected:
     bool m_bAnimPullRevX;
     bool m_bAnimPullRevY;
     float m_fAnimPullCount;
-    
-    //----------------------
-    // セッティング
-    //----------------------
+
+    // 設定
     CBmpDotSettingData m_oSetting;
+    int m_nArrMenuVal[eBTMI_MAX];
 
     //----------------------
     // テクスチャ
     //----------------------
-    CTex* m_pTexForLine;                // 線
-    CTex* m_pTexForColor;               // 塗り
-    CTex* m_pTexForPath;                // パス
-
-    //----------------------
-    // テストレイヤーデータ
-    //----------------------
-    CLayerData* m_pLayerBase;           // 基本
+    CTex* m_pTexForLine;        // 線
+    CTex* m_pTexForColor;       // 塗り
+    CTex* m_pTexForPath;        // パス
     
-    CLayerData* m_pLayerFrill;          // フリル
+    // ログ
+    int m_nBmpGenTimeForPath;
+    int m_nBmpGenTime;
 
-    CLayerData* m_pLayerDelay;          // 遅延
-
-    CLayerData* m_pLayerHookA;          // フック（Ａ）
-    CLayerData* m_pLayerHookB;          // フック（Ｂ）
-    CLayerData* m_pLayerHookC;          // フック（Ｃ）
-    
-    CLayerData* m_pLayerLineRepair;     // 線修復
+#ifdef ENABLE_SS
+    bool m_bDumpSS;             // 画像更新時にスクショをダンプするか？
+    int  m_nDumpSkipCount;      // アニメダンプの間引き用
+#endif
 
 public:
     // コンストラクタ／デストラクタ
@@ -176,10 +179,6 @@ protected:
     virtual void registForDraw0( void ){}
 
 private:
-    // 確保／開放
-    void allocForTest( void );
-    void releaseForTest( void );
-
     // 更新
     bool updateAnim( void );
     
@@ -189,30 +188,50 @@ private:
     void onAnimPull( void );
     void onAnimShot( void );
     
-    // ブラシ強制
-    void fixBrush( int type );
-    
-    // ボタン更新
-    void fixButtonAnim( void );
+    // ボタン確定
+    void fixForAnimButton( void );
+        
+    // セッティング確定
+    void fixForSetting( bool isRandom );
+
+    // メニュー確定
+    void fixForMenu( void );
 
     // BMP作成
     void createBmp( void );
     void createBmpWithLayerData( stBMP_GEN_CREATE_PARAM* pCreateParam );
     void createBmpWithBmpDot( stBMP_GEN_CREATE_PARAM* pCreateParam );
+    
+    //------------------------------------------------
+    // テストバッファの確保／開放
+    //------------------------------------------------
+    void allocForTest( void );
+    void releaseForTest( void );
 
     //=================================================
     // 以下は[BezierTestLoopForBase.cpp]で実装
     //=================================================
+    CLayerData* m_pLayerBase;
     void allocForLayerForBase( void );
+
+    //=================================================
+    // 以下は[BezierTestLoopForTouch.cpp]で実装
+    //=================================================
+    CLayerData* m_pLayerTouch;
+    void allocForLayerForTouch( void );
 
     //=================================================
     // 以下は[BezierTestLoopForDelay.cpp]で実装
     //=================================================
+    CLayerData* m_pLayerDelay;
     void allocForLayerForDelay( void );
 
     //=================================================
     // 以下は[BezierTestLoopForHook.cpp]で実装
     //=================================================
+    CLayerData* m_pLayerHookA;
+    CLayerData* m_pLayerHookB;
+    CLayerData* m_pLayerHookC;
     void allocForLayerForHookA( void );
     void allocForLayerForHookB( void );
     void allocForLayerForHookC( void );
@@ -220,7 +239,13 @@ private:
     //=================================================
     // 以下は[BezierTestLoopForLineRepair.cpp]で実装
     //=================================================
+    CLayerData* m_pLayerLineRepair;
     void allocForLayerForLineRepair( void );
+
+    //=================================================
+    // 以下は[CBezier::GetLayerDataForFrill]を参照
+    //=================================================
+    CLayerData* m_pLayerRefForFrill;
 };
 
 /*+----------------------------------------------------------------+

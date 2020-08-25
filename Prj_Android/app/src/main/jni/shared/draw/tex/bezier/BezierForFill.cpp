@@ -12,77 +12,6 @@
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
-//----------------------------------------------------------------------------------------------
-// 塗り処理の共通部分（ストローク準備）
-//----------------------------------------------------------------------------------------------
-#define FILL_COMMON_STROKE                                                                      \
-    int strokeSize = (int)pFP->optionStrokeSize;                                                \
-    if( strokeSize <= 0 ){                                                                      \
-        return;                                                                                 \
-    }                                                                                           \
-    int strokeRange = (int)pFP->optionStrokeRange;                                              \
-    CStroke* pStroke = CStrokeMgr::GetStroke( eSTROKE_TYPE_CIRCLE, strokeSize, strokeRange );   \
-    if( pStroke == NULL ){                                                                      \
-        return;                                                                                 \
-    }                                                                                           \
-    int size = (int)pStroke->getSize();
-
-//----------------------------------------------------------------------------------
-// ポイント処理の共通部分（開始）
-//----------------------------------------------------------------------------------
-#define POINT_COMMON_START                                                          \
-    /* 座標調整（※ドットの中央に描画されるように）*/                                       \
-    x -=  size/2.0f;                                                                \
-    y -=  size/2.0f;                                                                \
-    /* 座標のはみ出し具合の算出 */                                                       \
-    int iX0 = (int)x;                                                               \
-    int iY0 = (int)y;                                                               \
-    float rateOutX = x - iX0;                                                       \
-    float rateOutY = y - iY0;                                                       \
-    /* ストローク画像取得＆描画 */                                                       \
-    stSTROKE_OUTPUT_CELL* pCell = pStroke->getStrokeCell( rateOutX, rateOutY );     \
-    BYTE* pDot = pCell->pBuf;                                                       \
-    int w = pCell->sizeW;                                                           \
-    int h = pCell->sizeH;                                                           \
-    int iX = iX0 + pCell->ofsX; /* １ピクセルを超えるオフセットの適用 */                   \
-    int iY = iY0 + pCell->ofsY; /* １ピクセルを超えるオフセットの適用 */
-
-//----------------------------------------------------------------------------------
-// ポイント処理の共通部分（終了＝特に無し）
-//----------------------------------------------------------------------------------
-#define POINT_COMMON_END
-
-//-----------------------------------------------------------------------------------
-// アンチ処理の共通部分（開始）（※ここのタッチ座標は傾き適用後の値）
-//-----------------------------------------------------------------------------------
-#define ANTI_COMMON_START                                                            \
-    int num = s_nArrTouchPointNum[touchId];                                          \
-    float* arrX = s_fArrArrTouchPointX[touchId];                                     \
-    float* arrY = s_fArrArrTouchPointY[touchId];                                     \
-    /* 塗りバッファに対してストロークを描く（※色味の取り扱いが別なので[PutDotAt]は使えない）*/     \
-    for( int target=0; target<num; target++ ){                                       \
-        /* 座標調整（※ドットの中央に描画されるように）*/                                    \
-        float x = arrX[target] - size/2.0f;                                          \
-        float y = arrY[target] - size/2.0f;                                          \
-        /* 座標のはみ出し具合の算出 */                                                    \
-        int iX0 = (int)x;                                                            \
-        int iY0 = (int)y;                                                            \
-        float rateOutX = x - iX0;   /* 小数点以下がＸ方向のはみ出し */                    \
-        float rateOutY = y - iY0;   /* 小数点以下がＹ方向のはみ出し */                    \
-        /* ストローク画像取得＆描画 */                                                   \
-        stSTROKE_OUTPUT_CELL* pCell = pStroke->getStrokeCell( rateOutX, rateOutY ); \
-        BYTE* pDot = pCell->pBuf;                                                   \
-        int w = pCell->sizeW;                                                       \
-        int h = pCell->sizeH;                                                       \
-        int iX = iX0 + pCell->ofsX; /* １ピクセルを超えるオフセットの適用 */               \
-        int iY = iY0 + pCell->ofsY; /* １ピクセルを超えるオフセットの適用 */
-
-//----------------------------------------------------------------------------------
-// アンチ処理の共通部分（終了）
-//----------------------------------------------------------------------------------
-#define ANTI_COMMON_END                                                             \
-    }
-
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
   +----------------------------------------------------------------+*/
@@ -102,12 +31,11 @@ void CBezier::DrawFill( stBEZIER_FILL_POINT* pHead ){
     stBEZIER_FILL_POINT* pFP = pHead;
     
     while( pFP != NULL ){
+        //----------------------------------------------
+        // アングルの指定が有効であれば変換（※塗りの座標を傾ける）
+        //----------------------------------------------
         float x = pFP->x;
         float y = pFP->y;
-
-        //-------------------------------
-        // アングルの指定が有効であれば変換
-        //-------------------------------
         if( pFP->angleRateLR != 0.0f || pFP->angleRateUD != 0.0f ){
             s_pBaseParam->pAnglePlane->calcXY( &x, &y, x, y, pFP->angleSearchKey, pFP->angleRateLR, pFP->angleRateUD );
         }
@@ -115,263 +43,456 @@ void CBezier::DrawFill( stBEZIER_FILL_POINT* pHead ){
         // ワークパスなら塗りつぶし位置の出力
         if( s_bWorkPath ){
             if( ! IsDispOnlyAnchorPoint() ){
-                PutCrossForWorkPath( x, y, BEZIER_WP_PAINT_PAL + pFP->workPathPalOfsS );
+                bool isMarkDisp = true;
+                
+                // 塗りオプションの場合線別
+                if( IS_FILL_OPTION_VALID( pFP->option ) ){
+                    // 座標に意味のあるものは退避
+                    if( pFP->option == eFILL_OPTION_POINT_AFTER_FILL ){}
+                    else if( pFP->option == eFILL_OPTION_AREA ){}
+                    // ここまできたら座標に意味はない
+                    else{ isMarkDisp = false; }
+                }
+
+                if( isMarkDisp ){
+                    PutCrossForWorkPath( x, y, BEZIER_WP_PAINT_PAL + pFP->workPathPalOfsS );
+                }
+
             }
         }else{
             // 通常時ならフィルを取得して塗りつぶし
-            // TODO:肌(顔)と髪のテストに対する補正は必要か？（※例えば髪のメッシュもテストに含まれるように調整すべきか？）
-            CFill* pFill = CFillMgr::GetFill( pFP->type );
-            BYTE palGrp, palVal;
+            CFill* pFill = GetFillWithFillPoint( pFP );
 
             if( pFill != NULL ){
+                eSTROKE_TOUCH_TARGET touchId;
+                bool isOnOutCol = pFP->isFillOnOutCol;
+
+                // 塗りの明暗オフセット（※ここは明色と暗色の値の制限を見る）
+                int darkOfs = pFP->darkOfs;
+                if( darkOfs < -BEZIER_PAL_MAX_LEVEL_FOR_BRIGHT ){ darkOfs = -BEZIER_PAL_MAX_LEVEL_FOR_BRIGHT; }
+                else if( darkOfs > BEZIER_PAL_MAX_LEVEL_FOR_DARK ){ darkOfs = BEZIER_PAL_MAX_LEVEL_FOR_DARK; }
+
+                // オプションの明暗オフセット（※ここは最小〜最大までの変動を許可する）
+                int optionDarkOfs = pFP->optionDarkOfs;
+                if( optionDarkOfs < -(BEZIER_PAL_COL_NUM_IN_GRP-1) ){ optionDarkOfs = -(BEZIER_PAL_COL_NUM_IN_GRP-1); }
+                else if( optionDarkOfs > (BEZIER_PAL_COL_NUM_IN_GRP-1) ){ optionDarkOfs = (BEZIER_PAL_COL_NUM_IN_GRP-1); }
+                
+                // 塗りオプション制限
+                if( IsDispOffFillOption() ){
+                    if( IS_FILL_OPTION_VALID( pFP->option ) ){
+                        if( pFP->option != eFILL_OPTION_MASK ){
+                            return;
+                        }
+                    }
+                    darkOfs = 0;
+                }
+
                 switch( pFP->option ){
-                // ポイント指定：明色
-                case eFILL_OPTION_POINT_BRIGHT:
-                    DrawFillPointBright( pFP, x, y, s_nTestPalGrp );
+                // ポイント
+                case eFILL_OPTION_POINT_AFTER_FILL:
+                    if( optionDarkOfs < 0 ){
+                        DrawFillPointBright( x, y, pFP->optionStrokeSize, pFP->optionStrokeRange, -optionDarkOfs );
+                    }else if( optionDarkOfs > 0 ){
+                        DrawFillPointDark( x, y, pFP->optionStrokeSize, pFP->optionStrokeRange, optionDarkOfs );
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_POINT_AFTER_FILL]\n" );
+                    }
+                    break;
+
+                // アンチストローク（※座標情報は不要）
+                case eFILL_OPTION_ANTI_STROKE_AFTER_FILL:
+                    touchId = pFP->optionTouchId;
+                    if( IS_STROKE_TOUCH_TARGET_VALID( touchId ) ){
+                        if( optionDarkOfs < 0 ){
+                            DrawFillAntiStrokeBright( touchId, pFP->optionStrokeSize, pFP->optionStrokeRange, -optionDarkOfs );
+                        }else if( optionDarkOfs > 0 ){
+                            DrawFillAntiStrokeDark( touchId, pFP->optionStrokeSize, pFP->optionStrokeRange, optionDarkOfs );
+                        }else{
+                            LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_ANTI_STROKE_AFTER_FILL]\n" );
+                        }
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [touchId] for [eFILL_OPTION_ANTI_STROKE_AFTER_FILL] touchId=%d\n", touchId );
+                    }
+                    break;
+                    
+                // 明暗：領域指定
+                case eFILL_OPTION_AREA:
+                    if( optionDarkOfs != 0 ){
+                        pFill->fillAdd( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH,
+                                        (int)x, (int)y, s_nTestPalGrp, optionDarkOfs, isOnOutCol );
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_AREA]\n" );
+                    }
                     break;
                         
-                // ポイント指定：暗色
-                case eFILL_OPTION_POINT_DARK:
-                    DrawFillPointDark( pFP, x, y, s_nTestPalGrp );
+                // 明暗（※座標情報は不要）
+                case eFILL_OPTION_RESERVE:
+                    if( optionDarkOfs != 0 ){
+                        pFill->ofsAddForReserve( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH,
+                                                 pFP->optionOfsX, pFP->optionOfsY, optionDarkOfs );
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_RESERVE]\n" );
+                    }
                     break;
-                    
-                // 広域指定：明色（※アンチできないので１段階のみにしておく）
-                case eFILL_OPTION_AREA_BRIGHT:
-                    pFill->fillAddForAdd( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, (int)x, (int)y, s_nTestPalGrp, -1 );
+
+                // 明暗（※座標情報は不要）
+                case eFILL_OPTION_INTO:
+                    if( optionDarkOfs != 0 ){
+                        pFill->ofsAddForInto( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH,
+                                              pFP->optionOfsX, pFP->optionOfsY, optionDarkOfs );
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_INTO]\n" );
+                    }
                     break;
-                    
-                // 広域指定：暗色（※アンチできないので１段階のみにしておく）
-                case eFILL_OPTION_AREA_DARK:
-                    pFill->fillAddForAdd( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, (int)x, (int)y, s_nTestPalGrp, +1 );
-                    break;
-                    
-                // 全画素指定：明色（※アンチできないので１段階のみにしておく）
-                case eFILL_OPTION_COLOR_BRIGHT:
-                    pFill->fillAddForColor( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, pFP->optionOfsX, pFP->optionOfsY, -1 );
-                    break;
-                    
-                // 全画素指定：暗色（※アンチできないので１段階のみにしておく）
-                case eFILL_OPTION_COLOR_DARK:
-                    pFill->fillAddForColor( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, pFP->optionOfsX, pFP->optionOfsY, +1 );
+
+                // 明暗（※座標情報は不要）
+                case eFILL_OPTION_COLOR:
+                    if( optionDarkOfs != 0 ){
+                        pFill->ofsAddForColor( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH,
+                                               pFP->optionOfsX, pFP->optionOfsY, optionDarkOfs );
+                    }else{
+                        LOGE( "@ CBezier::DrawFill: INVALID [optionDarkOfs] for [eFILL_OPTION_COLOR]\n" );
+                    }
                     break;
 
                 // マスク
                 case eFILL_OPTION_MASK:
-                    pFill->fillMask( s_pBufFillGuard, s_pBufFillGuide, s_nBufW, s_nBufH, (int)x, (int)y );
+                    // マスクはガードバッファ[FillGuard]へ描き込む
+                    pFill->mask( s_pBufFillGuard, s_pBufFillGuide, s_nBufW, s_nBufH, (int)x, (int)y );
                     break;
                     
-                // ここまできたら通常の塗り
+                // ここまできたら通常の塗りつぶし
                 default:
-                    // 塗りオプションによりパレット値の調整
-                    palGrp = CDefTable::GetPalOfsValue( pFP->palOfsId );
-                    palVal = BEZIER_PAL_VAL_BASE;
-                    if( pFP->option == eFILL_OPTION_BRIGHT ){ palVal = BEZIER_PAL_VAL_MIN; }
-                    else if( pFP->option == eFILL_OPTION_DARK ){ palVal = BEZIER_PAL_VAL_MAX; }
-                    
-                    pFill->fill( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, (int)x, (int)y, palGrp, palVal, s_nTestPalGrp );
-                        
-                    // 明暗予約であれば塗りの直後に適用（※下塗りバッファの状況が残っているうちに処理する）
-                    if( pFP->option == eFILL_OPTION_RESERVE_BRIGHT ){
-                        pFill->fillAddForReserve( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, pFP->optionOfsX, pFP->optionOfsY, -1 );
-                    }else if( pFP->option == eFILL_OPTION_RESERVE_DARK ){
-                        pFill->fillAddForReserve( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, pFP->optionOfsX, pFP->optionOfsY, +1 );
-                    }
+                    pFill->fill( s_pBuf, s_pBufFillGuide, s_pBufFillGuard, s_nBufW, s_nBufH, (int)x, (int)y,
+                                 pFP->palGrp, BEZIER_PAL_VAL_BASE+darkOfs, s_nTestPalGrp, isOnOutCol );
                     break;
                 }
             }
         }
         // 次のポイントへ
-        pFP = (stBEZIER_FILL_POINT*) pFP->pNext;
+        pFP = pFP->pNext;
     }
 }
 
-//----------------------------------------------------------------
-// [Fill] 描画実体：ポイント明色（※無効判定は呼び出し元で済んでいるものとする）
-//----------------------------------------------------------------
-void CBezier::DrawFillPointBright( stBEZIER_FILL_POINT* pFP, float x, float y, BYTE targetPalGrp ){
-    FILL_COMMON_STROKE;
-    POINT_COMMON_START;
-    
-    // 画素の出力
-    for( int i=0; i<h; i++ ){
-        for( int j=0; j<w; j++ ){
-            //-----------------------------------
-            // 画素が有効であれば（※出力に意味があれば）
-            //-----------------------------------
-            int dotAt = w*i + j;
-            int subVal = ((BEZIER_PAL_VAL_BASE-BEZIER_PAL_VAL_MIN)*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
-            if( subVal > 0 ){
-                //-----------------------------------
-                // 対象パレットであれば
-                //-----------------------------------
-                int bufAt = s_nBufW*(iY+i) + (iX+j);
-                int palGrp = BEZIER_CONV_DOT_TO_PAL_GRP( s_pBuf[bufAt] );
-                if( palGrp >= BEZIER_PAL_GRP_HEAD && (targetPalGrp==0x00 || palGrp==targetPalGrp) ){
-                    // ストロークの濃さにより対象画素を明るく（※値を減算）
-                    int palVal = BEZIER_CONV_DOT_TO_PAL_VAL( s_pBuf[bufAt] ) - subVal;
-                    if( palVal < BEZIER_PAL_VAL_MIN ){
-                        palVal = BEZIER_PAL_VAL_MIN;
-                    }
-                    
-                    s_pBuf[bufAt] = BEZIER_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
-                }
-            }
-        }
-    }
-    
-    POINT_COMMON_END;
-}
-
-//----------------------------------------------------------------
-// [Fill] 描画実体：ポイント暗色（※無効判定は呼び出し元で済んでいるものとする）
-//----------------------------------------------------------------
-void CBezier::DrawFillPointDark( stBEZIER_FILL_POINT* pFP, float x, float y, BYTE targetPalGrp ){
-    FILL_COMMON_STROKE;
-    POINT_COMMON_START;
-    
-    // 画素の出力
-    for( int i=0; i<h; i++ ){
-        for( int j=0; j<w; j++ ){
-            //-----------------------------------
-            // 画素が有効であれば（※出力に意味があれば）
-            //-----------------------------------
-            int dotAt = w*i + j;
-            int addVal = ((BEZIER_PAL_VAL_MAX-BEZIER_PAL_VAL_BASE)*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
-            if( addVal > 0 ){
-                //-----------------------------------
-                // 対象パレットであれば
-                //-----------------------------------
-                int bufAt = s_nBufW*(iY+i) + (iX+j);
-                int palGrp = BEZIER_CONV_DOT_TO_PAL_GRP( s_pBuf[bufAt] );
-                if( palGrp >= BEZIER_PAL_GRP_HEAD && (targetPalGrp==0x00 || palGrp==targetPalGrp) ){
-                    // ストロークの濃さにより対象画素を明るく（※値を加算）
-                    int palVal = BEZIER_CONV_DOT_TO_PAL_VAL( s_pBuf[bufAt] ) + addVal;
-                    if( palVal > BEZIER_PAL_VAL_MAX ){
-                        palVal = BEZIER_PAL_VAL_MAX;
-                    }
-                    
-                    s_pBuf[bufAt] = BEZIER_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
-                }
-            }
-        }
-    }
-    
-    POINT_COMMON_END;
-}
-
-//-----------------------------------------------------------------------
-// [Fill] 描画実体：塗りのアンチ（※タッチ対象座標に沿って塗りバッファにアンチを適用する）
-//-----------------------------------------------------------------------
-void CBezier::DrawFillAntiForTouch( stBEZIER_FILL_POINT* pHead ){
-    // ワークパスであれば無視
-    if( s_bWorkPath ){
+//-----------------------------------
+// [Fill] ポイント：明るく
+//-----------------------------------
+void CBezier::DrawFillPointBright( float x, float y, int strokeSize, int strokeRange, int ofs ){
+    // 一時バッファにポイントの出力
+    if( ! DrawPointForTemp( x, y, strokeSize, strokeRange ) ){
+        LOGE( "@ CBezier::DrawFillPointBright: FAILED x=%f, y=%f, strokeSize=%d, strokeRange=%d, ofs=%d\n",
+              x, y, strokeSize, strokeRange, ofs );
         return;
     }
-    
-    stBEZIER_FILL_POINT* pFP = pHead;
-    
-    while( pFP != NULL ){
-        // オプションのタッチ対象IDが有効なら
-        eSTROKE_TOUCH_TARGET touchId = pFP->touchIdForOption;
-        if( touchId >= 0 && touchId < eSTROKE_TOUCH_TARGET_MAX ){
-            // オプションに応じた処理の呼び出し
-            switch( pFP->option ){
-            case eFILL_OPTION_BRIGHT:
-                DrawFillAntiBrightForTouch( pFP, touchId, CDefTable::GetPalOfsValue( pFP->palOfsId ) );
-                break;
-                
-            case eFILL_OPTION_DARK:
-                DrawFillAntiDarkForTouch( pFP, touchId, CDefTable::GetPalOfsValue( pFP->palOfsId ) );
-                break;
-                    
-            // その他はアンチを引けない
-            default:
-                break;
-            }
-        }
-        
-        // 次のポイントへ
-        pFP = (stBEZIER_FILL_POINT*) pFP->pNext;
-    }
-}
 
-//-----------------------------------------------------------
-// [Fill] 描画実体：明るく（※無効判定は呼び出し元で済んでいるものとする）
-//-----------------------------------------------------------
-void CBezier::DrawFillAntiBrightForTouch( stBEZIER_FILL_POINT* pFP, eSTROKE_TOUCH_TARGET touchId, BYTE targetPalGrp ){
-    FILL_COMMON_STROKE;
-    ANTI_COMMON_START;
-    
-    // 画素の出力
-    for( int i=0; i<h; i++ ){
-        for( int j=0; j<w; j++ ){
+    // work
+    int l = CBmpGenerator::GetLeftForTempBuf();
+    int r = CBmpGenerator::GetRightForTempBuf();
+    int t = CBmpGenerator::GetTopForTempBuf();
+    int b = CBmpGenerator::GetBottomForTempBuf();
+
+    BYTE* pBuf;
+    BYTE* pTemp;
+    BYTE* pGuide;
+    BYTE* pGuard;
+
+    // 一時バッファの内容をカラーバッファの明暗へ反映
+    for( int i=t; i<=b; i++ ){
+        pBuf = &s_pBuf[s_nBufW*i];
+        pTemp = &s_pBufTemp[s_nBufW*i];
+        pGuide = &s_pBufFillGuide[s_nBufW*i];
+        pGuard = &s_pBufFillGuard[s_nBufW*i];
+
+        for( int j=l; j<=r; j++ ){
             //----------------------------------------------------------------
-            // 塗り完了色でなければ（※ストローク境界上の塗り潰されなかった画素がアンチ対象）
+            // 直近色であれば（※先行する処理で塗り潰された画素が対象）
             //----------------------------------------------------------------
-            int bufAt = s_nBufW*(iY+i) + (iX+j);
-            if( ((s_pBufFillGuide[bufAt]&BEZIER_PAL_UNDERCOAT_FILL_DONE_FLAG)==0x00) && (s_pBufFillGuard[bufAt]==0) ){
-                //-----------------------------------
-                // 画素が有効であれば（※出力に意味があれば）
-                //-----------------------------------
-                int dotAt = w*i + j;
-                int subVal = (BEZIER_PAL_VAL_MAX*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+            if( IS_BFG_LAST_COL( pGuide[j] ) && pGuard[j] == 0 ){
+                int subVal = (ofs*pTemp[j]) / STROKE_DOT_OUT_PRECISION_MAX;
                 if( subVal > 0 ){
                     //-----------------------------------
                     // 対象パレットであれば
                     //-----------------------------------
-                    int palGrp = BEZIER_CONV_DOT_TO_PAL_GRP( s_pBuf[bufAt] );
-                    if( palGrp == targetPalGrp ){
-                        // ストロークの濃さにより対象画素を明るく（※累積すると汚いので上書き）
-                        int palVal = BEZIER_CONV_DOT_TO_PAL_VAL( s_pBuf[bufAt] );
-                        subVal = BEZIER_PAL_VAL_MAX - subVal;   // 濃さを明るさに調整
-                        if( subVal < palVal ){
-                            s_pBuf[bufAt] = BEZIER_CONV_PAL_INFO_TO_DOT( palGrp, subVal );
+                    int palGrp = BP_CONV_DOT_TO_PAL_GRP( pBuf[j] );
+                    if( palGrp >= BEZIER_PAL_GRP_HEAD && (s_nTestPalGrp==0x00 || palGrp==s_nTestPalGrp) ){
+                        // ストロークの濃さにより対象画素を明るく
+                        int palVal = BP_CONV_DOT_TO_PAL_VAL( pBuf[j] ) - subVal;
+                        if( palVal < BEZIER_PAL_VAL_MIN ){
+                            palVal = BEZIER_PAL_VAL_MIN;
                         }
+                        pBuf[j] = BP_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
                     }
                 }
             }
         }
+        
+        // ついでに値のクリア（※テンポラリバッファのクリアを呼ばなくても済むように）
+        memset( &pTemp[l], 0, r-l+1 );
     }
-    
-    ANTI_COMMON_END;
+
+    // テンポラリ情報のクリア
+    CBmpGenerator::ResetTempBufInfo();
 }
 
-//-----------------------------------------------------------
-// [Fill] 描画実体：暗く（※無効判定は呼び出し元で済んでいるものとする）
-//-----------------------------------------------------------
-void CBezier::DrawFillAntiDarkForTouch( stBEZIER_FILL_POINT* pFP, eSTROKE_TOUCH_TARGET touchId, BYTE targetPalGrp ){
-    FILL_COMMON_STROKE;
-    ANTI_COMMON_START;
+//-----------------------------------
+// [Fill] ポイント：暗く
+//-----------------------------------
+void CBezier::DrawFillPointDark( float x, float y, int strokeSize, int strokeRange, int ofs ){
+    // 一時バッファにポイントの出力
+    if( ! DrawPointForTemp( x, y, strokeSize, strokeRange ) ){
+        LOGE( "@ CBezier::DrawFillPointDark: FAILED x=%f, y=%f, strokeSize=%d, strokeRange=%d, ofs=%d\n",
+              x, y, strokeSize, strokeRange, ofs );
+        return;
+    }
 
-    // 画素の出力
-    for( int i=0; i<h; i++ ){
-        for( int j=0; j<w; j++ ){
+    // work
+    int l = CBmpGenerator::GetLeftForTempBuf();
+    int r = CBmpGenerator::GetRightForTempBuf();
+    int t = CBmpGenerator::GetTopForTempBuf();
+    int b = CBmpGenerator::GetBottomForTempBuf();
+
+    BYTE* pBuf;
+    BYTE* pTemp;
+    BYTE* pGuide;
+    BYTE* pGuard;
+
+    // 一時バッファの内容をカラーバッファの明暗へ反映
+    for( int i=t; i<=b; i++ ){
+        pBuf = &s_pBuf[s_nBufW*i];
+        pTemp = &s_pBufTemp[s_nBufW*i];
+        pGuide = &s_pBufFillGuide[s_nBufW*i];
+        pGuard = &s_pBufFillGuard[s_nBufW*i];
+
+        for( int j=l; j<=r; j++ ){
             //----------------------------------------------------------------
-            // 塗り完了色でなければ（※ストローク境界上の塗り潰されなかった画素がアンチ対象）
+            // 直近色であれば（※先行する処理で塗り潰された画素が対象）
             //----------------------------------------------------------------
-            int bufAt = s_nBufW*(iY+i) + (iX+j);
-            if( ((s_pBufFillGuide[bufAt]&BEZIER_PAL_UNDERCOAT_FILL_DONE_FLAG)==0x00) && (s_pBufFillGuard[bufAt]==0) ){
-                //-----------------------------------
-                // 画素が有効であれば（※出力に意味があれば）
-                //-----------------------------------
-                int dotAt = w*i + j;
-                int addVal = (BEZIER_PAL_VAL_MAX*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+            if( IS_BFG_LAST_COL( pGuide[j] ) && pGuard[j] == 0 ){
+                int addVal = (ofs*pTemp[j]) / STROKE_DOT_OUT_PRECISION_MAX;
                 if( addVal > 0 ){
                     //-----------------------------------
                     // 対象パレットであれば
                     //-----------------------------------
-                    int palGrp = BEZIER_CONV_DOT_TO_PAL_GRP( s_pBuf[bufAt] );
-                    if( palGrp == targetPalGrp ){
-                        // ストロークの濃さにより対象画素を暗く（※累積すると汚いので上書き）
-                        int palVal = BEZIER_CONV_DOT_TO_PAL_VAL( s_pBuf[bufAt] );
-                        if( addVal > palVal ){
-                            s_pBuf[bufAt] = BEZIER_CONV_PAL_INFO_TO_DOT( palGrp, addVal );
+                    int palGrp = BP_CONV_DOT_TO_PAL_GRP( pBuf[j] );
+                    if( palGrp >= BEZIER_PAL_GRP_HEAD && (s_nTestPalGrp==0x00 || palGrp==s_nTestPalGrp) ){
+                        // ストロークの濃さにより対象画素を暗く
+                        int palVal = BP_CONV_DOT_TO_PAL_VAL( pBuf[j] ) + addVal;
+                        if( palVal > BEZIER_PAL_VAL_MAX ){
+                            palVal = BEZIER_PAL_VAL_MAX;
                         }
+                        pBuf[j] = BP_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
                     }
+                }
+            }
+        }
+        
+        // ついでに値のクリア（※テンポラリバッファのクリアを呼ばなくても済むように）
+        memset( &pTemp[l], 0, r-l+1 );
+    }
+
+    // テンポラリ情報のクリア
+    CBmpGenerator::ResetTempBufInfo();
+}
+
+//-----------------------------------
+// [Fill] アンチストローク：明るく
+//-----------------------------------
+void CBezier::DrawFillAntiStrokeBright( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange, int ofs ){
+    // 一時バッファにストロークの出力
+    if( ! DrawStrokeWithTouchForTemp( touchId, strokeSize, strokeRange ) ){
+        LOGE( "@ CBezier::DrawFillAntiStrokeBright: FAILED touchId=%d, strokeSize=%d, strokeRange=%d, ofs=%d\n",
+              touchId, strokeSize, strokeRange, ofs );
+        return;
+    }
+
+    // work
+    int l = CBmpGenerator::GetLeftForTempBuf();
+    int r = CBmpGenerator::GetRightForTempBuf();
+    int t = CBmpGenerator::GetTopForTempBuf();
+    int b = CBmpGenerator::GetBottomForTempBuf();
+
+    BYTE* pBuf;
+    BYTE* pTemp;
+    BYTE* pGuide;
+    BYTE* pGuard;
+
+    // 一時バッファの内容をカラーバッファの明暗へ反映
+    for( int i=t; i<=b; i++ ){
+        pBuf = &s_pBuf[s_nBufW*i];
+        pTemp = &s_pBufTemp[s_nBufW*i];
+        pGuide = &s_pBufFillGuide[s_nBufW*i];
+        pGuard = &s_pBufFillGuard[s_nBufW*i];
+
+        for( int j=l; j<=r; j++ ){
+            //----------------------------------------------------------------
+            // 直近色でなければ（※ストローク境界上の塗り潰されなかった画素がアンチ対象）
+            //----------------------------------------------------------------
+            if( IS_NOT_BFG_LAST_COL( pGuide[j] ) && pGuard[j] == 0 ){
+                int subVal = (ofs*pTemp[j]) / STROKE_DOT_OUT_PRECISION_MAX;
+                if( subVal > 0 ){
+                    //-----------------------------------
+                    // 対象パレットであれば
+                    //-----------------------------------
+                    int palGrp = BP_CONV_DOT_TO_PAL_GRP( pBuf[j] );
+                    if( palGrp >= BEZIER_PAL_GRP_HEAD && (s_nTestPalGrp==0x00 || palGrp==s_nTestPalGrp) ){
+                        // ストロークの濃さにより対象画素を明るく
+                        int palVal = BP_CONV_DOT_TO_PAL_VAL( pBuf[j] ) - subVal;
+                        if( palVal < BEZIER_PAL_VAL_MIN ){
+                            palVal = BEZIER_PAL_VAL_MIN;
+                        }
+                        pBuf[j] = BP_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
+                    }
+                }
+            }
+        }
+        
+        // ついでに値のクリア（※テンポラリバッファのクリアを呼ばなくても済むように）
+        memset( &pTemp[l], 0, r-l+1 );
+    }
+
+    // テンポラリ情報のクリア
+    CBmpGenerator::ResetTempBufInfo();
+}
+
+//-----------------------------------
+// [Fill] アンチストローク：暗く
+//-----------------------------------
+void CBezier::DrawFillAntiStrokeDark( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange, int ofs ){
+    // 一時バッファにストロークの出力
+    if( ! DrawStrokeWithTouchForTemp( touchId, strokeSize, strokeRange ) ){
+        LOGE( "@ CBezier::DrawFillAntiStrokeDark: FAILED touchId=%d, strokeSize=%d, strokeRange=%d, ofs=%d\n",
+              touchId, strokeSize, strokeRange, ofs );
+        return;
+    }
+
+    // work
+    int l = CBmpGenerator::GetLeftForTempBuf();
+    int r = CBmpGenerator::GetRightForTempBuf();
+    int t = CBmpGenerator::GetTopForTempBuf();
+    int b = CBmpGenerator::GetBottomForTempBuf();
+
+    BYTE* pBuf;
+    BYTE* pTemp;
+    BYTE* pGuide;
+    BYTE* pGuard;
+
+    // 一時バッファの内容をカラーバッファの明暗へ反映
+    for( int i=t; i<=b; i++ ){
+        pBuf = &s_pBuf[s_nBufW*i];
+        pTemp = &s_pBufTemp[s_nBufW*i];
+        pGuide = &s_pBufFillGuide[s_nBufW*i];
+        pGuard = &s_pBufFillGuard[s_nBufW*i];
+
+        for( int j=l; j<=r; j++ ){
+            //----------------------------------------------------------------
+            // 直近色でなければ（※ストローク境界上の塗り潰されなかった画素がアンチ対象）
+            //----------------------------------------------------------------
+            if( IS_NOT_BFG_LAST_COL( pGuide[j] ) && pGuard[j] == 0 ){
+                int addVal = (ofs*pTemp[j]) / STROKE_DOT_OUT_PRECISION_MAX;
+                if( addVal > 0 ){
+                    //-----------------------------------
+                    // 対象パレットであれば
+                    //-----------------------------------
+                    int palGrp = BP_CONV_DOT_TO_PAL_GRP( pBuf[j] );
+                    if( palGrp >= BEZIER_PAL_GRP_HEAD && (s_nTestPalGrp==0x00 || palGrp==s_nTestPalGrp) ){
+                        // ストロークの濃さにより対象画素を暗く
+                        int palVal = BP_CONV_DOT_TO_PAL_VAL( pBuf[j] ) + addVal;
+                        if( palVal > BEZIER_PAL_VAL_MAX ){
+                            palVal = BEZIER_PAL_VAL_MAX;
+                        }
+                        pBuf[j] = BP_CONV_PAL_INFO_TO_DOT( palGrp, palVal );
+                    }
+                }
+            }
+        }
+        
+        // ついでに値のクリア（※テンポラリバッファのクリアを呼ばなくても済むように）
+        memset( &pTemp[l], 0, r-l+1 );
+    }
+
+    // テンポラリ情報はクリア
+    CBmpGenerator::ResetTempBufInfo();
+}
+
+//------------------------------------------------------
+// [Fill] 描画実体：指定位置にポイントを描画する
+//-------------------------------------------------------
+bool CBezier::DrawPointForTemp( float x, float y, int strokeSize, int strokeRange ){
+    CStroke* pStroke = CStrokeMgr::GetStroke( eSTROKE_TYPE_CIRCLE, strokeSize, strokeRange );
+    if( pStroke == NULL ){
+        LOGE( "@ CBezier::DrawPointForTemp: INVALID STROKE strokeSize=%d, strokeRange=%d\n", strokeSize, strokeRange );
+        return( false );
+    }
+
+    // 指定の１ドットの出力
+    PutDotAtForTemp( x, y, pStroke );
+    return( true );
+}
+
+//------------------------------------------------------
+// [Fill] 描画実体：一時バッファにタッチに沿ったストロークを描画する
+//-------------------------------------------------------
+bool CBezier::DrawStrokeWithTouchForTemp( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange ){
+    if( ! IS_STROKE_TOUCH_TARGET_VALID( touchId ) ){
+        LOGE( "@ CBezier::DrawStrokeWithTouchForTemp: INVALID touchId=%d\n", touchId );
+        return( false );
+    }
+    
+    CStroke* pStroke = CStrokeMgr::GetStroke( eSTROKE_TYPE_CIRCLE, strokeSize, strokeRange );
+    if( pStroke == NULL ){
+        LOGE( "@ CBezier::DrawStrokeWithTouchForTemp: INVALID STROKE strokeSize=%d, strokeRange=%d\n", strokeSize, strokeRange );
+        return( false );
+    }
+    
+    // タッチ登録されている座標の描画（※傾き後の座標で処理する）
+    int num = s_nArrTouchPointNum[touchId];
+    float* arrX = s_fArrArrTouchPointX[touchId];
+    float* arrY = s_fArrArrTouchPointY[touchId];
+    for( int i=0; i<num; i++ ){
+        PutDotAtForTemp( arrX[i], arrY[i], pStroke );
+    }
+    
+    return( true );
+}
+
+//------------------------------
+// [Fill] 一時バッファにドットを置く
+//------------------------------
+void CBezier::PutDotAtForTemp( float x0, float y0, CStroke* pStroke ){
+    // 座標調整（※ドットの中央に描画されるように）
+    int size = (int)pStroke->getSize();
+    float x = x0 - size/2.0f;
+    float y = y0 - size/2.0f;
+
+    // 座標のはみ出し具合の算出
+    int iX0 = (int)x;
+    int iY0 = (int)y;
+    float rateOutX = x - iX0;   // 小数点以下がＸ方向のはみ出し
+    float rateOutY = y - iY0;   // 小数点以下がＹ方向のはみ出し
+    
+    // ストローク画像取得
+    stSTROKE_OUTPUT_CELL* pCell = pStroke->getStrokeCell( rateOutX, rateOutY );
+    int w = pCell->sizeW;
+    int h = pCell->sizeH;
+    int iX = iX0 + pCell->ofsX; // １ピクセルを超えるオフセットの適用
+    int iY = iY0 + pCell->ofsY; // １ピクセルを超えるオフセットの適用
+
+    // 出力
+    for( int i=0; i<h; i++ ){
+        BYTE* pOut = &s_pBufTemp[s_nBufW*(iY+i)+iX];
+        BYTE* pDot = &pCell->pBuf[w*i];
+        
+        for( int j=0; j<w; j++ ){
+            if( pOut[j] < STROKE_DOT_OUT_PRECISION_MAX ){
+                pOut[j] += pDot[j];
+                if( pOut[j] > STROKE_DOT_OUT_PRECISION_MAX ){
+                    pOut[j] = STROKE_DOT_OUT_PRECISION_MAX;
                 }
             }
         }
     }
     
-    ANTI_COMMON_END;
+    // 一時バッファの領域を更新
+    CBmpGenerator::UpdateTempBufInfo( iX, iY );        // 左上
+    CBmpGenerator::UpdateTempBufInfo( iX+w, iY+h );    // 右下
 }

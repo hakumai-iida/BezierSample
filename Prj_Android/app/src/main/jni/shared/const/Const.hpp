@@ -116,7 +116,7 @@ public:
     
     // 割合座標変換
     inline static float ConvBezierPositionRate( int baseSize, int posRate ){ return( ((float)(baseSize*posRate))/BEZIER_POSITION_RATE ); }
-    inline static float ConvBezierRateScale( int rateScale ){ return( ((float)(rateScale))/BEZIER_SCALE_RATE ); }
+    inline static float ConvBezierScaleRate( int rateScale ){ return( ((float)(rateScale))/BEZIER_SCALE_RATE ); }
     inline static float ConvBezierRotationRate( int rotRate ){ return( ((float)(rotRate))/BEZIER_ROTATION_RATE ); }
 
 	//----------------------------------------------------------------
@@ -139,6 +139,10 @@ public:
     
     // カウンタによる色アニメ
     static uint32 CalcMoveForRGBA( uint32 rgbaFrom, uint32 rgbaDest, int count, int countMax );
+    
+    // 色の調整
+    static void AdjustColor( BYTE* pR, BYTE* pG, BYTE* pB, bool isDark, float rate, int minStep );
+    static void AdjustColorRand( BYTE* pR, BYTE* pG, BYTE* pB, int randRange );
 
 	//----------------------------------------------
 	// カウンタ（※目的値に到達したら[true]が返る）
@@ -149,6 +153,12 @@ public:
 	// 判定
 	inline static bool IsIncrementableToMax( float val, float max ){ return( val < max ); }
 	inline static bool IsDecrementableToZero( float val ){ return( val > 0.0f ); }
+
+    //----------------------
+    // 利用状況
+    //----------------------
+    static float CalcUseRate( int num, int max );
+    static DWORD GetUseAlertRGBA( float rate );
 
 	//----------------------------------------------
 	// フラグ

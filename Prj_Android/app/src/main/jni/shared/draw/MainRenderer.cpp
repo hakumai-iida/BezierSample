@@ -232,6 +232,12 @@ bool CMainRenderer::OnCreate( void ){
         return( false );
     }
 
+    if( ! CBmpPalMgr::OnCreate() ){
+        LOGE( "@ CBmpPalMgr::OnCreate(): FAILED!!\n" );
+        env_push_error_log( "[CBmpPalMgr::OnCreate()]に失敗しました。\n" );
+        return( false );
+    }
+
     if( ! CBmpGenerator::OnCreate() ){
         LOGE( "@ CBmpGenerator::OnCreate(): FAILED!!\n" );
         env_push_error_log( "[CBmpGenerator::OnCreate()]に失敗しました。\n" );
@@ -327,6 +333,7 @@ void CMainRenderer::OnDestroy( void ){
 	CFrameBufferMgr::OnDestroy();
 	CShaderMgr::OnDestroy();
     CBmpGenerator::OnDestroy();
+    CBmpPalMgr::OnDestroy();
     CBmpDotMgr::OnDestroy();
     CFillMgr::OnDestroy();
     CStrokeMgr::OnDestroy();

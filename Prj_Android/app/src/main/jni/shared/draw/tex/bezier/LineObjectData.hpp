@@ -30,13 +30,13 @@ enum eLOD_FLAG{
 
     eLOD_FLAG_DISABLE,	                    // 00:[*] 無効（※[CLayerData::draw]で処理されない）
     eLOD_FLAG_CLOSE_PATH,                   // 01:[C] パスを閉じる（※終点から始点へストロークを引く）
-    eLOD_FLAG_DOT,                          // 02:[D] パスではなくドットを描画する（※１ＡＰにつき１ドットのみ出力）
+    eLOD_FLAG_DOT,                          // 02:[D] ドットを描画する（※１ＡＰにつき１ドットのみ出力）
     eLOD_FLAG_TOUCH,                        // 03:[T] タッチを描画する
     eLOD_FLAG_TOUCH_IS_STRIPE,              // 04:[S] タッチ描画をストライプ扱いする
     eLOD_FLAG_TOUCH_IS_FRILL,               // 05:[F] タッチ描画をフリル扱いする
-    eLOD_FLAG_GUIDE_DRAW_BEFORE_STROKE,     // 06:[dG] ストローク処理の前に登録タッチ情報でガイドを描画する
-    eLOD_FLAG_GUIDE_RESET_AFTER_STROKE,     // 07:[rG] ストローク処理の後にガイドをリセットする
-    eLOD_FLAG_GUIDE_RESET_FULL,             // 08:[grF] ガイドを完全にリセットする
+    eLOD_FLAG_RESET_GUIDE_AFTER_STROKE,     // 06:[rG] ストローク処理の後にガイドをリセットする
+    eLOD_FLAG_FOCUS_OUT_COL_AFTER_STROKE,   // 07:[@] 塗りの後に出力色を持ち越す（※塗られた範囲にのみ処理を限定する場合）
+    eLOD_FLAG_RESET_MASK_AFTER_STROKE,      // 08:[rM] ストローク処理の後にマスクをリセットする
 
     eLOD_FLAG_MAX,		                    // 最大（※フラグ変数は[short]なので[00〜15]まで）
     
@@ -73,12 +73,14 @@ protected:
 	//--------------------------------------------------------------------
 	// 保存データ（※簡便のため[int]で宣言するが入出力時は値域に見合った型で処理される）
 	//--------------------------------------------------------------------
-    //int m_eFlag;                      // [2]: フラグ（※[IMPLEMENT_DATA_FLAG]で宣言）
-    //CList m_oDataList;                // [X]: データリスト：CAnchorPointData
+    //int m_eFlag;                          // [2]: フラグ（※[IMPLEMENT_DATA_FLAG]で宣言）
+    //CList m_oDataList;                    // [X]: データリスト：CAnchorPointData
     
-    eBRUSH m_eBrushId;                  // [enum]: ブラシID
-    ePAL_OFS m_eTestPalOfsId;           // [enum]: テストするパレットオフセットID（※指定色の上にのみ線を引く）
-    ePAL_OFS m_eTestPalOfsIdForRepair;  // [enum]: ラインの接続時の修復テストをするパレットオフセットID（※指定色の上に再度線を引く指定）
+    eBRUSH m_eBrushId;                      // [enum]: ブラシID
+    int m_nStrokeSize;                      // [2]: ストローク：基本サイズ:[0〜300%]
+    ePAL_OFS m_eTestPalOfsId;               // [enum]: テストするパレットオフセットID（※指定色の上にのみ線を引く）
+    ePAL_OFS m_eTestPalOfsIdForRepair;      // [enum]: ラインの接続時の修復テストをするパレットオフセットID（※指定色の上に再度線を引く指定）
+    eSTROKE_GUIDE_TARGET m_eGuideTargetId;  // [enum]: ガイド対象ID
 
 public:
     // コンストラクタ／デストラクタ
@@ -89,17 +91,21 @@ public:
     // 設定
     //----------------
     inline void setBrushId( eBRUSH brushId ){ m_eBrushId = brushId; }
+    inline void setStrokeSize( int size ){ m_nStrokeSize = size; }
     inline void setTestPalOfsId( ePAL_OFS palOfsId ){ m_eTestPalOfsId = palOfsId; }
     inline void setTestPalOfsIdForRepair( ePAL_OFS repairPalOfsId ){ m_eTestPalOfsIdForRepair = repairPalOfsId; }
+    inline void setGuideTargetId( eSTROKE_GUIDE_TARGET target ){ m_eGuideTargetId = target; }
 
 	//----------------
 	// 取得
 	//----------------
     inline eBRUSH getBrushId( void ){ return( m_eBrushId ); }
+    inline int getStrokeSize( void ){ return( m_nStrokeSize ); }
     inline ePAL_OFS getTestPalOfsId( void ){ return( m_eTestPalOfsId ); }
-    inline ePAL_OFS getTestPalOfsIdForRepair( void ){ return( m_eTestPalOfsIdForRepair ); }
     inline BYTE getTestPalGrp( void ){ return( CDefTable::GetPalOfsValue( m_eTestPalOfsId ) ); }
+    inline ePAL_OFS getTestPalOfsIdForRepair( void ){ return( m_eTestPalOfsIdForRepair ); }
     inline BYTE getTestPalGrpForRepair( void ){ return( CDefTable::GetPalOfsValue( m_eTestPalOfsIdForRepair ) ); }
+    eSTROKE_GUIDE_TARGET getGuideTargetId( int slotIndex=-1 );
 
     //-----------------------------------------------
     // アンカーポイントの追加（※現在選択中の点と次の点の中間）

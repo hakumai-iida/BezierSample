@@ -56,6 +56,8 @@ void CBmpDotSettingSlotData::reset( void ){
     
     m_nRateAdjForT = 0;
     m_nRateAdjForS = 0;
+    
+    m_bInvalid = false;
 }
 
 //--------------------
@@ -79,6 +81,8 @@ void CBmpDotSettingSlotData::copy( CBmpDotSettingSlotData* pData ){
     
     m_nRateAdjForT = pData->m_nRateAdjForT;
     m_nRateAdjForS = pData->m_nRateAdjForS;
+    
+    m_bInvalid = pData->m_bInvalid;
 }
 
 //---------------------------
@@ -97,6 +101,8 @@ void CBmpDotSettingSlotData::read( CInputBuffer* pIB ){
 
     m_nRateAdjForT = pIB->readInt16();
     m_nRateAdjForS = pIB->readInt16();
+    
+    m_bInvalid = (pIB->readUint8() != 0);
 }
 
 //---------------------------
@@ -111,17 +117,18 @@ void CBmpDotSettingSlotData::write( COutputBuffer* pOB ){
     CEnum::WriteEnum( pOB, m_eEmo, eBD_EMO_MAX, g_pArrLabelBdEmo );
     CEnum::WriteEnum( pOB, m_eForm, eBD_FORM_MAX, g_pArrLabelBdForm );
     pOB->writeInt16( (short)m_nSubId );
-    CEnum::WriteEnum( pOB, m_eDir, eBD_SLOT_MAX, g_pArrLabelBdDir );
+    CEnum::WriteEnum( pOB, m_eDir, eBD_DIR_MAX, g_pArrLabelBdDir );
 
     pOB->writeInt16( (short)m_nRateAdjForT );
     pOB->writeInt16( (short)m_nRateAdjForS );
+    
+    pOB->writeUint8( (m_bInvalid)? 1: 0 );
 }
 
-//------------
-// 判定
-//------------
+//-------------------------------
+// 判定（※ここでは無効フラグは見ない）
+//-------------------------------
 bool CBmpDotSettingSlotData::checkSlot( eBD_SLOT slot, int slotIndex ){
-    // 無効は無視
     if( ! IS_BD_SLOT_VALID( m_eSlot ) ){
         return( false );
     }

@@ -26,7 +26,7 @@
 //--------------------------------------------
 // メニュー項目（※表示用＆ダイアログ呼び出しパラメータ）
 //--------------------------------------------
-struct stEDIT_VALUE_ITEM_MENU_ITEM{
+struct stEDIT_VALUE_MENU_ITEM{
 	const char*			pName;          // 表示名
 	void*				pVal;           // 編集対象
 	eEDIT_VALUE_TYPE	eType;          // 値のタイプ
@@ -50,7 +50,7 @@ struct stEDIT_VALUE_ITEM_MENU_ITEM{
 class CEditValueMenu: public CScrollBarMenu{
 protected:
 	// メンバー
-	stEDIT_VALUE_ITEM_MENU_ITEM* m_stArrEditItem;
+	stEDIT_VALUE_MENU_ITEM* m_stArrItem;
 	int m_nValueOfsX;
 	bool m_bEditBoolDirect;
 
@@ -61,14 +61,14 @@ public:
 	CEditValueMenu( eGRP grpId, int cW, int cH );
 	virtual ~CEditValueMenu( void );
 
-	void releaseEditItem( void );
+	void releaseItem( void );
 
 	virtual void setItemNum( int num, bool isBlockRequired=false );
 
     //--------------------------------------
     // アイテム設定
     //--------------------------------------
-	bool setItemAt( int id, stEDIT_VALUE_ITEM_MENU_ITEM* pItem, bool isBlock=false );
+	bool setItemAt( int id, stEDIT_VALUE_MENU_ITEM* pItem, bool isBlock=false );
 	bool setItemAt( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type, int32 min, int32 max, bool isBlock=false );
 	bool setItemAtAsLabel( int id, const char* pName, void* pVal,
                            eEDIT_VALUE_TYPE type, int32 min, int32 max, const char** pArrLabel, bool isBlock=false );
@@ -78,8 +78,8 @@ public:
     void setSeparatorAt( int id, bool flag );
 
 	// 取得
-	stEDIT_VALUE_ITEM_MENU_ITEM* getItemAt( int at );
-	stEDIT_VALUE_ITEM_MENU_ITEM* getSelectedItem( void );
+	stEDIT_VALUE_MENU_ITEM* getItemAt( int at );
+	stEDIT_VALUE_MENU_ITEM* getSelectedItem( void );
     inline bool isChanged( void ){ return( m_bChanged ); }
 
     // ブールの編集を直接行うか？（※デフォルトはオン）

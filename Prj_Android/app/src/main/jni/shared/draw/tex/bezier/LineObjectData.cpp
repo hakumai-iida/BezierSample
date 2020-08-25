@@ -72,6 +72,13 @@ CLineObjectData::~CLineObjectData( void ){
     clear();    // リストの解放
 }
 
+//---------------------------
+// ガイド対象IDの取得
+//---------------------------
+eSTROKE_GUIDE_TARGET CLineObjectData::getGuideTargetId( int slotIndex ){
+    return( CStroke::AdjustGuideTargetForSlotIndex( m_eGuideTargetId, slotIndex ) );
+}
+
 //--------------------
 // クリア（※データの破棄）
 //--------------------
@@ -90,8 +97,10 @@ void CLineObjectData::clear( void ){
     
     // 各種値
     m_eBrushId = eBRUSH_INVALID;
+    m_nStrokeSize = BEZIER_SCALE_RATE;
     m_eTestPalOfsId = ePAL_OFS_INVALID;
     m_eTestPalOfsIdForRepair = ePAL_OFS_INVALID;
+    m_eGuideTargetId = eSTROKE_GUIDE_TARGET_INVALID;
 }
 
 //--------------------
@@ -119,8 +128,10 @@ void CLineObjectData::copy( CLineObjectData* pData ){
 
     // 各種値
     m_eBrushId = pData->m_eBrushId;
+    m_nStrokeSize = pData->m_nStrokeSize;
     m_eTestPalOfsId = pData->m_eTestPalOfsId;
     m_eTestPalOfsIdForRepair = pData->m_eTestPalOfsIdForRepair;
+    m_eGuideTargetId = pData->m_eGuideTargetId;
 }
 
 //---------------------------
@@ -143,8 +154,17 @@ void CLineObjectData::read( CInputBuffer* pIB ){
 
     // 各種値
     m_eBrushId = (eBRUSH)CEnum::ReadEnum( pIB, g_pArrLabelBrush );
+    m_nStrokeSize = pIB->readInt16();
     m_eTestPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
     m_eTestPalOfsIdForRepair = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_eGuideTargetId = (eSTROKE_GUIDE_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeGuideTarget );
+    
+#if 0
+    // test
+    if( checkFlag( eLOD_FLAG_TOUCH ) && !checkFlag( eLOD_FLAG_TOUCH_IS_STRIPE ) ){
+        m_nStrokeSize = 10000;
+    }
+#endif
 }
 
 //---------------------------
@@ -166,8 +186,10 @@ void CLineObjectData::write( COutputBuffer* pOB ){
 
     // 各種値
     CEnum::WriteEnum( pOB, m_eBrushId, eBRUSH_MAX, g_pArrLabelBrush );
+    pOB->writeInt16( (int16)m_nStrokeSize );
     CEnum::WriteEnum( pOB, m_eTestPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
     CEnum::WriteEnum( pOB, m_eTestPalOfsIdForRepair, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_eGuideTargetId, eSTROKE_GUIDE_TARGET_MAX, g_pArrLabelStrokeGuideTarget );
 }
 
 //---------------------------
@@ -383,8 +405,10 @@ void CLineObjectData::applyRateScale( int rateScale ){
     }
     
     // [m_eBrushId]は無視
+    // [m_nStrokeSize]は無視
     // [m_eTestPalOfsId]は無視
     // [m_eTestPalOfsIdForRepair]は無視
+    // [m_eGuideTargetId]は無視
 }
 
 //---------------------------------------------------------
@@ -392,18 +416,25 @@ void CLineObjectData::applyRateScale( int rateScale ){
 //---------------------------------------------------------
 void CLineObjectData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 3 + 4 + eLOD_FLAG_MAX );
+    pMenu->setItemNum( 5 + 4 + eLOD_FLAG_MAX );
     
     int id = 0;
     
     // 値
     pMenu->setItemAtAsLabel( id++, "BRUSH_ID", &m_eBrushId, eEDIT_VALUE_TYPE_INT32,
                              eBRUSH_INVALID, eBRUSH_MAX-1, g_pArrLabelBrush );
+
+    pMenu->setItemAt( id++, "STROKE: SIZE", &m_nStrokeSize, eEDIT_VALUE_TYPE_INT32, 0, BEZIER_SCALE_RATE_MAX );
+
     pMenu->setItemAtAsLabel( id++, "TEST_PAL_F_ID", &m_eTestPalOfsId, eEDIT_VALUE_TYPE_INT32,
                              ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
+
     pMenu->setItemAtAsLabel( id++, "REPAIR_TEST_PAL_F_ID", &m_eTestPalOfsIdForRepair, eEDIT_VALUE_TYPE_INT32,
                              ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
     
+    pMenu->setItemAtAsLabel( id++, "GUIDE", &m_eGuideTargetId, eEDIT_VALUE_TYPE_INT32,
+                             eSTROKE_GUIDE_TARGET_INVALID, eSTROKE_GUIDE_TARGET_MAX-1, g_pArrLabelStrokeGuideTarget );
+
     pMenu->setSeparatorAt( id, true );
     
     // 一時調整値（※この値は保存されない＝修正後に[applyTempAdjust]で調整を適用する想定）
@@ -421,11 +452,10 @@ void CLineObjectData::setEditValueMenu( CEditValueMenu* pMenu ){
     pMenu->setItemAtAsBit( id++, "FLAG: TOUCH", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_TOUCH );
     pMenu->setItemAtAsBit( id++, "FLAG: TOUCH_IS_STRIPE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_TOUCH_IS_STRIPE );
     pMenu->setItemAtAsBit( id++, "FLAG: TOUCH_IS_FRILL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_TOUCH_IS_FRILL );
-    pMenu->setItemAtAsBit( id++, "FLAG: GUIDE_DRAW_BEFORE_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_GUIDE_DRAW_BEFORE_STROKE );
-    pMenu->setItemAtAsBit( id++, "FLAG: GUIDE_RESET_AFTER_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_GUIDE_RESET_AFTER_STROKE );
-    pMenu->setItemAtAsBit( id++, "FLAG: GUIDE_RESET_FULL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_GUIDE_RESET_FULL );
+    pMenu->setItemAtAsBit( id++, "FLAG: RESET_GUIDE_AFTER_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_RESET_GUIDE_AFTER_STROKE );
+    pMenu->setItemAtAsBit( id++, "FLAG: FOCUS_OUT_COL_AFTER_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_FOCUS_OUT_COL_AFTER_STROKE );
+    pMenu->setItemAtAsBit( id++, "FLAG: RESET_MASK_AFTER_STROKE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLOD_FLAG_RESET_MASK_AFTER_STROKE );
 
-    
     // 確定
     pMenu->fixMenu();
 }

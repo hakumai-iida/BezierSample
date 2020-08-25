@@ -41,38 +41,50 @@
 class CAdjustCalc{
 public:
     //-------------------------------------------------------------
-    // 座標計算：調整値[Ｈ/Ｖ]
+    // 座標計算：調整値[Ｈ/Ｖ]（アンカーポイント）
     //-------------------------------------------------------------
     static void CalcRateXYForHV( int* pOutRateX, int* pOutRateY, int rX0, int rY0,
                                  CAdjustablePoint* pAP, float fixedAdjustRateH, float fixedAdjustRateV );
 
-    //-----------------------------------------------------------------------------
-    // 半径計算: 調整値[Ｈ]
-    //-----------------------------------------------------------------------------
+    //-------------------------------------------------------------
+    // 半径計算: 調整値[Ｈ]（アンカーポイント）
+    //-------------------------------------------------------------
     static void CalcRateRForH( int *pOutRateR, int *pOutRateOfsR, int rR0, int rOfsForCenter0,
                                CSlotAdjuster* pSA, float fixedAdjustRateH );
 
     //-------------------------------------------------------------
-    // 座標計算：遅延ログ
+    // 座標計算：遅延ログ（アンカーポイント）
     //-------------------------------------------------------------
     static void CalcRateXYForDelayLog( int* pOutRateX, int* pOutRateY, int rX0, int rY0,
                                        bool isReverseH, bool isReverseV, float rot,
                                        CAdjustablePoint* pAP, CDelayLog* pDelayLog );
-    
+
     //-------------------------------------------------------------
-    // 角度計算：遅延ログ
+    // オフセット計算：遅延ログ（レイヤー）
+    //-------------------------------------------------------------
+    static void CalcRateOfsXYForDelayLog( int* pOutRateOfsX, int* pOutRateOfsY,
+                                          bool isReverseH, bool isReverseV,
+                                          CLayerData* pLD, CDelayLog* pDelayLog );
+
+    //-------------------------------------------------------------
+    // 角度計算：遅延ログ（レイヤー）
     //-------------------------------------------------------------
     static void CalcRateRotForDelayLog( int* pOutRateRot,
                                         bool isReverseH, bool isReverseV,
                                         CLayerData* pLD, CDelayLog* pDelayLog );
 
     //-------------------------------------------------------------
-    // 角度計算：テンション
+    // サイズ計算：遅延ログ（レイヤー）
+    //-------------------------------------------------------------
+    static void CalcRateScaleForDelayLog( int* pOutRateScale, CLayerData* pLD, CDelayLog* pDelayLog );
+
+    //-------------------------------------------------------------
+    // 角度計算：テンション（スロット＝パーツ）
     //-------------------------------------------------------------
     static void CalcRateRotForT( int* pOutRateRot, CSlotAdjuster* pSA, float fixedAdjustRateT );
 
     //-------------------------------------------------------------
-    // サイズ計算：サイズ
+    // サイズ計算：サイズ（スロット＝パーツ）
     //-------------------------------------------------------------
     static void CalcRateScaleForS( int* pOutRateScale, CSlotAdjuster* pSA, float fixedAdjustRateS );
 

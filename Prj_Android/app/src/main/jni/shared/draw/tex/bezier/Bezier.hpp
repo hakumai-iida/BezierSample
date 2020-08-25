@@ -23,20 +23,12 @@
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
+// 利用状況確認
+#define BEZIER_USE_NUM_CHECK
+
 /*+----------------------------------------------------------------+
   |	Struct		構造体型宣言
   +----------------------------------------------------------------+*/
-//------------------------------
-// 分割点（※アンカーポイント間の補完）
-//------------------------------
-typedef struct{
-    float x, y;                     // 座標：テクスチャの左上を原点とした位置（※傾きがある場合は適用済みの値となる）
-    float x0, y0;                   // 元座標（※傾き適用前の値＝タッチの処理で利用する）
-    float strokeSize;               // ストロークサイズ
-    bool isEdgeFillCheck;           // エッジ埋めの確認をするか？
-    stBEZIER_ANCHOR_POINT* pAP;     // 分割元のアンカーポイント（※描画情報参照用）
-} stBEZIER_DIVISION_POINT;
-
 /*+----------------------------------------------------------------+
   |	Class		クラス定義
   +----------------------------------------------------------------+*/
@@ -50,18 +42,37 @@ public:
     static int GetAllocSizeK( void );
     
 private:
-    // 管理フラグ
+    // 表示管理フラグ
+    static bool s_bDispOffTouch;                // タッチを表示しない
+    static bool s_bDispOffStripe;               // ストライプを表示しない
+    static bool s_bDispOffFrill;                // フリルを表示しない
+    static bool s_bDispOffEdge;                 // エッジ塗りを表示しない
+    static bool s_bDispOffFillOption;           // 塗りオプションを表示しない
+
     static bool s_bDispDirVectorAlways;         // 方向線を常に表示する
     static bool s_bDispOffDirVectorAlways;      // 方向線を常に表示しない
     static bool s_bDispPathActiveAlways;        // 全てのパスの表示をアクティブにする（一律の色味で表示する）
-    static bool s_bDispOnlyAnchorPoint;         // アンカーポイントのみ憑依ｚ
+    static bool s_bDispOnlyAnchorPoint;         // アンカーポイントのみ表示
     
 public:
-    // 管理
+    // 設定
+    inline static void SetDispOffTouch( bool flag ){ s_bDispOffTouch = flag; }
+    inline static void SetDispOffStripe( bool flag ){ s_bDispOffStripe = flag; }
+    inline static void SetDispOffFrill( bool flag ){ s_bDispOffFrill = flag; }
+    inline static void SetDispOffEdge( bool flag ){ s_bDispOffEdge = flag; }
+    inline static void SetDispOffFillOption( bool flag ){ s_bDispOffFillOption = flag; }
+
     inline static void SetDispDirVectorAlways( bool flag ){ s_bDispDirVectorAlways = flag; }
     inline static void SetDispOffDirVectorAlways( bool flag ){ s_bDispOffDirVectorAlways = flag; }
     inline static void SetDispPathActiveAlways( bool flag ){ s_bDispPathActiveAlways = flag; }
     inline static void SetDispOnlyAnchorPoint( bool flag ){ s_bDispOnlyAnchorPoint = flag;}
+
+    // 判定
+    inline static bool IsDispOffTouch( void ){ return( s_bDispOffTouch ); }
+    inline static bool IsDispOffStripe( void ){ return( s_bDispOffStripe ); }
+    inline static bool IsDispOffFrill( void ){ return( s_bDispOffFrill ); }
+    inline static bool IsDispOffEdge( void ){ return( s_bDispOffEdge ); }
+    inline static bool IsDispOffFillOption( void ){ return( s_bDispOffFillOption ); }
 
     inline static bool IsDispDirVectorAlways( void ){ return( s_bDispDirVectorAlways ); }
     inline static bool IsDispOffDirVectorAlways( void ){ return( s_bDispOffDirVectorAlways ); }
@@ -75,19 +86,25 @@ private:
     // 分割点（※ストロークはＡＰ間の距離に応じて分割点に分けられて処理される）
     static stBEZIER_DIVISION_POINT* s_stArrDivisionPoint;
     static int s_nUseDivisionPoint;         // 現在の分割点利用数
-    static int s_nUseDivisionPointMax;      // 最大の分割点利用数（※ログ用）
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseDivisionPointMax;      // 最大利用数（※ログ用）
+#endif
     
-    // テンポラリ（※ドット出力処理内での[if]判定を極力省くため、座標とストロークサイズを事前計算してバッファに登録しておき、後でまとめて処理する用）
+    // テンポラリ（※ドット出力処理内での[if]判定を極力省くため、座標とストロークサイズを事前計算してバッファに登録しておき、後でまとめて処理するためのバッファ）
     static float* s_fArrTempPointX;         // テンポラリ：ポイントＸ
     static float* s_fArrTempPointY;         // テンポラリ：ポイントＹ
     static float* s_fArrTempPointX0;        // テンポラリ：ポイントＸ（※傾き適用前）
     static float* s_fArrTempPointY0;        // テンポラリ：ポイントＹ（※傾き適用前）
     static float* s_fArrTempStrokeSize;     // ストロークサイズ
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseTempPointMax;          // 最大利用数（※ログ用）
+#endif
     
     // フック（※データ指定／システム指定の２パターンで指定される）
     static bool* s_bArrHookPoint;          // 結合点有効性
     static float* s_fArrHookPointX;        // 結合点位置Ｘ
     static float* s_fArrHookPointY;        // 結合点位置Ｙ
+    // フックは１座標の処理なので利用状況の確認は不要
 
     // タッチ（※タッチ描画の起点となる座標関連）
     static int* s_nArrTouchPointNum;        // タッチ登録数
@@ -98,21 +115,35 @@ private:
     static float** s_fArrArrTouchPointY0;   // タッチ位置Ｙ（※傾き適用前）
     static float* s_fArrTouchPoint0;        // タッチ位置（※傾き適用前）（※バッファ実体）
     static float* s_fArrTouchWorkForLen0;   // タッチワーク（長さ）
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseTouchPointMax;         // 最大利用数（※ログ用）
+#endif
 
-    static int s_nTouchStrokePointCur;      // タッチストロークポイント現在値
-    static int s_nTouchStrokePointMax;      // タッチストロークポイント最大数
-    static int s_nTouchStrokePointLimit;    // タッチストロークポイント出力制限
+    // ガイド（※レイヤーをまたぐ際の塗りガイド座標保持枠）
+    static int* s_nArrGuidePointNum;        // ガイド登録数
+    static float** s_fArrArrGuidePointX;    // ガイド位置Ｘ
+    static float** s_fArrArrGuidePointY;    // ガイド位置Ｙ
+    static float* s_fArrGuidePoint;         // ガイド位置（※バッファ実体）
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseGuidePointMax;         // 最大利用数（※ログ用）
+#endif
 
     // ストライプ塗りつぶし情報
     static int s_nStripePointNum;           // ストライプ塗りつぶし点登録数
     static BYTE* s_nArrStripePalGrp;        // ストライプ塗りつぶしパレットグループ値
     static float* s_fArrStripePointX;       // ストライプ塗りつぶし点位置Ｘ
     static float* s_fArrStripePointY;       // ストライプ塗りつぶし点位置Ｙ
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseStripePointMax;        // 最大利用数（※ログ用）
+#endif
 
-    // ガイド（※塗りガイド座標参照用／ストライプの塗りつぶし位置の算出用）
+    // ストライプ用ガイド（※塗りガイド座標参照用／ストライプの塗りつぶし位置の算出用）
     static int s_nNumStripeGuidePoint;      // ドット数
-    static int* s_nArrStripeGuidePointX;    // ドットのＸ座標
-    static int* s_nArrStripeGuidePointY;    // ドットのＹ座標
+    static float* s_fArrStripeGuidePointX;    // ドットのＸ座標
+    static float* s_fArrStripeGuidePointY;    // ドットのＹ座標
+#ifdef BEZIER_USE_NUM_CHECK
+    static int s_nUseStripeGuidePointMax;   // 最大利用数（※ログ用）
+#endif
 
     // エッジ塗り
     static int s_nBufSizeForEdgeFillGuide;                  // エッジ塗りガイドサイズ
@@ -121,16 +152,12 @@ private:
     static int s_nOfsYForEdgeFillGuide;                     // エッジ塗り：オフセットY（※簡便のため／固定的な値を引数で渡すのを避けるため）
     static stBEZIER_ANCHOR_POINT* s_pApForEdgeFillGuide;    // エッジ塗り：AP（※簡便のため／固定的な値を引数で渡すのを避けるため）
     
-    // バッファの利用状況（※有効領域判定用）
-    static int s_nLeftForStrokeBuf;     // ストロークバッファの左端
-    static int s_nRightForStrokeBuf;    // ストロークバッファの右端
-    static int s_nTopForStrokeBuf;      // ストロークバッファの上端
-    static int s_nBottomForStrokeBuf;   // ストロークバッファの下端
-    static int s_nLeftForColorBuf;      // カラーバッファの左端
-    static int s_nRightForColorBuf;     // カラーバッファの右端
-    static int s_nTopForColorBuf;       // カラーバッファの上端
-    static int s_nBottomForColorBuf;    // カラーバッファの下端
-
+    // スキップストローク（※ストロークの出力制限）
+    static int s_nSkipStrokePointCur;               // スキップストロークポイント現在値
+    static int s_nSkipStrokePointMax;               // スキップストロークポイント最大数
+    static int s_nSkipStrokePointLimitForHead;      // ストロークポイント出力制限：先頭
+    static int s_nSkipStrokePointLimitForTail;      // ストロークポイント出力制限：末尾
+    
     //-------------------------------------
     // 入力データ
     //-------------------------------------
@@ -141,10 +168,13 @@ private:
     // 処理設定
     //-------------------------------------
     static BYTE* s_pBuf;                    // メインバッファ（※ストローク時は不透明色出力先）
+    static BYTE* s_pBufTest;                // テストバッファ（※ストロークの出力可能判定用）
     static BYTE* s_pBufFillGuide;           // 塗りつぶしガイド（※ここに描かれた閉領域が塗りつぶしの対象となる）
     static BYTE* s_pBufFillGuard;           // バッファ：塗りガード（マスク）
-    static BYTE* s_pBufTest;                // テストバッファ（※ストロークの出力可能判定用）
+    static BYTE* s_pBufTemp;                // テンポラリ（※塗り境界のアンチストローク用）
+    
     static int s_nBufW, s_nBufH;            // バッファサイズ
+    
     static BYTE s_nTestPalGrp;              // テスト値（※[s_pBufTest]内の、この値と同じパレットグループの領域のみが出力対象となる）
     static BYTE s_nTestPalGrpForRepair;     // ライン修復時のテスト値
     static bool s_bTouch;                   // タッチの描画
@@ -185,34 +215,21 @@ public:
 	static bool OnCreate( void );
 	static void OnDestroy( void );
     
-    // 情報取得
+#ifdef BEZIER_USE_NUM_CHECK
+    // 利用状況取得
     static int GetDivisionPointNumMax( void );
     static int GetDivisionPointNumUseMax( void );
-    
-    // 領域関連（※画像の利用状況＝四隅の位置）
-    static void ResetBufInfo( int w, int h );
-    static int GetLeftForStrokeBuf( void ){ return( s_nLeftForStrokeBuf ); }
-    static int GetRightForStrokeBuf( void ){ return( s_nRightForStrokeBuf ); }
-    static int GetTopForStrokeBuf( void ){ return( s_nTopForStrokeBuf ); }
-    static int GetBottomForStrokeBuf( void ){ return( s_nBottomForStrokeBuf ); }
-    static int GetLeftForColorBuf( void ){ return( s_nLeftForColorBuf ); }
-    static int GetRightForColorBuf( void ){ return( s_nRightForColorBuf ); }
-    static int GetTopForColorBuf( void ){ return( s_nTopForColorBuf ); }
-    static int GetBottomForColorBuf( void ){ return( s_nBottomForColorBuf ); }
-
-    inline static void UpdateStrokeBufInfo( int x, int y ){
-        if( s_nLeftForStrokeBuf > x ){ s_nLeftForStrokeBuf = x; }
-        if( s_nRightForStrokeBuf < x ){ s_nRightForStrokeBuf = x; }
-        if( s_nTopForStrokeBuf > y ){ s_nTopForStrokeBuf = y; }
-        if( s_nBottomForStrokeBuf < y ){ s_nBottomForStrokeBuf = y; }
-    }
-
-    inline static void UpdateColorBufInfo( int x, int y ){
-        if( s_nLeftForColorBuf > x ){ s_nLeftForColorBuf = x; }
-        if( s_nRightForColorBuf < x ){ s_nRightForColorBuf = x; }
-        if( s_nTopForColorBuf > y ){ s_nTopForColorBuf = y; }
-        if( s_nBottomForColorBuf < y ){ s_nBottomForColorBuf = y; }
-    }
+    static int GetTempPointNumMax( void );
+    static int GetTempPointNumUseMax( void );
+    static int GetTouchPointNumMax( void );
+    static int GetTouchPointNumUseMax( void );
+    static int GetGuidePointNumMax( void );
+    static int GetGuidePointNumUseMax( void );
+    static int GetStripePointNumMax( void );
+    static int GetStripePointNumUseMax( void );
+    static int GetStripeGuidePointNumMax( void );
+    static int GetStripeGuidePointNumUseMax( void );
+#endif
 
     // フック登録リセット
     static void ResetHookPoint( bool isAll=true );
@@ -220,9 +237,9 @@ public:
     // タッチ登録リセット
     static void ResetTouchPoint( bool isAll=true );
 
-    // 全フラグ解除（※開発用）
-    static void ResetAllFlagForDev( void );
-    
+    // ガイド登録リセット
+    static void ResetGuidePoint( bool isAll=true );
+
     //------------------------------------------------------------------------------------------
     // ストローク（線）の描画
     //------------------------------------------------------------------------------------------
@@ -268,33 +285,10 @@ public:
     // 情報：基準点（※開発用：基準点に印を出力）
     //------------------------------------------------------------------------------------------
     static void BasePointForDev( float x, float y, stBEZIER_BASE_PARAM* pParam, bool isActive, bool isSelected );
-
+    
 private:
-    // ワーククリア
-    static void ClearWork( void );
-    static void ClearWorkSetting( void );
-    static void ClearWorkPoint( void );
-    static void ClearWorkStripePoint( void );
-    
-    // 出力先設定
-    static bool SetBufForStroke( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath );
-    static bool SetBufForFill( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath );
-    static bool SetBufForDev( stBEZIER_BASE_PARAM* pParam );
-
     //-----------------------
-    // 分割点関連
-    //-----------------------
-    // AP間の分割点の登録
-    static void RegistDivisionPointList( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 );
-    
-    // AP間の分割点数の算出
-    static int  CalcDivisionNumForSegment( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 );
-    
-    // 分割点の追加
-    static void AddDivisionPoint( float x, float y, float strokeSize, bool isEdgeFillCheck, stBEZIER_ANCHOR_POINT* pAP );
-    
-    //-----------------------
-    // ストロークの描画
+    // 描画
     //-----------------------
     // 指定の分割点間を線形補間しながら描画（※描画設定は[pAP]から参照する）
     static void PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POINT* pDP1, stBEZIER_ANCHOR_POINT* pAP );
@@ -307,80 +301,126 @@ private:
     
     // ドットを置く
     static void PutDotAt( float x0, float y0, float strokeSize, BYTE testPalGrp, CStroke* pStroke, stBEZIER_ANCHOR_POINT* pAP );
+
+    //-----------------------
+    // 登録関連
+    //-----------------------
+    // AP間の分割点の登録
+    static void RegistDivisionPointList( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 );
+    
+    // AP間の分割点数の算出
+    static int  CalcDivisionNumForSegment( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 );
+    
+    // 分割点の追加
+    static void AddDivisionPoint( float x, float y, float strokeSize, bool isEdgeFillCheck, stBEZIER_ANCHOR_POINT* pAP );
+    
+    // タッチポイント反転
+    static void ReverseTouchPoint( eSTROKE_TOUCH_TARGET targetTouchId, int atFrom, int atTo );
     
     // フックの登録／設定
-    static void resolveHookPoint( stBEZIER_ANCHOR_POINT* pBAP );
+    static void ResolveHookPoint( stBEZIER_ANCHOR_POINT* pBAP );
 
     // ストライプ塗りポイントの追加
     static void AddStripePoint( BYTE palOfsGrp, float x, float y );
-    
-    //====================================================================================
-    // 以下は、[BezierSub.cpp]で実装
-    //====================================================================================
-    //----------------------------------------------
-    // ワークパス用
-    //----------------------------------------------
-    static void ReadyDotForWorkPath( void );
-    static void PutTexForWorkPath( float x0, float y0, int size, BYTE* pTex, BYTE pal, int cut=0 );
-    
-    static void PutLineDotForWorkPath( float x0, float y0, BYTE pal );
-    static void PutPointForWorkPath( float x0, float y0, BYTE pal );
-    static void PutTriangleForWorkPath( float x0, float y0, float ofsX, float ofsY, BYTE pal, bool isFlip );
-    static void PutCrossForWorkPath( float x0, float y0, BYTE pal );
-    static void PutPlusForWorkPath( float x0, float y0, BYTE pal );
-    static void PutPlusForWorkPathS( float x0, float y0, BYTE pal );
-    
-    static void PutLinearForWorkPath( float x0, float y0, float ofsX, float ofsY, BYTE pal );
 
-    //----------------------------------------------
-    // 描画（※各種実体）
-    //----------------------------------------------
-    static void DrawStroke( stBEZIER_ANCHOR_POINT* pHead, float limitRate=1.0f );
-    static void ReverseTouchPoint( eSTROKE_TOUCH_TARGET targetTouchId, int atFrom, int atTo );
-    static void FillStrokeEdge( int targetDivisionPoint );
-    static void FillStrokeAt( int from, int x, int y );
+    //====================================================================================
+    // 以下は、[BezierForSub.cpp]で実装
+    //====================================================================================
+public:
+    // ループ間を行き来する際の環境リセット
+    static void ResetEnv( void );
     
+    // 全フラグ解除（※開発用）
+    static void ResetAllFlagForDev( void );
+
+    //---------------------------
+    // ガイド復旧
+    //---------------------------
+    static void RecoverGuide( eSTROKE_GUIDE_TARGET guideTarget );
+    static void RecoverGuideWithTouch( eSTROKE_TOUCH_TARGET touchTarget );
+
+private:
+    // 描画実体
+    static void DrawStroke( stBEZIER_ANCHOR_POINT* pHead, float skipHeadRate=0.0f, float skipTailRate=0.0f );
     static void DrawDot( stBEZIER_ANCHOR_POINT* pHead );
+
+    // ワーククリア
+    static void ClearWork( void );
+    static void ClearWorkSetting( void );
+    static void ClearWorkPoint( void );
+    static void ClearWorkStripePoint( void );
     
-    //----------------------------------------------
+    // 出力先設定
+    static bool SetBufForStroke( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath );
+    static bool SetBufForFill( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath );
+    static bool SetBufForDev( stBEZIER_BASE_PARAM* pParam );
+
     // ブラシのブレ用
-    //----------------------------------------------
     static void ResetBrushShake( void );
     static void SetBrushShake( void );
     static void UpdateBrushShake( void );
     static float GetBrushShakeForPosX( void );
     static float GetBrushShakeForPosY( void );
     static float GetBrushShakeForSize( void );
-
+    
+    // APからストロークの取得
+    static CStroke* GetStrokeWithAnchorPoint( stBEZIER_ANCHOR_POINT* pAP );
+    
+    // FPから塗りの取得
+    static CFill* GetFillWithFillPoint( stBEZIER_FILL_POINT* pFP );
+    
     //====================================================================================
     // 以下は、[BezierForFill.cpp]で実装
     //====================================================================================
+private:
+    // 塗りつぶしメイン（※ここでオプションによる分岐をする）
     static void DrawFill( stBEZIER_FILL_POINT* pHead );
-    static void DrawFillPointBright( stBEZIER_FILL_POINT* pFP, float x, float y, BYTE targetPalGrp );
-    static void DrawFillPointDark( stBEZIER_FILL_POINT* pFP, float x, float y, BYTE targetPalGrp );
-    static void DrawFillAntiForTouch( stBEZIER_FILL_POINT* pHead );
-    static void DrawFillAntiBrightForTouch( stBEZIER_FILL_POINT* pFP, eSTROKE_TOUCH_TARGET touchId, BYTE targetPalGrp );
-    static void DrawFillAntiDarkForTouch( stBEZIER_FILL_POINT* pFP, eSTROKE_TOUCH_TARGET touchId, BYTE targetPalGrp );
+    
+    // 明暗ドット
+    static void DrawFillPointBright( float x, float y, int strokeSize, int strokeRange, int ofs );
+    static void DrawFillPointDark( float x, float y, int strokeSize, int strokeRange, int ofs );
+
+    // 明暗アンチストローク
+    static void DrawFillAntiStrokeBright( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange, int ofs );
+    static void DrawFillAntiStrokeDark( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange, int ofs );
+
+    // 一時バッファ描画
+    static bool DrawPointForTemp( float x, float y, int strokeSize, int strokeRange );
+    static bool DrawStrokeWithTouchForTemp( eSTROKE_TOUCH_TARGET touchId, int strokeSize, int strokeRange );
+    static void PutDotAtForTemp( float x0, float y0, CStroke* pStroke );
+
+    //====================================================================================
+    // 以下は、[BezierForEdge.cpp]で実装
+    //====================================================================================
+private:
+    static void DrawStrokeEdge( int targetDivisionPoint );
+    static bool CheckFillStrokeEdgeStartAt( int* pStartX, int* pStartY, int bL, int bR, int bT, int bB, bool isCheckLeft, bool isCheckUp );
+    static bool CheckFillStrokeEdgeAt( int* pStartX, int* pStartY, int bL, int bR, int bT, int bB );
+    static void FillStrokeEdgeAt( int from, int x, int y );
 
     //=================================================
     // 以下は、[BezierForTouch.cpp]で実装
     //=================================================
-public:
-    // タッチ対象によるガイド描画
-    static bool DrawFillGuideForTouch( stBEZIER_BASE_PARAM* pParam );
-
 private:
+    // 描画
     static void DrawTouch( stBEZIER_ANCHOR_POINT* pHead );
-    static void DrawTouchAt( stBEZIER_ANCHOR_POINT* pPairHead, float x, float y, float size, float rot, float* pCenterX=NULL, float* pCenterY=NULL );
-    static float CalcTouchWorkForLen0( int target );
-    static int SearchTouchIndexForLen0( int target, float len, int from, bool isBack );
+    static void DrawTouchAt( stBEZIER_ANCHOR_POINT* pPairHead, float x, float y, float size, float rot, float* pCenterX, float* pCenterY,
+                             bool isSubValid=false, float subX=0.0f, float subY=0.0f );
+
+    static float CalcTouchWorkForLen0( eSTROKE_TOUCH_TARGET target );
+    static int SearchTouchIndexForLen0( eSTROKE_TOUCH_TARGET target, float len, int from, bool isBack );
+    static int SearchTouchIndexForSub( eSTROKE_TOUCH_TARGET target, int at, eSTROKE_TOUCH_TARGET targetSub, bool isReverse );
+    
+    static float CalcRotForTouch( eSTROKE_TOUCH_TARGET target, int at, bool isFlipH, bool isFlipV, float rate, float baseRot );
+    static float CalcTouchDirForLen0( eSTROKE_TOUCH_TARGET target, int at, bool isFlipH, bool isFlipV );
 
     //=================================================
     // 以下は、[BezierForFrill.cpp]で実装
     //=================================================
 private:
     static void DrawFrill( stBEZIER_ANCHOR_POINT* pHead );
-    static void DrawFrillAt( stBEZIER_ANCHOR_POINT* pBAP, CLayerData* pLD, float x, float y, float size, float rot );
+    static void DrawFrillAt( stBEZIER_ANCHOR_POINT* pBAP, CLayerData* pLD, float x, float y, float size, float baseLen, float rot,
+                             bool isSub, float* pX0, float* pY0, float* pX1, float* pY1 );
 
     //=================================================
     // 以下は、[BezierForFrillLayerData.cpp]で実装
@@ -396,6 +436,27 @@ private:
     static bool AllocFrillForTestCircle( void );
     static bool AllocFrillForTestTriangle( void );
     static bool AllocFrillForTestSquare( void );
+    static bool AllocFrillForFluffySquareMain( void );
+    static bool AllocFrillForFluffySquareSub( void );
+
+    //====================================================================================
+    // 以下は、[BezierForWork.cpp]で実装
+    //====================================================================================
+private:
+    //----------------------------------------------
+    // ワークパス用
+    //----------------------------------------------
+    static void ReadyDotForWorkPath( void );
+    static void PutTexForWorkPath( float x0, float y0, int size, BYTE* pTex, BYTE pal, int cut=0 );
+    
+    static void PutLineDotForWorkPath( float x0, float y0, BYTE pal );
+    static void PutPointForWorkPath( float x0, float y0, BYTE pal );
+    static void PutTriangleForWorkPath( float x0, float y0, float ofsX, float ofsY, BYTE pal, bool isFlip );
+    static void PutCrossForWorkPath( float x0, float y0, BYTE pal );
+    static void PutPlusForWorkPath( float x0, float y0, BYTE pal );
+    static void PutPlusForWorkPathS( float x0, float y0, BYTE pal );
+    
+    static void PutLinearForWorkPath( float x0, float y0, float ofsX, float ofsY, BYTE pal );
 
 private:
     // インスタンス作成は不可

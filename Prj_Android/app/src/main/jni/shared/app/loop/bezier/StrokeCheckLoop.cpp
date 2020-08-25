@@ -52,12 +52,21 @@ CStrokeCheckLoop::CStrokeCheckLoop( void ){
     setId( eLOOP_ID_STROKE_CHECK );
     
 	setDrawLayer( eDP_LAYER_LOOP );
+    
+    // BMP環境リセット
+    CBmpGenerator::Reset();
+
+    // 領域確保
+    allocForTest();
 }
 
 //------------------------
 // デストラクタ
 //------------------------
-CStrokeCheckLoop::~CStrokeCheckLoop( void ){}
+CStrokeCheckLoop::~CStrokeCheckLoop( void ){
+    // 領域開放
+    releaseForTest();
+}
 
 //------------------------
 // 初期化
@@ -151,8 +160,6 @@ void CStrokeCheckLoop::init0( void ){
 	addNode( m_pButtonBack );
 	addNode( m_pButtonExit );
     
-    // テストデータ確保
-    allocForTest();
   
     // 初期値
     m_bDot = false;
@@ -174,9 +181,7 @@ void CStrokeCheckLoop::init0( void ){
 //------------------------
 // 終了
 //------------------------
-void CStrokeCheckLoop::exit0( void ){
-    releaseForTest();
-}
+void CStrokeCheckLoop::exit0( void ){}
 
 //------------------------
 // 更新
@@ -413,13 +418,13 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // １本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 5000 );
     pLOD->setTempAdjust( -3333, -3500-666, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 5000, 0, 0, 0, 0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -436,7 +441,6 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 10000, 0, 0, 0, 0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -447,13 +451,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // ３本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 30000 );
     pLOD->setTempAdjust( -3333, -3500+666, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 30000, 0, 0, 0, 10000 );
+    pAP->setStroke(  0,10000, 10000,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -473,7 +478,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 10000, 0, 0, 5000, 10000 );
+    pAP->setStroke( 0,10000, 10000,5000 );
     pLOD->addData( pAP );
     
     // 点１
@@ -484,13 +489,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // ２本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 20000 );
     pLOD->setTempAdjust( 0-0, -3333, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 20000, 0, 0, 5000, 10000 );
+    pAP->setStroke( 0,10000, 10000,2500 );
     pLOD->addData( pAP );
     
     // 点１
@@ -501,13 +507,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // ３本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 30000 );
     pLOD->setTempAdjust( 0+666, -3333, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 30000, 0, 0, 5000, 10000 );
+    pAP->setStroke( 0,10000, 10000,2500 );
     pLOD->addData( pAP );
     
     // 点１
@@ -521,13 +528,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // １本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 30000 );
     pLOD->setTempAdjust( +3333, -2500, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 30000, 5000, 10000, 0, 0 );
+    pAP->setStroke( 10000,2500, 0,10000 );
     pLOD->addData( pAP );
     
     // 点１
@@ -538,13 +546,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // ２本目
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 30000 );
     pLOD->setTempAdjust( +3333, -2500, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 30000, 0, 0, 5000, 10000 );
+    pAP->setStroke( 0,10000, 10000,2500 );
     pLOD->addData( pAP );
     
     // 点１
@@ -563,13 +572,13 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 4000 );
-    pAP->setStrokeSize( 10000, 30000, 3333, 5000, 3333 );
+    pAP->setStroke( 3333,30000, 3333,5000 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, 0, 0, 4000, 0, -4000 );
-    pAP->setStrokeSize( 10000, 5000, 3333, 30000, 3333 );
+    pAP->setStroke( 3333,5000, 3333,30000 );
     pLOD->addData( pAP );
     
     // 点２
@@ -582,13 +591,14 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     //----------------------------
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
+    pLOD->setStrokeSize( 20000 );
     pLOD->setTempAdjust( 0, -1333, 3333, 3333 );
     pLD->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 0, 0, 0, 0, 4000 );
-    pAP->setStrokeSize( 20000, 2000, 3333, 2000, 3333 );
+    pAP->setStroke( 3333,1000, 3333,1000 );
     pLOD->addData( pAP );
     
     // 点１
@@ -607,7 +617,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -6000, 0, 0, -4000, 0 );
-    pAP->setStrokeSize( 10000, 30000, 6666, 2000, 3333 );
+    pAP->setStroke( 6666,30000, 3333,2000 );
     pLOD->addData( pAP );
     
     // 点１
@@ -627,25 +637,25 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, -4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 5000, 0, 10000, 0, 0 );
+    pAP->setStroke( 0,0, 0,7500 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, -4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 10000, 5000, 10000, 0, 0 );
+    pAP->setStroke( 0,7500, 0,15000 );
     pLOD->addData( pAP );
     
     // 点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 15000, 10000, 10000, 0, 0 );
+    pAP->setStroke( 0,15000, 0,22500 );
     pLOD->addData( pAP );
     
     // 点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 4000, 0, 0, 0, 0 );
-    pAP->setStrokeSize( 20000, 15000, 10000, 0, 0 );
+    pAP->setStroke( 0,22500, 0,30000 );
     pLOD->addData( pAP );
     
     //----------------------------
@@ -663,25 +673,25 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -r, 0, 0, dirPow, 0, -dirPow );
-    pAP->setStrokeSize( 30000, 0, 0, 25000, 10000 );
+    pAP->setStroke( 0,30000, 0,22500 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -r, -dirPow, 0, dirPow, 0 );
-    pAP->setStrokeSize( 25000, 0, 0, 20000, 10000 );
+    pAP->setStroke( 0,22500, 0,15000 );
     pLOD->addData( pAP );
     
     // 点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( r, 0, 0, -dirPow, 0, dirPow );
-    pAP->setStrokeSize( 20000, 0, 0, 15000, 10000 );
+    pAP->setStroke( 0,15000, 0,7500 );
     pLOD->addData( pAP );
     
     // 点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, r, dirPow, 0, -dirPow, 0 );
-    pAP->setStrokeSize( 15000, 0, 0, 0, 10000 );
+    pAP->setStroke( 0,7500, 0,0 );
     pLOD->addData( pAP );
     
     return( true );

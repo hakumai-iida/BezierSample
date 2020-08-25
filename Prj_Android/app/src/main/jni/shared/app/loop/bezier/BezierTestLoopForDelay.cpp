@@ -29,8 +29,8 @@
 
 #define SEPARATE_TEST
 #define ADJUST_IN_OUT_TEST
+
 //#define HOOK_TEST
-//#define OPTION_TEST
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
@@ -68,24 +68,6 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     CFillPointData* pFP;
     eBUCKET bucket = eBUCKET_TEST_MONO;
     ePAL_OFS bucketPalOfs = CHECK_PAL_OFS;
-
-#ifdef OPTION_TEST
-    //----------------------
-    // 線オブジェクト確保＆設定
-    //----------------------
-    pLOD = CLineObjectData::Alloc();
-    pLOD->setBrushId( brush );
-    pLOD->setFlagOn( eLOD_FLAG_DOT );
-    m_pLayerDelay->addData( pLOD );
-    
-    // 点０
-    pAP = CAnchorPointData::Alloc();
-    pAP->set( 0,0, 0,0, 0,0 );
-    //pAP->setOptionForValid( eBD_OPTION_UpBaseApron );
-    pAP->setOptionForInvalid( eBD_OPTION_UpBaseApron );
-    pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_A );
-    pLOD->addData( pAP );
-#endif
 
 #ifdef CLOTH_TEST
     //----------------------
@@ -147,6 +129,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     //----------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
 #ifdef SEPARATE_TEST
     pPOD->setTempAdjust( -2500,-2500, 6666,6666 );
 #endif
@@ -154,7 +137,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 #endif
 
@@ -218,6 +201,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     //----------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
 #ifdef SEPARATE_TEST
     pPOD->setTempAdjust( 2500,-2500, 6666,6666 );
 #endif
@@ -225,7 +209,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 #endif
     
@@ -289,6 +273,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     //----------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
 #ifdef SEPARATE_TEST
     pPOD->setTempAdjust( -2500,2500, 6666,6666 );
 #endif
@@ -296,7 +281,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 #endif
 
@@ -396,6 +381,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     //----------------------
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
 #ifdef SEPARATE_TEST
     pPOD->setTempAdjust( 2500,2500, 6666,6666 );
 #endif
@@ -403,7 +389,7 @@ void CBezierTestLoop::allocForLayerForDelay( void ){
     
     // 塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 #endif
 }

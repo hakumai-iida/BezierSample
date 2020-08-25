@@ -38,8 +38,9 @@ typedef struct{
 //----------------------------------------
 class CStroke{
 public:
-    static eSTROKE_HOOK_TARGET AdjustHookTargetForSlotIndex( eSTROKE_HOOK_TARGET target, int slotIndex );
+    static eSTROKE_HOOK_TARGET AdjustHookTargetForSlotIndex( eSTROKE_HOOK_TARGET target, eBD_SLOT slot, int slotIndex );
     static eSTROKE_TOUCH_TARGET AdjustTouchTargetForSlotIndex( eSTROKE_TOUCH_TARGET target, int slotIndex );
+    static eSTROKE_GUIDE_TARGET AdjustGuideTargetForSlotIndex( eSTROKE_GUIDE_TARGET target, int slotIndex );
 
 protected:
     //------------------------------

@@ -43,29 +43,31 @@ protected:
 	// メンバー [保存データ]
     //-----------------------------------------
     // 基本設定
-    int         m_nIdForFace;           // 顔
-    int         m_nIdForBody;           // 素体
-    int         m_nIdForSuit;           // スーツ
-    eBD_EMO     m_eEmo;                 // 感情（※感情による差分の適用指定）
-    eBD_FORM    m_eForm;                // フォーム（※ポーズによる差分の適用指定）
+    int         m_nIdForFace;           // [4] 顔
+    int         m_nIdForBody;           // [4] 素体
+    int         m_nIdForSuit;           // [4] スーツ
+    eBD_EMO     m_eEmo;                 // [enum] 感情（※感情による差分の適用指定）
+    eBD_FORM    m_eForm;                // [enum] フォーム（※ポーズによる差分の適用指定）
     
     // 調整値
-    int         m_nRateAdjustH;         // 割合調整値：H
-    int         m_nRateAdjustV;         // 割合調整値：V
-    int         m_nRateAngleLR;         // 割合傾き：左右
-    int         m_nRateAngleUD;         // 割合傾き：上下
+    int         m_nRateAdjustH;         // [2] 割合調整値：H
+    int         m_nRateAdjustV;         // [2] 割合調整値：V
+    int         m_nRateAdjustT;         // [2] 割合調整値：T
+    int         m_nRateAdjustS;         // [2] 割合調整値：S
+    int         m_nRateAngleLR;         // [2] 割合傾き：左右
+    int         m_nRateAngleUD;         // [2] 割合傾き：上下
     
     // 移動値（※指定の値から移動値を決定する）
-    int         m_nRateVX;              // 割合速度：X
-    int         m_nRateVY;              // 割合速度：Y
-    int         m_nRateAX;              // 割合加速度：X
-    int         m_nRateAY;              // 割合加速度：Y
-    int         m_nMoveCount;           // 移動カウント
+    int         m_nRateVX;              // [2] 割合速度：X
+    int         m_nRateVY;              // [2] 割合速度：Y
+    int         m_nRateAX;              // [2] 割合加速度：X
+    int         m_nRateAY;              // [2] 割合加速度：Y
+    int         m_nMoveCount;           // [2] 移動カウント
     
-    // オプション指定
-    bool        m_bArrOptionValid[eBD_OPTION_MAX];
+    // [1 x MAX] オプション指定（※編集処理の都合上、bool配列を数値で管理）
+    int         m_nArrOptionValid[eBD_OPTION_MAX];
 
-    // スロット枠（※BDPDの参照先の指定）
+    // [X x MAX]スロット枠（※BDPDの参照先の指定）
     CBmpDotSettingSlotData m_oArrSlot[BMP_DOT_SETTING_SLOT_DATA_MAX];
 
 public:
@@ -88,6 +90,8 @@ public:
     
     inline void setRateAdjustH( int rate ){ m_nRateAdjustH = rate; }
     inline void setRateAdjustV( int rate ){ m_nRateAdjustV = rate; }
+    inline void setRateAdjustT( int rate ){ m_nRateAdjustT = rate; }
+    inline void setRateAdjustS( int rate ){ m_nRateAdjustS = rate; }
     inline void setRateAngleLR( int rate ){ m_nRateAngleLR = rate; }
     inline void setRateAngleUD( int rate ){ m_nRateAngleUD = rate; }
     
@@ -106,13 +110,17 @@ public:
     
     inline int getRateAdjustH( void ){ return( m_nRateAdjustH ); }
     inline int getRateAdjustV( void ){ return( m_nRateAdjustV ); }
+    inline int getRateAdjustT( void ){ return( m_nRateAdjustT ); }
+    inline int getRateAdjustS( void ){ return( m_nRateAdjustS ); }
     inline int getRateAngleLR( void ){ return( m_nRateAngleLR ); }
     inline int getRateAngleUD( void ){ return( m_nRateAngleUD ); }
     
-    inline float getAdjustH( void ){ return( CConst::ConvBezierRateScale( m_nRateAdjustH ) ); }
-    inline float getAdjustV( void ){ return( CConst::ConvBezierRateScale( m_nRateAdjustV ) ); }
-    inline float getAngleLR( void ){ return( CConst::ConvBezierRateScale( m_nRateAngleLR ) ); }
-    inline float getAngleUD( void ){ return( CConst::ConvBezierRateScale( m_nRateAngleUD ) ); }
+    inline float getAdjustH( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjustH ) ); }
+    inline float getAdjustV( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjustV ) ); }
+    inline float getAdjustT( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjustT ) ); }
+    inline float getAdjustS( void ){ return( CConst::ConvBezierScaleRate( m_nRateAdjustS ) ); }
+    inline float getAngleLR( void ){ return( CConst::ConvBezierScaleRate( m_nRateAngleLR ) ); }
+    inline float getAngleUD( void ){ return( CConst::ConvBezierScaleRate( m_nRateAngleUD ) ); }
     
     inline int getRateVX( void ){ return( m_nRateVX ); }
     inline int getRateVY( void ){ return( m_nRateVY ); }
@@ -120,14 +128,14 @@ public:
     inline int getRateAY( void ){ return( m_nRateAY ); }
     inline int getMoveCount( void ){ return( m_nMoveCount ); }
     
-    inline float getVX( void ){ return( CConst::ConvBezierRateScale( m_nRateVX ) ); }
-    inline float getVY( void ){ return( CConst::ConvBezierRateScale( m_nRateVY ) ); }
-    inline float getAX( void ){ return( CConst::ConvBezierRateScale( m_nRateAX ) ); }
-    inline float getAY( void ){ return( CConst::ConvBezierRateScale( m_nRateAY ) ); }
+    inline float getVX( void ){ return( CConst::ConvBezierScaleRate( m_nRateVX ) ); }
+    inline float getVY( void ){ return( CConst::ConvBezierScaleRate( m_nRateVY ) ); }
+    inline float getAX( void ){ return( CConst::ConvBezierScaleRate( m_nRateAX ) ); }
+    inline float getAY( void ){ return( CConst::ConvBezierScaleRate( m_nRateAY ) ); }
 
     // オプション関連
-    void setOptionValid( eBD_OPTION option, bool flag );
-    bool getOptionValid( eBD_OPTION option );
+    void setOptionValid( eBD_OPTION option, int slotIndex, bool flag );
+    bool isOptionValid( eBD_OPTION option, int slotIndex );
 
     // スロット関連
     CBmpDotSettingSlotData* getSlotAt( int at );
@@ -140,6 +148,8 @@ public:
     void setDefault( void );
 
     // ランダム設定
+    void setRandomPart( void );
+    void setRandomPartForSuit( void );
     void setRandomAdjForHV( void );
     void setRandomAdjForT( void );
     void setRandomAdjForS( void );

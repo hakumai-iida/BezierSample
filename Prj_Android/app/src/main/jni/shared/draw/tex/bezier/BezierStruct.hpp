@@ -37,7 +37,8 @@ typedef struct{
     BYTE* pBufColor;            // 塗りバッファ（※テストバッファとしても利用される）
     BYTE* pBufFillGuide;        // 塗りガイド（※塗りバッファに出力する前の下塗り用）
     BYTE* pBufFillGuard;        // 塗りガード（※塗りバッファへの出力制限用）
-
+    BYTE* pBufTemp;             // テンポラリ
+    
     // 出力画像サイズ
     int pixelRate;              // ピクセル割合（※論理ピクセル単位に対する実際のピクセル数＝GM_P_RATE）
     int texW0;                  // テクスチャ名目サイズ：横幅（※ピクセル割合適用後のサイズ＝論理座標変換時に利用される）
@@ -57,7 +58,7 @@ typedef struct{
     float scale;                // スケール
 
     // オプション
-    bool arrOption[eBD_OPTION_MAX];
+    bool arrOption[eBD_OPTION_MAX][BD_SLOT_INDEX_MAX];
 
     //-----------------------------------------------------------------
     // 調整率：ベジェ描画時に座標や角度を調整する割合（※画像に対して一律で適用される）
@@ -131,7 +132,7 @@ typedef struct{
 // アンカーポイント（※描画用のデータ：解像度や割合座標の処理が反映された値）
 //（※論理データ[CAnchorPointData]に対して各種調整等をした描画用情報）
 //-----------------------------------------------------------------
-typedef struct{
+struct stBEZIER_ANCHOR_POINT{
     // 座標
     float           x, y;                   // 座標：テクスチャの左上を原点とした値（※実ピクセル座標）
     float           xIn, yIn;               // 方向線：進入（※[x,y]からの相対位置）
@@ -147,7 +148,7 @@ typedef struct{
     int             dotPutRateWeak;         // ドット出力割合：薄い方（※出力済み画素／ブラシ画素の薄い方への適用率：百分率）
     bool            isDotPutForce;          // 強制的にドットを出力するか？（※テストを無視して必ずドットを出力する）
     bool            isDotPutWhetherMax;     // 画素が最大値に到達していてもドットを出力するか？（※デフォルトでは最大濃さになった画素は処理対象から外れる）
-    bool            isDotPutOnOut;          // 塗り出力されたドットの上にストロークを出力するか？（※直前の塗りで実際に出力された画素を対象にする）
+    bool            isDotPutOnOutCol;       // 塗り出力されたドットの上にストロークを出力するか？（※直前の塗りで実際に出力された画素を対象にする）
     bool            isDotErase;             // 消去するか？（※画素の値を減算する）
     
     // ストロークのブレ（※ドット出力時のバネによるブレ値への適用率）
@@ -155,12 +156,16 @@ typedef struct{
     float           shakeScaleForSize;      // サイズブレの強さ（※この値が大きいほど太さが歪なストロークになる）
 
     // パレット
-    BYTE            stripeMainPalGrp;       // ストライプパレットグループへのオフセット：メイン（※０で無効）
-    BYTE            stripeSubPalGrp;        // ストライプパレットグループへのオフセット：サブ（※０で無効）
-    BYTE            workPathPalOfsS;        // ワークパス色のオフセット（※毎回判定するのは面倒なので値で持っておく）
+    BYTE            stripeOrFrillMainPalGrp;    // ストライプパレットグループへのオフセット：メイン（※０で無効）
+    BYTE            stripeOrFrillSubPalGrp;     // ストライプパレットグループへのオフセット：サブ（※０で無効）
+    BYTE            workPathPalOfsS;            // ワークパス色のオフセット（※毎回判定するのは面倒なので値で持っておく）
 
     bool            bNoFillGuide;           // 塗りガイドを出力しないか？（※領域に関わらないストロークがガイドに影響しないように）
     bool            bLineRepairTest;        // 線修復テストを行うか？（※出力済みの色テクスチャにより欠けてしまったストロークへの重複描画）
+    bool            bAsTouchStroke;         // タッチストロークとして扱う（※タッチオフ時は透明）
+    
+    // ガイド対象
+    eSTROKE_GUIDE_TARGET guideTarget;       // ガイド対象
 
     // フック対象（※２点間をつなげる指定）
     eSTROKE_HOOK_TARGET hookTarget;         // フック対象（※データ指定＝任意の二点によるフック）
@@ -168,51 +173,50 @@ typedef struct{
 
     // ストロークサイズ（※[CAnchorPointData]から取り出して調整した値：値域は[0.0〜3.0]）
     float           strokeSize;             // ストロークサイズ：基本サイズ
-    float           strokeStartSize;        // ストロークサイズ：開始サイズ
     float           strokeStartRange;       // ストロークサイズ：開始サイズ適用範囲（※[0.0f〜stronStartRange]間でストロークサイズを補正する）
-    float           strokeEndSize;          // ストロークサイズ：終了サイズ
+    float           strokeStartSize;        // ストロークサイズ：開始サイズ
     float           strokeEndRange;         // ストロークサイズ：終了サイズ適用範囲（※[1.0f-stronkeEndRange〜1.0f]間でストロークサイズを補正する）
+    float           strokeEndSize;          // ストロークサイズ：終了サイズ
 
     // ストローク先端の塗りつぶしサイズ
     float           strokeEdgeFillSize;     // このＡＰの前後のストロークの角度が浅い場合に先端を埋めるサイズ
 
     // タッチ（※線による質感）
     eSTROKE_TOUCH_TARGET touchTarget;       // タッチ：対象
-    float           touchBasePos;           // タッチ00：基本位置（※ストロークの開始位置）
-    float           touchBaseSize;          // タッチ01：基本サイズ（※ストロークの開始サイズ）
-    float           touchBaseRot;           // タッチ02：基本角度（※ストロークの開始角度）
-    float           touchFrontArea;         // タッチ03：前方の領域（※基本位置から前方へのタッチ適用領域割合＝1.0で全領域）
-    float           touchFrontSize;         // タッチ04：前方のサイズ（※前方領域の目標サイズ）
-    float           touchFrontRot;          // タッチ05：前方の角度（※前方領域の目標角度）
-    float           touchBackArea;          // タッチ06：後方の領域（※基本位置から後方へのタッチ適用領域割合＝1.0で全領域）
-    float           touchBackSize;          // タッチ07：後方のサイズ（※後方領域の目標サイズ）
-    float           touchBackRot;           // タッチ08：後方の角度（※後方領域の目標角度）
-    float           touchFrontStep;         // タッチ09：前方のステップ（※次のストロークを表示する間隔）
-    float           touchFrontStep2;        // タッチ10：前方のステップ（※１つおきに適用する間隔＝二重線的なストロークを描きたい場合等）
-    float           touchFrontStepRnd;      // タッチ11：前方のステップ乱数（※ストロークの不均一性）
-    float           touchBackStep;          // タッチ12：後方のステップ（※次のストロークを表示する間隔）
-    float           touchBackStep2;         // タッチ13：後方のステップ（※１つおきに適用する間隔＝二重線的なストロークを描きたい場合等）
-    float           touchBackStepRnd;       // タッチ14：後方のステップ乱数（※ストロークの不均一性）
+    eSTROKE_TOUCH_TARGET touchTargetSub;    // タッチ：サブ
+    float           touchBasePos;           // タッチ：基本位置（※ストロークの開始位置）
+    float           touchBaseSize;          // タッチ：基本サイズ（※ストロークの開始サイズ）
+    float           touchBaseRot;           // タッチ：基本角度（※ストロークの開始角度）
+    float           touchFrontArea;         // タッチ：前方の領域（※基本位置から前方へのタッチ適用領域割合＝1.0で全領域）
+    float           touchFrontSizeOfs;      // タッチ：前方のサイズオフセット（※前方領域の最終サイズオフセット）
+    float           touchFrontRotRate;      // タッチ：前方の角度適用率（※前方領域の角度適用割合）
+    float           touchBackArea;          // タッチ：後方の領域（※基本位置から後方へのタッチ適用領域割合＝1.0で全領域）
+    float           touchBackSizeOfs;       // タッチ：後方のサイズオフセット（※後方領域の最終サイズオフセット）
+    float           touchBackRotRate;       // タッチ：後方の角度適用率（※後方領域の角度適用割合）
+    int             touchFrontNum;          // タッチ：前方の要素数
+    int             touchFrontSkip;         // タッチ：前方のスキップ数
+    float           touchFrontBorderRate;   // タッチ：前方のボーダー割合
+    int             touchBackNum;           // タッチ：後方の要素数
+    int             touchBackSkip;          // タッチ：後方のスキップ数
+    float           touchBackBorderRate;    // タッチ：後方のボーダー割合
+    float           touchRandomOfsFor0;     // タッチ：ランダムオフセット０
+    float           touchRandomOfsFor1;     // タッチ：ランダムオフセット１
+    float           touchHeadSkipRate;      // タッチ：先頭のスキップ率
+    float           touchTailSkipRate;      // タッチ：末尾のスキップ率
+    float           frillWidthRateForMain;  // フリル：メインの横幅補正
+    float           frillWidthRateForSub;   // フリル：メインの横幅補正
     
-    bool            isStripeFillFront;      // ストライプ：前方端を塗りつぶすか？（※タッチによる閉領域に対して[stripeMain/SubPalGrp]で[Fill]するか？）
-    bool            isStripeFillBack;       // ストライプ：後方端を塗りつぶすか？（※タッチによる閉領域に対して[stripeMain/SubPalGrp]で[Fill]するか？）
-    bool            isTouchPointReverse;    // タッチ：ポイントを反転登録するか？（※ＡＰの構成がタッチ点の並びと逆の場合に反転登録する指定）
+    // フリルのメイン／サブの横幅補正（※フリルの割り当て後の横幅を補正する／縦幅は通常のサイズで補正する想定）
+    int             m_nFrillWidthRateForMain;
+    int             m_nFrillWidthRateForSub;
 
-    float           touchStepMarginMin;     // タッチ：ストロークの配置間隔最低値（※最低でもこの値だけは間隔を取る／システムで設定）
+    bool            isTouchPointReverse;    // タッチ：ポイントを反転登録するか？（※ＡＰの構成がタッチ点の並びと逆の場合に反転登録する指定）
+    bool            isTouchSubReverse;      // タッチ：タッチ処理時にサブの座標を反転参照するか？
+    bool            isFrillDirReverse;      // フリル：フック登録の反転
 
     // フリル（※タッチ指定に対してフリルを適用する／変数の役割はタッチと同様）
-    eSTROKE_FRILL   frillId;                // フリル：種類
-    float           frillBasePos;           // フリル00：基本位置
-    float           frillBaseSize;          // フリル01：基本サイズ
-    float           frillBaseRot;           // フリル02：基本角度
-    float           frillFrontArea;         // フリル03：前方の領域
-    float           frillFrontSize;         // フリル04：前方のサイズ
-    float           frillFrontRot;          // フリル05：前方の角度
-    float           frillBackArea;          // フリル06：後方の領域
-    float           frillBackSize;          // フリル07：後方のサイズ
-    float           frillBackRot;           // フリル08：後方の角度
-
-    float           frillSizeMin;           // フリル：最低出力サイズ（※これ未満の値であれば出力しない／システムで設定）
+    eSTROKE_FRILL   frillMainId;            // フリル：メイン素材ID
+    eSTROKE_FRILL   frillSubId;             // フリル：サブ素材ID
 
     // 傾け（※局所）
     int             angleLocalSearchKey;    // 傾け：検索キー
@@ -224,8 +228,9 @@ typedef struct{
     float           angleRateLR;            // 傾け：左右の割合（※実効値）
     float           angleRateUD;            // 傾け：上下の割合（※実効値）
     
-    void*           pNext;                  // 次の要素
-} stBEZIER_ANCHOR_POINT;
+    stBEZIER_ANCHOR_POINT* pPrev;           // 前の要素
+    stBEZIER_ANCHOR_POINT* pNext;           // 次の要素
+};
 
 // クリア
 #define CLEAR_BEZIER_ANCHOR_POINT( _p )                     \
@@ -240,21 +245,24 @@ typedef struct{
 // 塗りつぶし点（※描画用のデータ：解像度や割合座標の処理がされた値を想定）
 //（※論理データ[CFillPointData]の値に対して各種調整等をした描画用情報）
 //-----------------------------------------------------------------
-typedef struct{
-    float                   x, y;                   // 塗りつぶしの始点：テクスチャの左上を原点とした位置
+struct stBEZIER_FILL_POINT{
+    float           x, y;                   // 塗りつぶしの始点：テクスチャの左上を原点とした位置
     
     // 塗り情報
-    eFILL_TYPE              type;                   // 塗りのスタイル
-    eFILL_OPTION            option;                 // 塗りオプション
-    eSTROKE_TOUCH_TARGET    touchIdForOption;       // 塗りオプションのタッチ対象ID（※アンチ処理をする際はあらかじめタッチ点を登録しておく）
-    float                   optionStrokeSize;       // オプションのストロークサイズ（※アンチ処理のストロークサイズ）
-    float                   optionStrokeRange;      // オプションのストロークレンジ（※アンチ処理のストロークレンジ）
-    float                   optionOfsX;             // オプションのオフセットＸ（※広域塗り／全体塗り時のオフセット）
-    float                   optionOfsY;             // オプションのオフセットＹ（※広域塗り／全体塗り時のオフセット）
+    eFILL_TYPE      type;                   // 塗りのスタイル
+    BYTE            palGrp;                 // パレットグループ
+    int             darkOfs;                // 塗りの明暗オフセット
+    BYTE            workPathPalOfsS;        // ワークパス色のオフセット（※毎回判定するのは面倒なので値で持っておく）
+    bool            isFillOnOutCol;         // 塗り出力された領域にのみ出力する
 
-    // パレット
-    ePAL_OFS                palOfsId;               // パレットオフセットID
-    BYTE                    workPathPalOfsS;        // ワークパス色のオフセット（※毎回判定するのは面倒なので値で持っておく）
+    // 塗りオプション
+    eFILL_OPTION            option;                 // オプション：タイプ
+    int                     optionDarkOfs;          // オプション：明暗オフセット
+    eSTROKE_TOUCH_TARGET    optionTouchId;          // オプション：タッチ対象ID（※アンチ処理をする際はあらかじめタッチ点を登録しておく）
+    float                   optionStrokeSize;       // オプション：ストロークサイズ（※アンチ処理のストロークサイズ）
+    float                   optionStrokeRange;      // オプション：ストロークレンジ（※アンチ処理のストロークレンジ）
+    float                   optionOfsX;             // オプション：オフセットＸ（※広域塗り／全体塗り時のオフセット）
+    float                   optionOfsY;             // オプション：オフセットＹ（※広域塗り／全体塗り時のオフセット）
     
     // 傾け（※局所）
     int             angleLocalSearchKey;    // 傾け：検索キー
@@ -266,22 +274,22 @@ typedef struct{
     float           angleRateLR;            // 傾け：左右の割合（※実効値）
     float           angleRateUD;            // 傾け：上下の割合（※実効値）
 
-    void*                   pNext;                  // 次の要素
-} stBEZIER_FILL_POINT;
+    stBEZIER_FILL_POINT* pPrev;             // 前の要素
+    stBEZIER_FILL_POINT* pNext;             // 次の要素
+};
 
 // クリア
 #define CLEAR_BEZIER_FILL_POINT( _p )                       \
     memset( _p, 0, sizeof(stBEZIER_FILL_POINT) );           \
     (_p)->type = eFILL_TYPE_INVALID;                        \
     (_p)->option = eFILL_OPTION_INVALID;                    \
-    (_p)->touchIdForOption = eSTROKE_TOUCH_TARGET_INVALID;  \
-    (_p)->palOfsId = ePAL_OFS_INVALID
+    (_p)->optionTouchId = eSTROKE_TOUCH_TARGET_INVALID;
 
 //-----------------------------------------------------------------
 // スロット点（※描画用のデータ：解像度や割合座標の処理がされた値を想定）
 //（※論理データ[CSlotPointData]の値に対して各種調整等をした描画用情報）
 //-----------------------------------------------------------------
-typedef struct{
+struct stBEZIER_SLOT_POINT{
     eBD_SLOT    slot;                   // スロット
     int         slotIndex;              // スロットインデックス
     int         rateOfsX, rateOfsY;     // オフセット割合座標の最終値
@@ -290,14 +298,30 @@ typedef struct{
     bool        isFlipH, isFlipV;       // 反転フラグ
     BYTE        workPathPalOfs;         // ワークパス色のオフセット（※毎回判定するのは面倒なので値で持って置く）
     
-    void*       pNext;                  // 次の要素
-} stBEZIER_SLOT_POINT;
+    stBEZIER_SLOT_POINT* pPrev;         // 前の要素
+    stBEZIER_SLOT_POINT* pNext;         // 次の要素
+};
 
 // クリア
 #define CLEAR_BEZIER_SLOT_POINT( _p )                   \
     memset( _p, 0, sizeof(stBEZIER_SLOT_POINT) );       \
     (_p)->slot = eBD_SLOT_INVALID;                      \
     (_p)->slotIndex = -1
+
+//------------------------------
+// 分割点（※ストロークの分割ポイント）
+//------------------------------
+typedef struct{
+    float x, y;                     // 座標：テクスチャの左上を原点とした位置（※傾きがある場合は適用済みの値となる）
+    float x0, y0;                   // 元座標（※傾き適用前の値＝タッチの処理で利用する）
+    float strokeSize;               // ストロークサイズ
+    bool isEdgeFillCheck;           // エッジ埋めの確認をするか？
+    stBEZIER_ANCHOR_POINT* pAP;     // 分割元のアンカーポイント（※描画情報参照用）
+} stBEZIER_DIVISION_POINT;
+
+// クリア
+#define CLEAR_BEZIER_DIVISION_POINT( _p )               \
+    memset( _p, 0, sizeof(stBEZIER_SLOT_POINT) )
 
 /*+----------------------------------------------------------------+
   |	Class		クラス定義

@@ -49,6 +49,8 @@ void CBmpDotSettingData::clear( void ){
     
     m_nRateAdjustH = 0;
     m_nRateAdjustV = 0;
+    m_nRateAdjustT = 0;
+    m_nRateAdjustS = 0;
     m_nRateAngleLR = 0;
     m_nRateAngleUD = 0;
     
@@ -59,7 +61,7 @@ void CBmpDotSettingData::clear( void ){
     m_nMoveCount = 0;
 
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        m_bArrOptionValid[i] = false;
+        m_nArrOptionValid[i] = 0x0;
     }
 
     for( int i=0; i<BMP_DOT_SETTING_SLOT_DATA_MAX; i++ ){
@@ -84,6 +86,8 @@ void CBmpDotSettingData::copy( CBmpDotSettingData* pData ){
     
     m_nRateAdjustH = pData->m_nRateAdjustH;
     m_nRateAdjustV = pData->m_nRateAdjustV;
+    m_nRateAdjustT = pData->m_nRateAdjustT;
+    m_nRateAdjustS = pData->m_nRateAdjustS;
     m_nRateAngleLR = pData->m_nRateAngleLR;
     m_nRateAngleUD = pData->m_nRateAngleUD;
     
@@ -94,7 +98,7 @@ void CBmpDotSettingData::copy( CBmpDotSettingData* pData ){
     m_nMoveCount = pData->m_nMoveCount;
 
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        m_bArrOptionValid[i] = pData->m_bArrOptionValid[i];
+        m_nArrOptionValid[i] = pData->m_nArrOptionValid[i];
     }
 
     for( int i=0; i<BMP_DOT_SETTING_SLOT_DATA_MAX; i++ ){
@@ -106,27 +110,34 @@ void CBmpDotSettingData::copy( CBmpDotSettingData* pData ){
 //------------------------------
 // オプション設定
 //------------------------------
-void CBmpDotSettingData::setOptionValid( eBD_OPTION option, bool flag ){
+void CBmpDotSettingData::setOptionValid( eBD_OPTION option, int slotIndex, bool flag ){
     // 無効は無視
-    if( ! IS_BD_OPTION_VALID( option ) ){
-        LOGE( "@ CBmpDotSettingData::setOptionValid: INVALID OPTION: option=%d\n", option );
+    if( !IS_BD_OPTION_VALID( option ) || !IS_BD_SLOT_INDEX_VALID( slotIndex ) ){
+        LOGE( "@ CBmpDotSettingData::setOptionValid: INVALID: option=%d, slotIndex=%d\n", option, slotIndex );
         return;
     }
     
-    m_bArrOptionValid[option] = flag;
+    int val = m_nArrOptionValid[option];
+    if( flag ){
+        val |= (1<<slotIndex);
+    }else{
+        val &= ~(1<<slotIndex);
+    }
+    m_nArrOptionValid[option] = val;
 }
 
 //------------------------------
-// オプションターゲット取得
+// オプションが有効か？
 //------------------------------
-bool CBmpDotSettingData::getOptionValid( eBD_OPTION option ){
+bool CBmpDotSettingData::isOptionValid( eBD_OPTION option, int slotIndex ){
     // 無効は無視
-    if( ! IS_BD_OPTION_VALID( option ) ){
-        LOGE( "@ CBmpDotSettingData::getOptionValid: INVALID OPTION: option=%d\n", option );
+    if( !IS_BD_OPTION_VALID( option ) || !IS_BD_SLOT_INDEX_VALID( slotIndex ) ){
+        LOGE( "@ CBmpDotSettingData::isOptionValid: INVALID: option=%d, slotIndex=%d\n", option, slotIndex );
         return( false );
     }
-    
-    return( m_bArrOptionValid[option] );
+
+    int val = m_nArrOptionValid[option];
+    return( (val & (1<<slotIndex)) != 0x0 );
 }
 
 //--------------------------
@@ -165,6 +176,8 @@ void CBmpDotSettingData::load0( CInputBuffer* pIB ){
     
     m_nRateAdjustH = pIB->readInt16();
     m_nRateAdjustV = pIB->readInt16();
+    m_nRateAdjustT = pIB->readInt16();
+    m_nRateAdjustS = pIB->readInt16();
     m_nRateAngleLR = pIB->readInt16();
     m_nRateAngleUD = pIB->readInt16();
     
@@ -173,9 +186,9 @@ void CBmpDotSettingData::load0( CInputBuffer* pIB ){
     m_nRateAX = pIB->readInt16();
     m_nRateAY = pIB->readInt16();
     m_nMoveCount = pIB->readInt16();
-    
+
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        m_bArrOptionValid[i] = (pIB->readUint8() ? 1: 0 );
+        m_nArrOptionValid[i] = pIB->readUint8();
     }
 
     // スロットデータは保存数がかきこまれている（※枠の数が変わった際への用心）
@@ -216,6 +229,8 @@ void CBmpDotSettingData::save0( COutputBuffer* pOB ){
 
     pOB->writeInt16( (short)m_nRateAdjustH );
     pOB->writeInt16( (short)m_nRateAdjustV );
+    pOB->writeInt16( (short)m_nRateAdjustT );
+    pOB->writeInt16( (short)m_nRateAdjustS );
     pOB->writeInt16( (short)m_nRateAngleLR );
     pOB->writeInt16( (short)m_nRateAngleUD );
 
@@ -226,7 +241,7 @@ void CBmpDotSettingData::save0( COutputBuffer* pOB ){
     pOB->writeInt16( (short)m_nMoveCount );
 
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        pOB->writeUint8( m_bArrOptionValid[i]? 1: 0 );
+        pOB->writeUint8( m_nArrOptionValid[i] );
     }
 
     // スロットデータの要素数の出力（※読み込み時に利用する）
@@ -262,7 +277,13 @@ void CBmpDotSettingData::setDefault( void ){
 
     // オプションは全て有効（※とりあえず）
     for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        m_bArrOptionValid[i] = true;
+        // スロットインデックス分１を立てる
+        int val = 0;
+        
+        for( int j=0; j<BD_SLOT_INDEX_MAX; j++ ){
+            val |= (1<<j);
+        }
+        m_nArrOptionValid[i] = val;
     }
     
     // 各スロットをインデックス毎に登録
@@ -282,6 +303,188 @@ void CBmpDotSettingData::setDefault( void ){
             pSlot->setSlotIndex( j );
         }
     }
+}
+
+//-------------------------
+// ランダム設定：縦横
+//-------------------------
+void CBmpDotSettingData::setRandomPart( void ){
+    // 用心にデフォルト
+    setDefault();
+
+    int eyeBaseUid = CRand::GetRand( 2 );
+    int eyeBallUid = CRand::GetRand( 2 );
+    int browseUid = CRand::GetRand( 2 );
+    int headSideUid = CRand::GetRand( 2 );
+    int upUid = CRand::GetRand( 2 );
+    int lowUid = CRand::GetRand( 2 );
+    int armUid = CRand::GetRand( 2 );
+    int legUid = CRand::GetRand( 2 );
+    int optionId = CRand::GetRand( 3 ) - 1;
+
+    // シャッフル
+    for( int i=0; i<BMP_DOT_SETTING_SLOT_DATA_MAX; i++ ){
+        CBmpDotSettingSlotData* pSlot = getSlotAt( i );
+
+        eBD_SLOT slot = pSlot->getSlot();
+        int slotIndex = pSlot->getSlotIndex();
+        if( IS_BD_SLOT_VALID( slot ) ){
+            eBD_CATEGORY category = CBDConst::GetCategoryForSlot( slot );
+            eBD_EMO emo = eBD_EMO_BASE;
+            eBD_FORM form = eBD_FORM_FRONT;
+            eBD_DIR dir = (slotIndex>0)? eBD_DIR_R: eBD_DIR_L;
+            int subId = 0;
+            int uid = 0;
+
+            switch( slot ){
+            case eBD_SLOT_BlBase:
+            case eBD_SLOT_BlJointUpBody:
+            case eBD_SLOT_BlJointLowBody:
+            case eBD_SLOT_BlOptionA:
+            case eBD_SLOT_BlOptionB:
+            case eBD_SLOT_UpBase:
+            case eBD_SLOT_UpJointNeck:
+            case eBD_SLOT_UpJointSholder:
+                uid = upUid;
+                break;
+
+            case eBD_SLOT_BdOptionA:
+            case eBD_SLOT_BdOptionB:
+            case eBD_SLOT_BdOptionJointA:
+            case eBD_SLOT_BdOptionJointB:
+                if( optionId < 0 ){
+                    slot = eBD_SLOT_INVALID;
+                }else{
+                    uid = optionId;
+                }
+                break;
+
+            case eBD_SLOT_UpOptionA:
+            case eBD_SLOT_UpOptionB:
+            case eBD_SLOT_NkBase:
+                uid = CRand::GetRand( 2 );
+                break;
+
+            case eBD_SLOT_AmBase:
+            case eBD_SLOT_AmCover:
+            case eBD_SLOT_AmJointElbow:
+            case eBD_SLOT_ElBase:
+            case eBD_SLOT_ElJointWrist:
+            case eBD_SLOT_HnBase:
+                uid = armUid;
+                break;
+                    
+            case eBD_SLOT_AmOptionA:
+            case eBD_SLOT_AmOptionB:
+                uid = CRand::GetRand( 2 );
+                break;
+                    
+            case eBD_SLOT_LwBase:
+                    
+            case eBD_SLOT_LwJointLeg:
+            case eBD_SLOT_LwOptionA:
+            case eBD_SLOT_LwOptionB:
+                uid = lowUid;
+
+            case eBD_SLOT_LgBase:
+            case eBD_SLOT_LgCover:
+            case eBD_SLOT_LgJointKnee:
+            case eBD_SLOT_LgOptionA:
+            case eBD_SLOT_LgOptionB:
+            case eBD_SLOT_KnBase:
+            case eBD_SLOT_KnJointAnkle:
+            case eBD_SLOT_FoBase:
+            case eBD_SLOT_FoGround:
+                uid = legUid;
+                break;
+                    
+            case eBD_SLOT_FcBase:
+            case eBD_SLOT_FcHairLine:
+            case eBD_SLOT_FcEar:
+            case eBD_SLOT_FcCheek:
+            case eBD_SLOT_FcNose:
+            case eBD_SLOT_FcGlasses:
+            case eBD_SLOT_FcDeco:
+            case eBD_SLOT_MoBase:
+                uid = CRand::GetRand( 2 );
+                break;
+                    
+            case eBD_SLOT_FcBrows:
+                uid = browseUid;
+                break;
+
+            case eBD_SLOT_EyBase:
+                uid = eyeBaseUid;
+                break;
+
+            case eBD_SLOT_EyBall:
+                uid = eyeBallUid;
+                break;
+
+            case eBD_SLOT_HdBase:
+                uid = CRand::GetRand( 2 );
+                break;
+
+            case eBD_SLOT_HdCover:
+            case eBD_SLOT_HdTop:
+                uid = CRand::GetRand( 2 );
+                break;
+
+            case eBD_SLOT_HdSide:
+                uid = headSideUid;
+                break;
+                    
+            case eBD_SLOT_HdFront:
+                if( CRand::IsRandHappen( 1, 4 ) ){
+                    slot = eBD_SLOT_INVALID;
+                }else{
+                    uid = CRand::GetRand( 2 );
+                }
+                break;
+                    
+            case eBD_SLOT_HdCap:
+            case eBD_SLOT_HdRibbon:
+            case eBD_SLOT_HdAccentTop:
+            case eBD_SLOT_HdAccentSide:
+            case eBD_SLOT_HdHairSideKnot:
+            case eBD_SLOT_HdHairSide:
+            case eBD_SLOT_HdHairBackKnot:
+            case eBD_SLOT_HdHairBack:
+                uid = CRand::GetRand( 2 );
+                break;
+
+            default:
+                break;
+            }
+
+            pSlot->setSlot( slot );
+            pSlot->setSlotIndex( slotIndex );
+            pSlot->setCategory( category );
+            pSlot->setEmo( emo );
+            pSlot->setForm( form );
+            pSlot->setSubId( subId );
+            pSlot->setDir( dir );
+            pSlot->setUid( uid );
+        }
+    }
+    
+    // オプション
+    for( int i=0; i<eBD_OPTION_MAX; i++ ){
+        int val = 0;
+        for( int j=0; j<BD_SLOT_INDEX_MAX; j++ ){
+            if( CRand::IsRandHappen( 1, 2 ) ){
+                val |= (1<<j);
+            }
+        }
+        m_nArrOptionValid[i] = val;
+    }
+}
+
+//-------------------------
+// ランダム設定：スーツ
+//-------------------------
+void CBmpDotSettingData::setRandomPartForSuit( void ){
+    //
 }
 
 //-------------------------
@@ -329,7 +532,7 @@ void CBmpDotSettingData::setRandomAdjForAngle( void ){
 //-------------------------------------------------
 void CBmpDotSettingData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 14 + eBD_OPTION_MAX );
+    pMenu->setItemNum( 16 + eBD_OPTION_MAX );
     
     int id = 0;
     
@@ -348,6 +551,8 @@ void CBmpDotSettingData::setEditValueMenu( CEditValueMenu* pMenu ){
     
     pMenu->setItemAt( id++, "RATE ADJ-H", &m_nRateAdjustH, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
     pMenu->setItemAt( id++, "RATE ADJ-V", &m_nRateAdjustV, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "RATE ADJ-T", &m_nRateAdjustT, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
+    pMenu->setItemAt( id++, "RATE ADJ-S", &m_nRateAdjustS, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
     pMenu->setItemAt( id++, "RATE ANG-LR", &m_nRateAngleLR, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
     pMenu->setItemAt( id++, "RATE ANG-UD", &m_nRateAngleUD, eEDIT_VALUE_TYPE_INT32, -BEZIER_SCALE_RATE, BEZIER_SCALE_RATE );
     
@@ -362,22 +567,27 @@ void CBmpDotSettingData::setEditValueMenu( CEditValueMenu* pMenu ){
     pMenu->setSeparatorAt( id, true );
 
     // オプション
-    pMenu->setItemAtAsBool( id++, "OPT: UpBaseApron", &m_bArrOptionValid[eBD_OPTION_UpBaseApron] );
-    pMenu->setItemAtAsBool( id++, "OPT: LwBaseApron", &m_bArrOptionValid[eBD_OPTION_LwBaseApron] );
-    pMenu->setItemAtAsBool( id++, "OPT: FcNoseBridge", &m_bArrOptionValid[eBD_OPTION_FcNoseBridge] );
-    pMenu->setItemAtAsBool( id++, "OPT: FcGlasses", &m_bArrOptionValid[eBD_OPTION_FcGlasses] );
-    pMenu->setItemAtAsBool( id++, "OPT: MoTooth", &m_bArrOptionValid[eBD_OPTION_MoTooth] );
-    pMenu->setItemAtAsBool( id++, "OPT: MoLip", &m_bArrOptionValid[eBD_OPTION_MoLip] );
-    pMenu->setItemAtAsBool( id++, "OPT: MoDrool", &m_bArrOptionValid[eBD_OPTION_MoDrool] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyLid", &m_bArrOptionValid[eBD_OPTION_EyLid] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyLashUp", &m_bArrOptionValid[eBD_OPTION_EyLashUp] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyLashLow", &m_bArrOptionValid[eBD_OPTION_EyLashLow] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyShadowUp", &m_bArrOptionValid[eBD_OPTION_EyShadowUp] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyShadowLow", &m_bArrOptionValid[eBD_OPTION_EyShadowLow] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyMole", &m_bArrOptionValid[eBD_OPTION_EyMole] );
-    pMenu->setItemAtAsBool( id++, "OPT: EyTear", &m_bArrOptionValid[eBD_OPTION_EyTear] );
-    pMenu->setItemAtAsBool( id++, "OPT: HdHairMesh", &m_bArrOptionValid[eBD_OPTION_HdHairMesh] );
-    pMenu->setItemAtAsBool( id++, "OPT: HdHairBand", &m_bArrOptionValid[eBD_OPTION_HdHairBand] );
+    int maxVal = (1<<BD_SLOT_INDEX_MAX) - 1;
+    pMenu->setItemAt( id++, "OPT: EyLid", &m_nArrOptionValid[eBD_OPTION_EyLid], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyLashUp", &m_nArrOptionValid[eBD_OPTION_EyLashUp], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyLashLow", &m_nArrOptionValid[eBD_OPTION_EyLashLow], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyShadowUp", &m_nArrOptionValid[eBD_OPTION_EyShadowUp], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyShadowLow", &m_nArrOptionValid[eBD_OPTION_EyShadowLow], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyMole", &m_nArrOptionValid[eBD_OPTION_EyMole], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: EyTear", &m_nArrOptionValid[eBD_OPTION_EyTear], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: MoTooth", &m_nArrOptionValid[eBD_OPTION_MoTooth], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: MoLip", &m_nArrOptionValid[eBD_OPTION_MoLip], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: MoDrool", &m_nArrOptionValid[eBD_OPTION_MoDrool], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: FcRough", &m_nArrOptionValid[eBD_OPTION_FcRough], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: FcAngry", &m_nArrOptionValid[eBD_OPTION_FcAngry], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: FcSad", &m_nArrOptionValid[eBD_OPTION_FcSad], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: FcShy", &m_nArrOptionValid[eBD_OPTION_FcShy], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: FcBlue", &m_nArrOptionValid[eBD_OPTION_FcBlue], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+    pMenu->setItemAt( id++, "OPT: HdHairMesh", &m_nArrOptionValid[eBD_OPTION_HdHairMesh], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+
+#if 1
+    pMenu->setItemAt( id++, "OPT: FcEarMike", &m_nArrOptionValid[eBD_OPTION_FcEarMike], eEDIT_VALUE_TYPE_INT32, 0, maxVal );
+#endif
 
     // 確定
     pMenu->fixMenu();

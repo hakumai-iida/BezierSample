@@ -17,9 +17,6 @@
 //#define DUMP_STROKE_DOT_CREATE_LOG
 //#define DUMP_STROKE_DOT_FIX_LOG
 
-// データチェック（※オフにしておく＝正常系でしか動かない前提）
-//#define CHECK_DATA_ACCESS
-
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
   +----------------------------------------------------------------+*/
@@ -116,15 +113,11 @@ BYTE* CStrokeDot::getDot( float rateOutX, float rateOutY ){
     int outY = (int)(rateOutY * STROKE_DOT_OUT_PRECISION_H);
     int dotAt = outY*STROKE_DOT_OUT_PRECISION_W + outX;
 
-#ifdef CHECK_DATA_ACCESS
-    // 用心
+    // 用心（※極まれに[rateOutY==1.0f]が渡されるのでリミッタが必要）
     if( dotAt < 0 || dotAt >= STROKE_DOT_OUT_PRECISION_MAX ){
-        LOGE( "@ CStrokeDot::getDot:: INVALID RATE OUT: rateOutX=%f, rateOutY=%f\n", rateOutX, rateOutY );
-        
-        // ごかましておく
+        LOGE( "@ CStrokeDot::getDot:: INVALID RATE OUT: dotAt=%d, rateOutX=%f, rateOutY=%f\n", dotAt, rateOutX, rateOutY );
         dotAt = STROKE_DOT_OUT_PRECISION_MAX-1;
     }
-#endif
     
     return( m_pArrDot[dotAt] );
 }

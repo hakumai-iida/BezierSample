@@ -29,7 +29,8 @@ enum eFPD_FLAG{
 	eFPD_FLAG_INVALID = -1,         // 無効値
 
     eFPD_FLAG_DISABLE,	            // 00:[*] 無効（※[CPaintObjectData::CreateBezierFillPoint]で登録されない）
-    eFPD_FLAG_TRANSPARENCY,         // 01:[(T)] 透明（※表示はしないが塗り処理を行う＝塗りガイドを埋めてマスク的な利用をする際）
+    eFPD_FLAG_TRANSPARENCY,         // 01:[?] 透明（※表示はしないが塗り処理を行う＝塗りガイドを埋めてマスク的な利用をする際）
+    eFPD_FLAG_FILL_ON_OUT_COL,      // 02:[@] 出力色の上にのみ塗りつぶす
     
     eFPD_FLAG_MAX,		            // 最大（※フラグ変数は[short]なので[00〜15]まで）
     
@@ -69,9 +70,8 @@ protected:
     //int m_nFlag;                                      // [2]: フラグ（※[IMPLEMENT_DATA_FLAG]で宣言）
     //CAdjustablePoint m_oAdjXY;                        // [X]: 座標（※画像サイズに対する割合座標）
 
-	ePAL_OFS m_ePalOfsId;                               // [enum]: パレットオフセットID
-    
     eFILL_OPTION m_eFillOption;                         // [enum]: 塗りオプション
+    int m_nDarkOfsForOption;                            // [2]: オプション用の明暗オフセット（※負で明るく、正で暗く）
     eSTROKE_TOUCH_TARGET m_eTouchTargetIdForOption;     // [enum]: オプションの対象タッチID
     int m_nStrokeSizeForOption;                         // [2]: オプションに対するストロークサイズ（※ゲーム解像度サイズ）
     int m_nStrokeRangeForOption;                        // [2]: オプションに対するストロークレンジ（※ゲーム解像度サイズ）
@@ -86,16 +86,17 @@ public:
     //------------
     // 設定
     //------------
-    void set( int rX, int rY, ePAL_OFS palOfsId=ePAL_OFS_INVALID );
-    void setOption( eFILL_OPTION option, eSTROKE_TOUCH_TARGET touchId=eSTROKE_TOUCH_TARGET_INVALID );
-    void setOptionStroke( int size, int range );
-    void setOptionOfsXY( int ofsX, int ofsY );
+    inline void set( int rX, int rY ){ m_oAdjXY.setRateXY( rX, rY ); }
+    inline void setOption( eFILL_OPTION option, int ofs=0 ){ m_eFillOption = option; m_nDarkOfsForOption = ofs; }
+    inline void setOptionTouch( eSTROKE_TOUCH_TARGET touchId ){ m_eTouchTargetIdForOption = touchId; }
+    inline void setOptionStroke( int size, int range ){ m_nStrokeSizeForOption = size; m_nStrokeRangeForOption = range; }
+    inline void setOptionOfsXY( int ofsX, int ofsY ){ m_nOfsXForOption = ofsX; m_nOfsYForOption = ofsY; }
 
 	//------------
 	// 取得
 	//------------
-	inline ePAL_OFS getPalOfsId( void ){ return( m_ePalOfsId ); }
     inline eFILL_OPTION getFillOption( void ){ return( m_eFillOption ); }
+    inline int getDarkOfsForOption( void ){ return( m_nDarkOfsForOption ); }
     eSTROKE_TOUCH_TARGET getTouchTargetIdForOption( int slotIndex=-1 );
     inline int getStrokeSizeForOption( void ){ return( m_nStrokeSizeForOption ); }
     inline int getStrokeRangeForOption( void ){ return( m_nStrokeRangeForOption ); }

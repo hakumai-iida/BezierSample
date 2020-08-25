@@ -68,42 +68,41 @@ protected:
     int m_nJointMaxRateOfsRForH;            // [2]: ヨコ調整：最大オフセット（※半径を太くする指定）
     int m_nJointRateRotOfs;                 // [2]: 基本角度（この角度を中心に前後９０度の二点を[TargetIdForFrom/To]へ登録する）
     int m_nJointRateOfsForRotCenter;        // [2]: 回転時にずらす中心割合オフセット（※円の中心から見て、[+]で上、[-]で下に中心がずれる）
-       
-    int m_nJointRateDirForFrom;             // [2]: 方向線調整：呼び出し元の強さ
-    int m_nJointRateDirForTo;               // [2]: 方向線調整：呼び出し先の強さ
-    int m_nJointRateDirForOpen;             // [2]: 方向線調整：二点間が開いた際の方向線の強さ
-    int m_nJointRateDirForClose;            // [2]: 方向線調整：二点間が閉じた際の方向線の強さ
+    
+    // プラステンション[adjT > 0.0f] 向けの調整値
+    int m_nJointOpenFromRateDirX_p;         // [2]: 方向線調整：二点間が開いた際の呼び出し元への方向線X
+    int m_nJointOpenFromRateDirY_p;         // [2]: 方向線調整：二点間が開いた際の呼び出し元への方向線Y
+    int m_nJointCloseFromRateDirX_p;        // [2]: 方向線調整：二点間が閉じた際の呼び出し元への方向線X
+    int m_nJointCloseFromRateDirY_p;        // [2]: 方向線調整：二点間が閉じた際の呼び出し元への方向線Y
+    int m_nJointOpenToRateDirX_p;           // [2]: 方向線調整：二点間が開いた際の呼び出し先への方向線X
+    int m_nJointOpenToRateDirY_p;           // [2]: 方向線調整：二点間が開いた際の呼び出し先への方向線Y
+    int m_nJointCloseToRateDirX_p;          // [2]: 方向線調整：二点間が閉じた際の呼び出し先への方向線X
+    int m_nJointCloseToRateDirY_p;          // [2]: 方向線調整：二点間が閉じた際の呼び出し先への方向線Y
+
+    // マイナステンション[adjT < 0.0f] 向けの調整値
+    int m_nJointOpenFromRateDirX_m;         // [2]: 方向線調整：二点間が開いた際の呼び出し元への方向線X
+    int m_nJointOpenFromRateDirY_m;         // [2]: 方向線調整：二点間が開いた際の呼び出し元への方向線Y
+    int m_nJointCloseFromRateDirX_m;        // [2]: 方向線調整：二点間が閉じた際の呼び出し元への方向線X
+    int m_nJointCloseFromRateDirY_m;        // [2]: 方向線調整：二点間が閉じた際の呼び出し元への方向線Y
+    int m_nJointOpenToRateDirX_m;           // [2]: 方向線調整：二点間が開いた際の呼び出し先への方向線X
+    int m_nJointOpenToRateDirY_m;           // [2]: 方向線調整：二点間が開いた際の呼び出し先への方向線Y
+    int m_nJointCloseToRateDirX_m;          // [2]: 方向線調整：二点間が閉じた際の呼び出し先への方向線X
+    int m_nJointCloseToRateDirY_m;          // [2]: 方向線調整：二点間が閉じた際の呼び出し先への方向線Y
+
+    //-----------------------------------------------------------------------------------------
+    // カバー調整値
+    //-----------------------------------------------------------------------------------------
+    int m_nCoverRateScale;                  // [2]:カバーに対するスケール
+    int m_nCoverRateRot;                    // [2]:カバーに対する回転
 
 public:
     // コンストラクタ／デストラクタ
     CSlotAdjuster( void );
     virtual ~CSlotAdjuster( void ){}
 
-    //----------------
-    // 設定
-    //----------------
-    // for T
-    inline void setMinRateForT( int rate ){ m_nMinRateForT = rate; }
-    inline void setMaxRateForT( int rate ){ m_nMaxRateForT = rate; }
-
-    // for S
-    inline void setMinRateForS( int rate ){ m_nMinRateForS = rate; }
-    inline void setMaxRateForS( int rate ){ m_nMaxRateForS = rate; }
-
-    // joint
-    inline void setJointPointIdForFrom( eJOINT_POINT targetId ){ m_eJointPointIdForFrom = targetId; }
-    inline void setJointPointIdForTo( eJOINT_POINT targetId ){ m_eJointPointIdForTo = targetId; }
-
-    inline void setJointRateRotR( int JointRateRotR ){ m_nJointRateRotR = JointRateRotR; }
-    inline void setJointMinRateOfsRForH( int rateOfsR ){ m_nJointMinRateOfsRForH = rateOfsR; }
-    inline void setJointMaxRateOfsRForH( int rateOfsR ){ m_nJointMaxRateOfsRForH = rateOfsR; }
-    inline void setJointRateRotOfs( int JointRateRotOfs ){ m_nJointRateRotOfs = JointRateRotOfs; }
-    inline void setJointRateOfsForRotCenter( int JointRateOfsForRotCenter ){ m_nJointRateOfsForRotCenter = JointRateOfsForRotCenter; }
-
-    inline void setJointRateDirForFrom( int rate ){ m_nJointRateDirForClose = rate; }
-    inline void setJointRateDirForTo( int rate ){ m_nJointRateDirForTo = rate; }
-    inline void setJointRateDirForOpen( int rate ){ m_nJointRateDirForOpen = rate; }
-    inline void setJointRateDirForClose( int rate ){ m_nJointRateDirForClose = rate; }
+    //---------------------------------------------------------------------------------------
+    // 設定（※レイヤーデータから直接利用しないので設定はもたない＝[CBezierTestLoop]で直接操作する需要がない）
+    //---------------------------------------------------------------------------------------
 
     //----------------
 	// 取得
@@ -126,15 +125,43 @@ public:
     inline int getJointRateRotOfs( void ){ return( m_nJointRateRotOfs ); }
     inline int getJointRateOfsForRotCenter( void ){ return( m_nJointRateOfsForRotCenter ); }
 
-    inline int getJointRateDirForFrom( void ){ return( m_nJointRateDirForFrom ); }
-    inline int getJointRateDirForTo( void ){ return( m_nJointRateDirForTo ); }
-    inline int getJointRateDirForOpen( void ){ return( m_nJointRateDirForOpen ); }
-    inline int getJointRateDirForClose( void ){ return( m_nJointRateDirForClose ); }
+    inline float getJointOpenFromScaleDirX( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointOpenFromRateDirX_m: m_nJointOpenFromRateDirX_p ) );
+    }
     
-    inline float getJointDirRateForFrom( void ){ return( CConst::ConvBezierRateScale( m_nJointRateDirForFrom ) ); }
-    inline float getJointDirRateForTo( void ){ return( CConst::ConvBezierRateScale( m_nJointRateDirForTo ) ); }
-    inline float getJointDirRateForOpen( void ){ return( CConst::ConvBezierRateScale( m_nJointRateDirForOpen ) ); }
-    inline float getJointDirRateForClose( void ){ return( CConst::ConvBezierRateScale( m_nJointRateDirForClose ) ); }
+    inline float getJointOpenFromScaleDirY( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointOpenFromRateDirY_m: m_nJointOpenFromRateDirY_p ) );
+    }
+    
+    inline float getJointCloseFromScaleDirX( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointCloseFromRateDirX_m: m_nJointCloseFromRateDirX_p ) );
+    }
+    
+    inline float getJointCloseFromScaleDirY( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointCloseFromRateDirY_m: m_nJointCloseFromRateDirY_p ) );
+    }
+    
+    inline float getJointOpenToScaleDirX( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointOpenToRateDirX_m: m_nJointOpenToRateDirX_p ) );
+    }
+    
+    inline float getJointOpenToScaleDirY( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointOpenToRateDirY_m: m_nJointOpenToRateDirY_p ) );
+    }
+    
+    inline float getJointCloseToScaleDirX( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointCloseToRateDirX_m: m_nJointCloseToRateDirX_p ) );
+    }
+    
+    inline float getJointCloseToScaleDirY( bool isMinus ){
+        return( CConst::ConvBezierScaleRate( (isMinus)? m_nJointCloseToRateDirY_m: m_nJointCloseToRateDirY_p ) );
+    }
+    
+    inline int  getCoverRateScale( void ){ return( m_nCoverRateScale ); }
+    inline float getCoverScale( void ){ return( CConst::ConvBezierScaleRate( m_nCoverRateScale ) ); }
+
+    inline int  getCoverRateRot( void ){ return( m_nCoverRateRot ); }
+    inline float getCoverRot( void ){ return( CConst::ConvBezierRotationRate( m_nCoverRateRot ) ); }
 
     //------------
     // スケール適用

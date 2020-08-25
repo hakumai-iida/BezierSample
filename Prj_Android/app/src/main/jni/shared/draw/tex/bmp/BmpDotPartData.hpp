@@ -32,12 +32,9 @@ enum eBDPD_FLAG{
     eBDPD_FLAG_INVALID = -1,            // 無効値
 
     eBDPD_FLAG_DISABLE,                 // 00:[*] 無効
-    eBDPD_FLAG_DUMMY_01,                // 01:[] 予備
-    eBDPD_FLAG_ROUGH_FLIP,              // 02:[rF] ラフの反転（ヨコのみ）
-    eBDPD_FLAG_ANGLE_FLIP_H,            // 03:[afH] 傾き方向の反転（ヨコ）
-    eBDPD_FLAG_ANGLE_FLIP_V,            // 04:[afV] 傾き方向の反転（タテ）
-    eBDPD_FLAG_REF_DRAW,                // 05:[rD] 参照パーツのオブジェクトを描画する
-    eBDPD_FLAG_REF_SLOT,                // 06:[rS] 参照パーツのスロットを呼び出す
+    eBDPD_FLAG_ROUGH_FLIP,              // 01:[rF] ラフの反転（ヨコのみ）
+    eBDPD_FLAG_REF_DRAW,                // 02:[rD] 参照パーツのオブジェクトを描画する
+    eBDPD_FLAG_REF_SLOT,                // 03:[rS] 参照パーツのスロットを呼び出す
 
     eBDPD_FLAG_MAX,			            // 最大（※フラグ変数は[short]なので[00〜15]まで）
     
@@ -95,7 +92,7 @@ protected:
     // マルチスロットに対して、左と右で違うパーツを割り当てたい場合に右側を作成する（※なければ検索時に左側がわりあてられる）
     eBD_DIR m_eDir;
     
-    // 接地影響（※角度影響を補正する）
+    // 回転適用率（※０にすることで常に基本角度になる＝接地要素）
     int m_nRotPowRate;
     
     //-----------------------------------------------------------------------------------------
@@ -113,7 +110,7 @@ protected:
     
     int             m_nRefRateScale;                // [2]:参照スケール
     int             m_nRefRateRot;                  // [2]:参照回転
-
+    
     //--------------------------------------------------------------------------------
     // 作業データ
     //--------------------------------------------------------------------------------
@@ -140,7 +137,7 @@ public:
     inline eBD_DIR getDir( void ){ return( m_eDir ); }
     
     inline int  getRotPowRate( void ){ return( m_nRotPowRate ); }
-    inline float getRotPow( void ){ return( CConst::ConvBezierRateScale( m_nRotPowRate ) ); }
+    inline float getRotPow( void ){ return( CConst::ConvBezierScaleRate( m_nRotPowRate ) ); }
 
     inline eBD_CATEGORY getRefCategory( void ){ return( m_eRefCategory ); }
     inline int getRefUid( void ){ return( m_nRefUid ); }
@@ -151,13 +148,13 @@ public:
     inline eBD_DIR getRefDir( void ){ return( m_eRefDir ); }
 
     inline int  getRefRateScale( void ){ return( m_nRefRateScale ); }
-    inline float getRefScale( void ){ return( CConst::ConvBezierRateScale( m_nRefRateScale ) ); }
+    inline float getRefScale( void ){ return( CConst::ConvBezierScaleRate( m_nRefRateScale ) ); }
 
     inline int  getRefRateRot( void ){ return( m_nRefRateRot ); }
     inline float getRefRot( void ){ return( CConst::ConvBezierRotationRate( m_nRefRateRot ) ); }
-    
+
     inline int getRateScaleForWork( void ){ return( m_nRateScaleForWork ); }
-    inline float getScaleForWork( void ){ return( CConst::ConvBezierRateScale( m_nRateScaleForWork ) ); }
+    inline float getScaleForWork( void ){ return( CConst::ConvBezierScaleRate( m_nRateScaleForWork ) ); }
 
     // 下絵関連
     inline BYTE getImgBgCol( void ){ return( m_nImgBgCol ); }

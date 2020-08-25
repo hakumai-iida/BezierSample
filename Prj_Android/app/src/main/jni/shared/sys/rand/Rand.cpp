@@ -23,6 +23,9 @@
 const char* CRand::s_pArrLabelForRandId[] = {
 	"COMMON",
     
+    "BEZIER_TOUCH",
+    "BEZIER_FRILL",
+    
 	"LOGIC_ANALYZE_SEARCH_FEELING",
 
 	NULL,

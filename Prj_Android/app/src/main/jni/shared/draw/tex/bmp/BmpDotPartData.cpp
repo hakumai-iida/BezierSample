@@ -218,7 +218,7 @@ void CBmpDotPartData::read( CInputBuffer* pIB ){
     m_eImgId = (eIMG)CEnum::ReadEnum( pIB, g_pArrLabelImg );
     m_nImgRateOfsX = pIB->readInt16();
     m_nImgRateOfsY = pIB->readInt16();
-    m_nImgAlpha = pIB->readUint8();
+    m_nImgAlpha = pIB->readUint8();   
 }
 
 //---------------------------
@@ -241,7 +241,7 @@ void CBmpDotPartData::write( COutputBuffer* pOB ){
     // 識別用
     CEnum::WriteEnum( pOB, m_eSlot, eBD_SLOT_MAX, g_pArrLabelBdSlot );
 	pOB->writeInt16( (short)m_nSubId );
-    CEnum::WriteEnum( pOB, m_eDir, eBD_SLOT_MAX, g_pArrLabelBdDir );
+    CEnum::WriteEnum( pOB, m_eDir, eBD_DIR_MAX, g_pArrLabelBdDir );
     
     pOB->writeInt16( (short)m_nRotPowRate );
 
@@ -252,7 +252,7 @@ void CBmpDotPartData::write( COutputBuffer* pOB ){
     CEnum::WriteEnum( pOB, m_eRefForm, eBD_FORM_MAX, g_pArrLabelBdForm );
     CEnum::WriteEnum( pOB, m_eRefSlot, eBD_SLOT_MAX, g_pArrLabelBdSlot );
     pOB->writeInt16( (short)m_nRefSubId );
-    CEnum::WriteEnum( pOB, m_eRefDir, eBD_SLOT_MAX, g_pArrLabelBdDir );
+    CEnum::WriteEnum( pOB, m_eRefDir, eBD_DIR_MAX, g_pArrLabelBdDir );
 
     pOB->writeInt16( (short)m_nRefRateScale );
     pOB->writeInt16( (short)m_nRefRateRot );
@@ -273,7 +273,7 @@ void CBmpDotPartData::write( COutputBuffer* pOB ){
 //--------------------
 const char* CBmpDotPartData::getNameWithTempBuf( void ){
     char* pBuf = CMemMgr::GetBufFromTempStr();
-    CBDConst::SetBmpDotPartName( pBuf, m_eSlot, m_nSubId, m_eDir );
+    CBDConst::SetBmpDotPartDataName( pBuf, m_eSlot, m_nSubId, m_eDir );
     return( pBuf );
 }
 
@@ -359,7 +359,7 @@ void CBmpDotPartData::applyRateScaleForWork( void ){
 //-------------------------------------------------
 void CBmpDotPartData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 20 + eBDPD_FLAG_MAX );
+    pMenu->setItemNum( 4 + 9 + 7 + eBDPD_FLAG_MAX );
     
     int id = 0;
     
@@ -417,10 +417,7 @@ void CBmpDotPartData::setEditValueMenu( CEditValueMenu* pMenu ){
     
     // フラグ
     pMenu->setItemAtAsBit( id++, "FLAG: DISABLE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_DISABLE );
-    pMenu->setItemAtAsBit( id++, "FLAG: (DUMMY)", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_DUMMY_01 );
     pMenu->setItemAtAsBit( id++, "FLAG: ROUGH_FLIP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_ROUGH_FLIP );
-    pMenu->setItemAtAsBit( id++, "FLAG: ANGLE_FLIP_H", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_ANGLE_FLIP_H );
-    pMenu->setItemAtAsBit( id++, "FLAG: ANGLE_FLIP_V", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_ANGLE_FLIP_V );
     pMenu->setItemAtAsBit( id++, "FLAG: REF_DRAW", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_REF_DRAW );
     pMenu->setItemAtAsBit( id++, "FLAG: REF_SLOT", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eBDPD_FLAG_REF_SLOT );
 

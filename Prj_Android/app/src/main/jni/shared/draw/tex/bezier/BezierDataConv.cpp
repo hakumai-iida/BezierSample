@@ -21,8 +21,8 @@
     int tempRateScaleY = pData->getTempAdjustRateScaleY();                                          \
     float tempOfsX = pLayerParam->pixelScaleX*CConst::ConvBezierPositionRate( w, tempRateOfsX );    \
     float tempOfsY = pLayerParam->pixelScaleY*CConst::ConvBezierPositionRate( h, tempRateOfsY );    \
-    float tempScaleX = pLayerParam->pixelScaleX*CConst::ConvBezierRateScale( tempRateScaleX );      \
-    float tempScaleY = pLayerParam->pixelScaleY*CConst::ConvBezierRateScale( tempRateScaleY )
+    float tempScaleX = pLayerParam->pixelScaleX*CConst::ConvBezierScaleRate( tempRateScaleX );      \
+    float tempScaleY = pLayerParam->pixelScaleY*CConst::ConvBezierScaleRate( tempRateScaleY );
 
 // 調整座標設定：スケール適用
 #define ADJUST_XY_WITH_SCALE( _x, _y )                                  \
@@ -96,7 +96,7 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
     int numPoint = 0;
     while( pAPD != NULL ){
         // 有効であれば
-        if( pAPD->isValid( pBaseParam->arrOption ) ){
+        if( ! pAPD->checkFlag( eAPD_FLAG_DISABLE ) ){
             numPoint++;
         }
         
@@ -119,7 +119,7 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
     pAPD = pHead;
     while( pAPD != NULL ){
         // 有効であれば
-        if( pAPD->isValid( pBaseParam->arrOption ) ){
+        if( ! pAPD->checkFlag( eAPD_FLAG_DISABLE ) ){
             pBAP = &pBAPArr[at++];
             
             // ポイント、方向線（進入）、方向線（出立）の取得
@@ -214,41 +214,35 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                                 tempX = pCell->nRateX;
                                 tempY = pCell->nRateY;
                         
-                                // システムフックの指定（※通常フック枠の後ろに接続ポイントによるフック枠がつづく＆二点で１フックなので接続元のIDで登録）
-                                systemHookTargetId = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_MAX + (jointPointId-JOINT_POINT_OFS_FOR_FROM_TO));
+                                // システムフックの指定（※確保枠の後ろに、接続ポイントによる枠がつづく＆二点で１フックなので接続元のIDで登録）
+                                systemHookTargetId = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_TOTAL_MAX + (jointPointId-JOINT_POINT_OFS_FOR_FROM_TO));
                             }
                             
-                            // 反転指定（※APの並びでどうしようもない時にはフラグで反転させる）
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_REVERSE_X ) ){
+                            // 方向線のスワップ（※想定の逆順でAPが配置されていた場合は反転させる）
+                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_OR_FRILL_DIR_SWAP ) ){
+                                isOdd = !isOdd;
                                 valForFlipH *= -1;
-                            }
-
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_REVERSE_Y ) ){
                                 valForFlipV *= -1;
-                            }
-                            
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_SWAP ) ){
-                                isOdd = !isOdd; // [IN/OUT]のスワップ（※無理やり）
                             }
                             
                             // 方向線の調整（※線のつなぎ目を自然にする）
                             if( isOdd ){
                                 if( isOverwrapped ){
-                                    inRX += pCell->dirRateX * pCell->closeRateForDir * valForFlipH;
-                                    inRY += pCell->dirRateY * pCell->closeRateForDir * valForFlipV;
+                                    inRX -= pBaseParam->texW0 * pCell->closeDirX * valForFlipH;
+                                    inRY -= pBaseParam->texH0 * pCell->closeDirY * valForFlipV;
                                 }else{
-                                    inRX -= pCell->dirRateX * pCell->openRateForDir * valForFlipH;
-                                    inRY -= pCell->dirRateY * pCell->openRateForDir * valForFlipV;
+                                    inRX += pBaseParam->texW0 * pCell->openDirX * valForFlipH;
+                                    inRY += pBaseParam->texH0 * pCell->openDirY * valForFlipV;
                                 }
                             }
                             // [偶数]側であれば
                             else{
                                 if( isOverwrapped ){
-                                    outRX -= pCell->dirRateX * pCell->closeRateForDir * valForFlipH;
-                                    outRY -= pCell->dirRateY * pCell->closeRateForDir * valForFlipV;
+                                    outRX += pBaseParam->texW0 * pCell->closeDirX * valForFlipH;
+                                    outRY += pBaseParam->texH0 * pCell->closeDirY * valForFlipV;
                                 }else{
-                                    outRX += pCell->dirRateX * pCell->openRateForDir * valForFlipH;
-                                    outRY += pCell->dirRateY * pCell->openRateForDir * valForFlipV;
+                                    outRX -= pBaseParam->texW0 * pCell->openDirX * valForFlipH;
+                                    outRY -= pBaseParam->texH0 * pCell->openDirY * valForFlipV;
                                 }
                             }
                         }
@@ -292,41 +286,35 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                                 tempX = pCell->nRateX;
                                 tempY = pCell->nRateY;
                         
-                                // システムフックの指定（※通常フック枠の後ろに接続ポイントによるフック枠がつづく）
-                                systemHookTargetId = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_MAX + jointPointId);
+                                // システムフックの指定（※確保枠の後ろに、接続ポイントによる枠がつづく）
+                                systemHookTargetId = (eSTROKE_HOOK_TARGET)(eSTROKE_HOOK_TARGET_TOTAL_MAX + jointPointId);
                             }
 
-                            // 反転指定（※APの並びでどうしようもない時にはフラグで反転させる）
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_REVERSE_X ) ){
+                            // 方向線のスワップ（※想定の逆順でAPが配置されていた場合は反転させる）
+                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_OR_FRILL_DIR_SWAP ) ){
+                                isOdd = !isOdd;
                                 valForFlipH *= -1;
-                            }
-
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_REVERSE_Y ) ){
                                 valForFlipV *= -1;
-                            }
-                            
-                            if( pAPD->checkFlag( eAPD_FLAG_JOINT_DIR_SWAP ) ){
-                                isOdd = !isOdd; // [IN/OUT]のスワップ（※無理やり）
                             }
                             
                             // 方向線の調整（※線のつなぎ目を自然にする）
                             if( isOdd ){
                                 if( isOverwrapped ){
-                                    outRX += pCell->dirRateX * pCell->closeRateForDir * valForFlipH;
-                                    outRY += pCell->dirRateY * pCell->closeRateForDir * valForFlipV;
+                                    outRX -= pBaseParam->texW0 * pCell->closeDirX * valForFlipH;
+                                    outRY -= pBaseParam->texH0 * pCell->closeDirY * valForFlipV;
                                 }else{
-                                    outRX -= pCell->dirRateX * pCell->openRateForDir * valForFlipH;
-                                    outRY -= pCell->dirRateY * pCell->openRateForDir * valForFlipV;
+                                    outRX += pBaseParam->texW0 * pCell->openDirX * valForFlipH;
+                                    outRY += pBaseParam->texH0 * pCell->openDirY * valForFlipV;
                                 }
                             }
                             // [偶数]側であれば
                             else{
                                 if( isOverwrapped ){
-                                    inRX -= pCell->dirRateX * pCell->closeRateForDir * valForFlipH;
-                                    inRY -= pCell->dirRateY * pCell->closeRateForDir * valForFlipV;
+                                    inRX += pBaseParam->texW0 * pCell->closeDirX * valForFlipH;
+                                    inRY += pBaseParam->texH0 * pCell->closeDirY * valForFlipV;
                                 }else{
-                                    inRX += pCell->dirRateX * pCell->openRateForDir * valForFlipH;
-                                    inRY += pCell->dirRateY * pCell->openRateForDir * valForFlipV;
+                                    inRX -= pBaseParam->texW0 * pCell->openDirX * valForFlipH;
+                                    inRY -= pBaseParam->texH0 * pCell->openDirY * valForFlipV;
                                 }
                             }
                         }
@@ -389,8 +377,8 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 pBAP->workPathPalOfsS = BEZIER_WP_PAL_VAL_FOR_SLEEP;
             }
             
-            // ストロークスケール（※ストロークの太さは基本情報とレイヤー情報の２つから補正される）
-            float strokeScale = pBaseParam->strokeScale * pLayerParam->strokeScale;
+            // ストロークスケール（※ストロークの太さは基本情報とレイヤー情報の２つから補正される＆ピクセル率も反映）
+            float strokeScale = pBaseParam->strokeScale * pLayerParam->strokeScale * pBaseParam->pixelRate;
 
             // ブラシ設定（※解像度の影響はここで加味する＆透明であれば無効）
             CBrushBinData* pBin = NULL;
@@ -398,10 +386,22 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 eBRUSH brushId = pData->getBrushId();
                 if( IS_BRUSH_VALID( brushId ) ){
 #ifdef ENABLE_FIXED_BRUSH
+#if 0
                     // 基本ブラシの場合、指定があれば強制ブラシで差し替え
                     if( brushId == eBRUSH_C_BASE && IS_BRUSH_VALID( s_eFixedBrush ) ){
-                        brushId = s_eFixedBrush;
+                        brushId = (eBRUSH)(eBRUSH_C_BASE + (s_eFixedBrush-eBRUSH_C_BASE));
                     }
+                    
+                    // タッチブラシの場合、指定があれば強制ブラシで差し替え
+                    if( brushId == eBRUSH_C_TOUCH && IS_BRUSH_VALID( s_eFixedBrush ) ){
+                        brushId = (eBRUSH)(eBRUSH_C_TOUCH + (s_eFixedBrush-eBRUSH_C_BASE));
+                    }
+                    
+                    // フリルブラシの場合、指定があれば強制ブラシで差し替え
+                    if( brushId == eBRUSH_C_FRILL && IS_BRUSH_VALID( s_eFixedBrush ) ){
+                        brushId = (eBRUSH)(eBRUSH_C_FRILL + (s_eFixedBrush-eBRUSH_C_BASE));
+                    }
+#endif
 #endif
                     CDefBinTable<CBrushBinData>* pTable = CDefTable::GetBrushTable();
                     pBin = pTable->getDataAt( brushId );
@@ -410,10 +410,11 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 }
             }
             
+            // ブラシが有効であれば設定
             if( pBin != NULL ){
                 pBAP->type = pBin->getStrokeType();
-                pBAP->size = pBin->getStrokeSize() * strokeScale * pBaseParam->pixelRate;
-                pBAP->ofsRange = pBin->getStrokeRange() * strokeScale * pBaseParam->pixelRate;
+                pBAP->size = pBin->getStrokeSize() * strokeScale;
+                pBAP->ofsRange = pBin->getStrokeRange() * strokeScale;
                                
                 pBAP->dotPutMax = pBin->getDotPutMax();
                 pBAP->dotPutRateBase = pBin->getDotPutRateBase();
@@ -421,7 +422,7 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 pBAP->dotPutRateWeak = pBin->getDotPutRateWeak();
                 pBAP->isDotPutForce = pBin->isDotPutForce();
                 pBAP->isDotPutWhetherMax = pBin->isDotPutWhetherMax();
-                pBAP->isDotPutOnOut = pAPD->checkFlag( eAPD_FLAG_DOT_PUT_ON_FILL_OUT );
+                pBAP->isDotPutOnOutCol = pAPD->checkFlag( eAPD_FLAG_DOT_ON_OUT_COL );
                 pBAP->isDotErase = pAPD->checkFlag( eAPD_FLAG_DOT_ERASE );
                 
                 // 線消去時は必ず出力されるようにフラグの調整
@@ -432,69 +433,68 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 pBAP->shakeScaleForPos = pBin->getShakePosScale();
                 pBAP->shakeScaleForSize = pBin->getShakeSizeScale();
 
-            }else{
+            }
+            // 無効であればオフ（非表示）
+            else{
                 pBAP->type = eSTROKE_TYPE_OFF;
             }
             
             // ストライプパレットグループ
-            pBAP->stripeMainPalGrp = CDefTable::GetPalOfsValue( pAPD->getStripeMainPalOfsId() );
-            pBAP->stripeSubPalGrp = CDefTable::GetPalOfsValue( pAPD->getStripeSubPalOfsId() );
+            pBAP->stripeOrFrillMainPalGrp = pAPD->getStripeOrFrillMainPalGrp();
+            pBAP->stripeOrFrillSubPalGrp = pAPD->getStripeOrFrillSubPalGrp();
 
             // フラグ
             pBAP->bNoFillGuide = pAPD->checkFlag( eAPD_FLAG_NO_FILL_GUIDE );
             pBAP->bLineRepairTest = pAPD->checkFlag( eAPD_FLAG_LINE_REPAIR_TEST );
+            pBAP->bAsTouchStroke = pAPD->checkFlag( eAPD_FLAG_AS_TOUCH_STROKE );
+            
+            // ガイド設定
+            pBAP->guideTarget = pAPD->getGuideTargetId( pLayerParam->slotIndex );
 
             // フック設定（※データ指定とシステム指定の２つ）
-            pBAP->hookTarget = pAPD->getHookTargetId( pLayerParam->slotIndex );
+            pBAP->hookTarget = pAPD->getHookTargetId( pLayerParam->slot, pLayerParam->slotIndex );
             pBAP->systemHookTarget = systemHookTargetId;
             
             // ストロークサイズ設定
-            pBAP->strokeSize = CConst::ConvBezierRateScale( pAPD->getStrokeSize() );
-            pBAP->strokeStartSize = CConst::ConvBezierRateScale( pAPD->getStrokeStartSize() );
-            pBAP->strokeStartRange = CConst::ConvBezierRateScale( pAPD->getStrokeStartRange() );
-            pBAP->strokeEndSize = CConst::ConvBezierRateScale( pAPD->getStrokeEndSize() );
-            pBAP->strokeEndRange = CConst::ConvBezierRateScale( pAPD->getStrokeEndRange() );
-            pBAP->strokeEdgeFillSize = CConst::ConvBezierRateScale( pAPD->getStrokeEdgeFillSize() ) * strokeScale;
+            pBAP->strokeSize = CConst::ConvBezierScaleRate( pData->getStrokeSize() );
+            pBAP->strokeStartRange = CConst::ConvBezierScaleRate( pAPD->getStrokeStartRange() );
+            pBAP->strokeStartSize = CConst::ConvBezierScaleRate( pAPD->getStrokeStartSize() );
+            pBAP->strokeEndRange = CConst::ConvBezierScaleRate( pAPD->getStrokeEndRange() );
+            pBAP->strokeEndSize = CConst::ConvBezierScaleRate( pAPD->getStrokeEndSize() );
+            pBAP->strokeEdgeFillSize = CConst::ConvBezierScaleRate( pAPD->getStrokeEdgeFillSize() );
 
             // タッチ設定（※ステップの値へのストローク影響はここで済ませておく）
             pBAP->touchTarget = pAPD->getTouchTargetId( pLayerParam->slotIndex );
-            pBAP->touchBasePos = CConst::ConvBezierRateScale( pAPD->getTouchBasePos() );
-            pBAP->touchBaseSize = CConst::ConvBezierRateScale( pAPD->getTouchBaseSize() );
+            pBAP->touchTargetSub = pAPD->getTouchTargetSubId( pLayerParam->slotIndex );
+            pBAP->touchBasePos = CConst::ConvBezierScaleRate( pAPD->getTouchBasePos() );
+            pBAP->touchBaseSize = CConst::ConvBezierScaleRate( pAPD->getTouchBaseSize() );
             pBAP->touchBaseRot = CConst::ConvBezierRotationRate( pAPD->getTouchBaseRot() );
-            pBAP->touchFrontArea = CConst::ConvBezierRateScale( pAPD->getTouchFrontArea() );
-            pBAP->touchFrontSize = CConst::ConvBezierRateScale( pAPD->getTouchFrontSize() );
-            pBAP->touchFrontRot = CConst::ConvBezierRotationRate( pAPD->getTouchFrontRot() );
-            pBAP->touchBackArea = CConst::ConvBezierRateScale( pAPD->getTouchBackArea() );
-            pBAP->touchBackSize = CConst::ConvBezierRateScale( pAPD->getTouchBackSize() );
-            pBAP->touchBackRot = CConst::ConvBezierRotationRate( pAPD->getTouchBackRot() );
-            pBAP->touchFrontStep = CConst::ConvBezierRateScale( pAPD->getTouchFrontStep() ) * pLayerParam->strokeScale;
-            pBAP->touchFrontStep2 = CConst::ConvBezierRateScale( pAPD->getTouchFrontStep2() ) * pLayerParam->strokeScale;
-            pBAP->touchFrontStepRnd = CConst::ConvBezierRateScale( pAPD->getTouchFrontStepRnd() ) * pLayerParam->strokeScale;
-            pBAP->touchBackStep = CConst::ConvBezierRateScale( pAPD->getTouchBackStep() ) * pLayerParam->strokeScale;
-            pBAP->touchBackStep2 = CConst::ConvBezierRateScale( pAPD->getTouchBackStep2() ) * pLayerParam->strokeScale;
-            pBAP->touchBackStepRnd = CConst::ConvBezierRateScale( pAPD->getTouchBackStepRnd() ) * pLayerParam->strokeScale;
+            pBAP->touchFrontArea = CConst::ConvBezierScaleRate( pAPD->getTouchFrontArea() );
+            pBAP->touchFrontSizeOfs = CConst::ConvBezierScaleRate( pAPD->getTouchFrontSizeOfs() );
+            pBAP->touchFrontRotRate = CConst::ConvBezierScaleRate( pAPD->getTouchFrontRotRate() );
+            pBAP->touchBackArea = CConst::ConvBezierScaleRate( pAPD->getTouchBackArea() );
+            pBAP->touchBackSizeOfs = CConst::ConvBezierScaleRate( pAPD->getTouchBackSizeOfs() );
+            pBAP->touchBackRotRate = CConst::ConvBezierScaleRate( pAPD->getTouchBackRotRate() );
+            pBAP->touchFrontNum = pAPD->getTouchFrontNum();
+            pBAP->touchFrontSkip = pAPD->getTouchFrontSkip();
+            pBAP->touchFrontBorderRate = CConst::ConvBezierScaleRate( pAPD->getTouchFrontBorderRate() );
+            pBAP->touchBackNum =  pAPD->getTouchBackNum();
+            pBAP->touchBackSkip = pAPD->getTouchBackSkip();
+            pBAP->touchBackBorderRate = CConst::ConvBezierScaleRate( pAPD->getTouchBackBorderRate() );
+            pBAP->touchRandomOfsFor0 = CConst::ConvBezierScaleRate( pAPD->getTouchRandomOfsFor0() );
+            pBAP->touchRandomOfsFor1 = CConst::ConvBezierScaleRate( pAPD->getTouchRandomOfsFor1() );
+            pBAP->touchHeadSkipRate = CConst::ConvBezierScaleRate( pAPD->getTouchHeadSkipRate() );
+            pBAP->touchTailSkipRate = CConst::ConvBezierScaleRate( pAPD->getTouchTailSkipRate() );
+            pBAP->frillWidthRateForMain = CConst::ConvBezierScaleRate( pAPD->getFrillWidthRateForMain() );
+            pBAP->frillWidthRateForSub = CConst::ConvBezierScaleRate( pAPD->getFrillWidthRateForSub() );
             
-            pBAP->isStripeFillFront = pAPD->checkFlag( eAPD_FLAG_STRIPE_FILL_FRONT_EDGE );
-            pBAP->isStripeFillBack = pAPD->checkFlag( eAPD_FLAG_STRIPE_FILL_BACK_EDGE );
             pBAP->isTouchPointReverse = pAPD->checkFlag( eAPD_FLAG_REVERSE_TOUCH_POINT );
-
-            // タッチストロークの最低間隔（とりあえず）
-            pBAP->touchStepMarginMin = 2.0f * GM_P_RATE * strokeScale;
+            pBAP->isTouchSubReverse = pAPD->checkFlag( eAPD_FLAG_REVERSE_TOUCH_SUB );
+            pBAP->isFrillDirReverse = pAPD->checkFlag( eAPD_FLAG_JOINT_OR_FRILL_DIR_SWAP );
 
             // フリル設定
-            pBAP->frillId = pAPD->getFrillId();
-            pBAP->frillBasePos = CConst::ConvBezierRateScale( pAPD->getFrillBasePos() );
-            pBAP->frillBaseSize = CConst::ConvBezierRateScale( pAPD->getFrillBaseSize() );
-            pBAP->frillBaseRot = CConst::ConvBezierRotationRate( pAPD->getFrillBaseRot() );
-            pBAP->frillFrontArea = CConst::ConvBezierRateScale( pAPD->getFrillFrontArea() );
-            pBAP->frillFrontSize = CConst::ConvBezierRateScale( pAPD->getFrillFrontSize() );
-            pBAP->frillFrontRot = CConst::ConvBezierRotationRate( pAPD->getFrillFrontRot() );
-            pBAP->frillBackArea = CConst::ConvBezierRateScale( pAPD->getFrillBackArea() );
-            pBAP->frillBackSize = CConst::ConvBezierRateScale( pAPD->getFrillBackSize() );
-            pBAP->frillBackRot = CConst::ConvBezierRotationRate( pAPD->getFrillBackRot() );
-
-            // フリルの最低出力サイズ（とりあえず）
-            pBAP->frillSizeMin = 4.0f * GM_P_RATE * strokeScale;
+            pBAP->frillMainId = pAPD->getFrillMainId();
+            pBAP->frillSubId = pAPD->getFrillSubId();
 
             // 傾け：全体
             if( pLayerParam->parentSlot != eBD_SLOT_INVALID && pLayerParam->parentSlotIndex >= 0 ){
@@ -514,14 +514,16 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
     // リスト構築
     //------------------------------
     for( int i=1; i<numPoint; i++ ){
+        pBAPArr[i].pPrev = &pBAPArr[i-1];
         pBAPArr[i-1].pNext = &pBAPArr[i];
     }
     
     // クローズパスであれば閉じる
     if( numPoint > 1 && pData->checkFlag( eLOD_FLAG_CLOSE_PATH ) ){
+        pBAPArr[0].pPrev = &pBAPArr[numPoint-1];
         pBAPArr[numPoint-1].pNext = &pBAPArr[0];
     }
-    
+        
     //----------------------------------------------------
     // 座標調整（※原点調整／オフセット＆拡縮適用）
     //----------------------------------------------------
@@ -622,8 +624,8 @@ stBEZIER_FILL_POINT* CBezierDataConv::CreateBezierFillPoint( CPaintObjectData* p
             pBFP->x = CConst::ConvBezierPositionRate( w, rX );
             pBFP->y = CConst::ConvBezierPositionRate( h, rY );
             
-            // ストロークスケール（※ストロークの太さは基本情報とレイヤー情報の２つから補正される）
-            float strokeScale = pBaseParam->strokeScale * pLayerParam->strokeScale;
+            // ストロークスケール（※ストロークの太さは基本情報とレイヤー情報の２つから補正される＆ピクセル率も反映）
+            float strokeScale = pBaseParam->strokeScale * pLayerParam->strokeScale * pBaseParam->pixelRate;
 
             // バケツ設定（※解像度の影響はここで加味する）
             CBucketBinData* pBin = NULL;
@@ -636,26 +638,18 @@ stBEZIER_FILL_POINT* CBezierDataConv::CreateBezierFillPoint( CPaintObjectData* p
                     LOGE( "@ BezierDatConv: UNKNOWN bucketId=%d\n", bucketId );
                 }
             }
-        
+
             if( pBin != NULL ){
                 pBFP->type = pBin->getFillType();
-                pBFP->option = pFPD->getFillOption();
-                pBFP->touchIdForOption = pFPD->getTouchTargetIdForOption( pLayerParam->slotIndex );
-                pBFP->optionStrokeSize = pFPD->getStrokeSizeForOption() * strokeScale * pBaseParam->pixelRate;
-                pBFP->optionStrokeRange = pFPD->getStrokeRangeForOption() * strokeScale * pBaseParam->pixelRate;
-                pBFP->optionOfsX = pFPD->getOfsXForOption() * strokeScale * pBaseParam->pixelRate;
-                pBFP->optionOfsY = pFPD->getOfsYForOption() * strokeScale * pBaseParam->pixelRate;
             }else{
                 pBFP->type = eFILL_TYPE_OFF;
             }
 
-            // パレットオフセットID取得（※デフォルト指定であれば親の値を使う）
-            ePAL_OFS palOfsId = pFPD->getPalOfsId();
-            if( palOfsId == ePAL_OFS_DEFAULT ){
-                palOfsId = pData->getDefaultPalOfsId();
-            }
-            pBFP->palOfsId = palOfsId;
-
+            // パレット＆明暗
+            pBFP->palGrp = pData->getPalGrp();
+            pBFP->darkOfs = pData->getDarkOfs();
+            pBFP->isFillOnOutCol = pFPD->checkFlag( eFPD_FLAG_FILL_ON_OUT_COL );
+            
             // ワークパス用の色設定
             if( CBezier::IsDispPathActiveAlways() ){
                 pBFP->workPathPalOfsS = BEZIER_WP_PAL_VAL_FOR_SELECTED; // 色味の関係で[SELECTED]
@@ -666,6 +660,15 @@ stBEZIER_FILL_POINT* CBezierDataConv::CreateBezierFillPoint( CPaintObjectData* p
             }else{
                 pBFP->workPathPalOfsS = BEZIER_WP_PAL_VAL_FOR_SLEEP;
             }
+
+            // 塗りオプション
+            pBFP->option = pFPD->getFillOption();
+            pBFP->optionDarkOfs = pFPD->getDarkOfsForOption();
+            pBFP->optionTouchId = pFPD->getTouchTargetIdForOption( pLayerParam->slotIndex );
+            pBFP->optionStrokeSize = pFPD->getStrokeSizeForOption() * strokeScale;
+            pBFP->optionStrokeRange = pFPD->getStrokeRangeForOption() * strokeScale;
+            pBFP->optionOfsX = pFPD->getOfsXForOption() * strokeScale;
+            pBFP->optionOfsY = pFPD->getOfsYForOption() * strokeScale;
             
             // 傾け：全体
             if( pLayerParam->parentSlot != eBD_SLOT_INVALID && pLayerParam->parentSlotIndex >= 0 ){
@@ -684,6 +687,7 @@ stBEZIER_FILL_POINT* CBezierDataConv::CreateBezierFillPoint( CPaintObjectData* p
     // リスト構築
     //------------------------------
     for( int i=1; i<numPoint; i++ ){
+        pBFPArr[i].pPrev = &pBFPArr[i-1];
         pBFPArr[i-1].pNext = &pBFPArr[i];
     }
     
@@ -813,9 +817,10 @@ stBEZIER_SLOT_POINT* CBezierDataConv::CreateBezierSlotPoint( CSlotObjectData* pD
     // リスト構築
     //------------------------------
     for( int i=1; i<numPoint; i++ ){
+        pBSPArr[i].pPrev = &pBSPArr[i-1];
         pBSPArr[i-1].pNext = &pBSPArr[i];
     }
-
+    
     //----------------------------------------------------
     // 座標調整（※原点調整／オフセット＆拡縮適用）
     //----------------------------------------------------

@@ -155,39 +155,45 @@ bool CTex::create( BYTE* pBuf, eTEX_DATA_TYPE type, int w, int h, uint32 opt ){
         if( (opt&TEX_CREATE_OPT_PAL_ADJ_FOR_ARITH_COL) != 0 ){
             // 各パレットの調整：[明色〜基本色〜暗色]のグラデの作成
             for( int i=0; i<BEZIER_PAL_GRP_NUM; i++ ){
-                int pg = BEZIER_CONV_PAL_ID_TO_PAL_GRP( BEZIER_PAL_GRP_ID_HEAD + i );
-                int dotMin = BEZIER_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_MIN );
-                int dotBase = BEZIER_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_BASE );
-                int dotMax = BEZIER_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_MAX );
+                int pg = BP_CONV_PAL_ID_TO_PAL_GRP( BEZIER_PAL_GRP_ID_HEAD + i );
+                int dotMin = BP_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_MIN );
+                int dotBase = BP_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_BASE );
+                int dotMax = BP_CONV_PAL_INFO_TO_DOT( pg, BEZIER_PAL_VAL_MAX );
                 
                 // 明色〜基本色のグラデ作成
                 int fromR = pBuf[4*dotMin+ofsR];
                 int fromG = pBuf[4*dotMin+ofsG];
                 int fromB = pBuf[4*dotMin+ofsB];
+                int fromA = pBuf[4*dotMin+ofsA];
                 int toR = pBuf[4*dotBase+ofsR];
                 int toG = pBuf[4*dotBase+ofsG];
                 int toB = pBuf[4*dotBase+ofsB];
+                int toA = pBuf[4*dotBase+ofsA];
 
                 int numCol = BEZIER_PAL_VAL_BASE - BEZIER_PAL_VAL_MIN;
                 for( int j=1; j<numCol; j++ ){
                     pBuf[4*(dotMin+j)+ofsR] = (BYTE)((fromR*(numCol-j)+toR*j)/numCol);
                     pBuf[4*(dotMin+j)+ofsG] = (BYTE)((fromG*(numCol-j)+toG*j)/numCol);
                     pBuf[4*(dotMin+j)+ofsB] = (BYTE)((fromB*(numCol-j)+toB*j)/numCol);
+                    pBuf[4*(dotMin+j)+ofsA] = (BYTE)((fromA*(numCol-j)+toA*j)/numCol);
                 }
                 
                 // 基本色〜暗色のグラデ作成
                 fromR = pBuf[4*dotBase+ofsR];
                 fromG = pBuf[4*dotBase+ofsG];
                 fromB = pBuf[4*dotBase+ofsB];
+                fromA = pBuf[4*dotBase+ofsA];
                 toR = pBuf[4*dotMax+ofsR];
                 toG = pBuf[4*dotMax+ofsG];
                 toB = pBuf[4*dotMax+ofsB];
-                
+                toA = pBuf[4*dotMax+ofsA];
+
                 numCol = BEZIER_PAL_VAL_MAX - BEZIER_PAL_VAL_BASE;
                 for( int j=1; j<numCol; j++ ){
                     pBuf[4*(dotBase+j)+ofsR] = (BYTE)((fromR*(numCol-j)+toR*j)/numCol);
                     pBuf[4*(dotBase+j)+ofsG] = (BYTE)((fromG*(numCol-j)+toG*j)/numCol);
                     pBuf[4*(dotBase+j)+ofsB] = (BYTE)((fromB*(numCol-j)+toB*j)/numCol);
+                    pBuf[4*(dotBase+j)+ofsA] = (BYTE)((fromA*(numCol-j)+toA*j)/numCol);
                 }
             }
             

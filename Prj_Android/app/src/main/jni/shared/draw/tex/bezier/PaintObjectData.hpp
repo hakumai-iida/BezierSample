@@ -26,11 +26,12 @@
 // フラグID（※デフォルトが[FALSE]になるように）
 //----------------------------------------
 enum ePOD_FLAG{
-	ePOD_FLAG_INVALID = -1,             // 無効値
+	ePOD_FLAG_INVALID = -1,                 // 無効値
 
-	ePOD_FLAG_DISABLE,	                // 00:[*] 無効（※[CLayerData::draw]で処理されない）
-    ePOD_FLAG_STAY_GUIDE_AFTER_FILL,    // 01:[sG] 塗りの後にガイドをリセットしない（※その後の線塗りでガイドの完了色による制御をしたい時用）
-    ePOD_FLAG_GUIDE_RESET_FULL,         // 02:[grF] ガイドを完全にリセットをする
+	ePOD_FLAG_DISABLE,	                    // 00:[*] 無効（※[CLayerData::draw]で処理されない）
+    ePOD_FLAG_STAY_GUIDE_AFTER_FILL,        // 01:[sG] 塗りの後にガイドを持ち越す（※ガイドをリセットしない）
+    ePOD_FLAG_FOCUS_OUT_COL_AFTER_FILL,     // 02:[@] 塗りの後に出力色を持ち越す（※塗られた範囲にのみ処理を限定する場合）
+    ePOD_FLAG_RESET_MASK_AFTER_FILL,        // 03:[rM] 塗りの後にマスクをリセットする
 
     ePOD_FLAG_MAX,		                // 最大（※フラグ変数は[short]なので[00〜15]まで）
     
@@ -67,12 +68,14 @@ protected:
 	//--------------------------------------------------------------------
 	// 保存データ（※簡便のため[int]で宣言するが入出力時は値域に見合った型で処理される）
 	//--------------------------------------------------------------------
-    //int m_eFlag;                  // [2]: フラグ（※[IMPLEMENT_DATA_FLAG]で宣言）
-    //CList m_oDataList;            // [X]: データリスト：CFillPointData
+    //int m_eFlag;                          // [2]: フラグ（※[IMPLEMENT_DATA_FLAG]で宣言）
+    //CList m_oDataList;                    // [X]: データリスト：CFillPointData
     
-    eBUCKET m_eBucketId;            // [enum]: バケツID
-    ePAL_OFS m_eDefaultPalOfsId;    // [enum]: デフォルトパレットオフセットID
-    ePAL_OFS m_eTestPalOfsId;       // [enum]: テストするパレットオフセットID（※カラーバッファの指定色を塗り対象とする）
+    eBUCKET m_eBucketId;                    // [enum]: バケツID
+    ePAL_OFS m_ePalOfsId;                   // [enum]: パレットオフセットID
+    int m_nDarkOfs;                         // [2]: 明暗オフセット（※負で明るく、正で暗く）
+    ePAL_OFS m_eTestPalOfsId;               // [enum]: テストするパレットオフセットID（※カラーバッファの指定色を塗り対象とする）
+    eSTROKE_GUIDE_TARGET m_eGuideTargetId;  // [enum]: ガイド対象ID
 
 public:
     // コンストラクタ／デストラクタ
@@ -83,16 +86,20 @@ public:
     // 取得
     //----------------
     inline void setBucketId( eBUCKET bucketId ){ m_eBucketId = bucketId; }
-    inline void setDefaultPalOfsId( ePAL_OFS palOfsId ){ m_eDefaultPalOfsId = palOfsId; }
+    inline void setPalOfsId( ePAL_OFS palOfsId, int ofs=0 ){ m_ePalOfsId = palOfsId; m_nDarkOfs=ofs; }
     inline void setTestPalOfsId( ePAL_OFS palOfsId ){ m_eTestPalOfsId = palOfsId; }
+    inline void setGuideTargetId( eSTROKE_GUIDE_TARGET target ){ m_eGuideTargetId = target; }
 
 	//----------------
 	// 取得
 	//----------------
     inline eBUCKET getBucketId( void ){ return( m_eBucketId ); }
-    inline ePAL_OFS getDefaultPalOfsId( void ){ return( m_eDefaultPalOfsId ); }
+    inline ePAL_OFS getPalOfsId( void ){ return( m_ePalOfsId ); }
+    inline BYTE getPalGrp( void ){ return( CDefTable::GetPalOfsValue( m_ePalOfsId ) ); }
+    inline int getDarkOfs( void ){ return( m_nDarkOfs ); }
     inline ePAL_OFS getTestPalOfsId( void ){ return( m_eTestPalOfsId ); }
     inline BYTE getTestPalGrp( void ){ return( CDefTable::GetPalOfsValue( m_eTestPalOfsId ) ); }
+    eSTROKE_GUIDE_TARGET getGuideTargetId( int slotIndex=-1 );
 
     //------------
     // スケール適用

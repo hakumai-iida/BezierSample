@@ -36,7 +36,8 @@ typedef struct{
     float rot;                      // 回転（※原点はバッファの中心）
     float scale;                    // スケール
 
-    bool arrOption[eBD_OPTION_MAX]; // オプション
+    // オプション
+    bool arrOption[eBD_OPTION_MAX][BD_SLOT_INDEX_MAX];
     
     float adjustRateH;              // 調整値：ヨコ
     float adjustRateV;              // 調整値：タテ
@@ -97,15 +98,37 @@ private:
     //--------------------
     // バッファ
     //--------------------
-    static BYTE* s_pBufLine;            // バッファ：線
-    static BYTE* s_pBufColor;           // バッファ：塗り
-    static BYTE* s_pBufFillGuide;       // バッファ：塗りガイド
-    static BYTE* s_pBufFillGuard;       // バッファ：塗りガード（マスク）
-
     static int s_nTexMargin;            // テクスチャマージン（※実解像度サイズ＝テクスチャ解像度適用後）
     static int s_nTexW0, s_nTexH0;      // テクスチャ名目サイズ（※実解像度サイズ＝テクスチャ解像度適用後）
     static int s_nTexW, s_nTexH;        // テクスチャ実サイズ（※余白までを含めたもの）
     static int s_nSizeBuf;              // バッファサイズ（※各バッファ共通）
+
+    static BYTE* s_pBufLine;            // バッファ：線
+    static BYTE* s_pBufColor;           // バッファ：色
+    static BYTE* s_pBufFillGuide;       // バッファ：塗りガイド
+    static BYTE* s_pBufFillGuard;       // バッファ：塗りガード（マスク）
+    static BYTE* s_pBufTemp;            // バッファ：テンポラリ
+
+    // バッファの利用状況（※画像の利用状況＝画素が有効な四隅の位置）
+    static int s_nLeftForLineBuf;           // 線バッファの左端
+    static int s_nRightForLineBuf;          // 線バッファの右端
+    static int s_nTopForLineBuf;            // 線バッファの上端
+    static int s_nBottomForLineBuf;         // 線バッファの下端
+
+    static int s_nLeftForColorBuf;          // 色バッファの左端
+    static int s_nRightForColorBuf;         // 色バッファの右端
+    static int s_nTopForColorBuf;           // 色バッファの上端
+    static int s_nBottomForColorBuf;        // 色バッファの下端
+
+    static int s_nLeftForFillGuideBuf;      // 塗りガイドバッファの左端
+    static int s_nRightForFillGuideBuf;     // 塗りガイドバッファの右端
+    static int s_nTopForFillGuideBuf;       // 塗りガイドバッファの上端
+    static int s_nBottomForFillGuideBuf;    // 塗りガイドバッファの下端
+
+    static int s_nLeftForTempBuf;           // 一時バッファの左端
+    static int s_nRightForTempBuf;          // 一時バッファの右端
+    static int s_nTopForTempBuf;            // 一時バッファの上端
+    static int s_nBottomForTempBuf;         // 一時バッファの下端
 
     //--------------------
     // ワーク
@@ -114,8 +137,8 @@ private:
     static stBEZIER_BASE_PARAM      s_stBaseParam;
     
     // 状況管理
-    static CJointPoint  s_oJointPoint;   // 結合点
-    static CAnglePlane  s_oAnglePlane;   // 傾き面
+    static CJointPoint  s_oJointPoint;      // 結合点
+    static CAnglePlane  s_oAnglePlane;      // 傾き面
 
     //------------------------
     // 出力データ（※検出用の座標）
@@ -138,7 +161,11 @@ public:
     
     // リセット
     static void Reset( void );
-    static void ResetGuide( bool isFullReset=true );
+    static void ResetLineBuf( void );
+    static void ResetColorBuf( void );
+    static void ResetFillGuideBuf( void );
+    static void ResetFillGuardBuf( void );
+    static void ResetTempBuf( void );
     
     // 設定
     inline static void SetTexResolution( int resolution ){ s_nTexResolution = resolution; }
@@ -154,6 +181,38 @@ public:
     inline static int GetTotalTexSizeW( void ){ return( s_nBaseTexSizeW + 2*s_nBaseTexMargin ); }
     inline static int GetTotalTexSizeH( void ){ return( s_nBaseTexSizeH + 2*s_nBaseTexMargin ); }
     inline static float GetBaseStrokeScale( void ){ return( s_fBaseStrokeScale ); }
+
+    // バッファの利用状況取得
+    inline static int GetLeftForLineBuf( void ){ return( s_nLeftForLineBuf ); }
+    inline static int GetRightForLineBuf( void ){ return( s_nRightForLineBuf ); }
+    inline static int GetTopForLineBuf( void ){ return( s_nTopForLineBuf ); }
+    inline static int GetBottomForLineBuf( void ){ return( s_nBottomForLineBuf ); }
+    
+    inline static int GetLeftForColorBuf( void ){ return( s_nLeftForColorBuf ); }
+    inline static int GetRightForColorBuf( void ){ return( s_nRightForColorBuf ); }
+    inline static int GetTopForColorBuf( void ){ return( s_nTopForColorBuf ); }
+    inline static int GetBottomForColorBuf( void ){ return( s_nBottomForColorBuf ); }
+
+    inline static int GetLeftForFillGuideBuf( void ){ return( s_nLeftForFillGuideBuf ); }
+    inline static int GetRightForFillGuideBuf( void ){ return( s_nRightForFillGuideBuf ); }
+    inline static int GetTopForFillGuideBuf( void ){ return( s_nTopForFillGuideBuf ); }
+    inline static int GetBottomForFillGuideBuf( void ){ return( s_nBottomForFillGuideBuf ); }
+
+    inline static int GetLeftForTempBuf( void ){ return( s_nLeftForTempBuf ); }
+    inline static int GetRightForTempBuf( void ){ return( s_nRightForTempBuf ); }
+    inline static int GetTopForTempBuf( void ){ return( s_nTopForTempBuf ); }
+    inline static int GetBottomForTempBuf( void ){ return( s_nBottomForTempBuf ); }
+
+    static void ResetLineBufInfo( void );
+    static void ResetColorBufInfo( void );
+    static void ResetFillGuideBufInfo( void );
+    static void ResetTempBufInfo( void );
+
+    // バッファの利用状況更新
+    static void UpdateLineBufInfo( int x, int y );
+    static void UpdateColorBufInfo( int x, int y );
+    static void UpdateFillGuideBufInfo( int x, int y );
+    static void UpdateTempBufInfo( int x, int y );
 
     //-----------------------------------------------------
     // BMP生成パラメータからテクスチャの生成

@@ -32,24 +32,6 @@
 enum eJOINT_POINT{
     eJOINT_POINT_INVALID = -1,  // 無効値
     
-    //--------------------------------------------------
-    // 一時枠（※確認／検証用）
-    //--------------------------------------------------
-    eJOINT_POINT_TEMP_A_0_FROM,     eJOINT_POINT_TEMP_A_0_TO,
-    eJOINT_POINT_TEMP_A_1_FROM,     eJOINT_POINT_TEMP_A_1_TO,
-
-    eJOINT_POINT_TEMP_B_0_FROM,     eJOINT_POINT_TEMP_B_0_TO,
-    eJOINT_POINT_TEMP_B_1_FROM,     eJOINT_POINT_TEMP_B_1_TO,
-
-    eJOINT_POINT_TEMP_C_0_FROM,     eJOINT_POINT_TEMP_C_0_TO,
-    eJOINT_POINT_TEMP_C_1_FROM,     eJOINT_POINT_TEMP_C_1_TO,
-
-    eJOINT_POINT_TEMP_D_0_FROM,     eJOINT_POINT_TEMP_D_0_TO,
-    eJOINT_POINT_TEMP_D_1_FROM,     eJOINT_POINT_TEMP_D_1_TO,
-
-    //--------------------------------------------------
-    // 用途別固定枠
-    //--------------------------------------------------
     // [UP_BODY]：腹から上半身へのつなぎ（※[BlJointUpBody]で設定され[From:BlBase]、[To:UpBase]となる）
     eJOINT_POINT_UP_BODY_0_FROM,    eJOINT_POINT_UP_BODY_0_TO,
     eJOINT_POINT_UP_BODY_1_FROM,    eJOINT_POINT_UP_BODY_1_TO,
@@ -110,8 +92,24 @@ enum eJOINT_POINT{
     eJOINT_POINT_ANKLE_R0_FROM,    eJOINT_POINT_ANKLE_R0_TO,
     eJOINT_POINT_ANKLE_R1_FROM,    eJOINT_POINT_ANKLE_R1_TO,
     
+    // 胴体の汎用枠：Ａ
+    eJOINT_POINT_BD_OPTION_A_L0_FROM,   eJOINT_POINT_BD_OPTION_A_L0_TO,
+    eJOINT_POINT_BD_OPTION_A_L1_FROM,   eJOINT_POINT_BD_OPTION_A_L1_TO,
+
+    eJOINT_POINT_BD_OPTION_A_R0_FROM,   eJOINT_POINT_BD_OPTION_A_R0_TO,
+    eJOINT_POINT_BD_OPTION_A_R1_FROM,   eJOINT_POINT_BD_OPTION_A_R1_TO,
+
+    // 胴体の汎用枠：Ｂ
+    eJOINT_POINT_BD_OPTION_B_L0_FROM,   eJOINT_POINT_BD_OPTION_B_L0_TO,
+    eJOINT_POINT_BD_OPTION_B_L1_FROM,   eJOINT_POINT_BD_OPTION_B_L1_TO,
+
+    eJOINT_POINT_BD_OPTION_B_R0_FROM,   eJOINT_POINT_BD_OPTION_B_R0_TO,
+    eJOINT_POINT_BD_OPTION_B_R1_FROM,   eJOINT_POINT_BD_OPTION_B_R1_TO,
+
     eJOINT_POINT_MAX,
 };
+
+#define IS_JOINT_POINT_VALID( _p )      ((_p)>=(eJOINT_POINT)0 && (_p)<eJOINT_POINT_MAX)
 
 // ジョイントインデックスに対するオフセット
 #define JOINT_POINT_OFS_FOR_FROM_TO         1
@@ -133,13 +131,14 @@ typedef struct{
     int   nRateX, nRateY;           // 割合座標（※結合用＝角度調整後の座標）
     int   nRateX0, nRateY0;         // 割合座標（※元々の値＝角度調整前の座標）
     int   nRateOfsX, nRateOfsY;     // 割合座標（※表示のオフセット）
-    int   dirRateX, dirRateY;       // 方向線調整値
 
     float fScaleAbs;                // 表示スケール（※絶対値＝符号は[bFlipX/bFlipV]で判断）
     float fRot0;                    // 表示角度（※重なり判定のために使う調整前の値）
 
-    float openRateForDir;           // 結合部分が開く際の方向線割合
-    float closeRateForDir;          // 結合部分が閉じる際の方向線割合
+    float openDirX;                 // 結合部分が開く際の方向線スケールX
+    float openDirY;                 // 結合部分が開く際の方向線スケールY
+    float closeDirX;                // 結合部分が閉じる際の方向線スケールX
+    float closeDirY;                // 結合部分が閉じる際の方向線スケールY
 } stJOINT_POINT_CELL;
 
 // クリア
@@ -188,7 +187,7 @@ public:
     //---------------------------------
     // 方向線調整値の設定（※[FROM/TO]で共通
     //---------------------------------
-    void setDirRateXY( eJOINT_POINT id, int dirRX, int dirRY, float openRate, float closeRate );
+    void setDirRateXY( eJOINT_POINT id, float openDirX, float openDirY, float closeDirX, float closeDirY );
     
 protected:
     // 座標の登録（実体）

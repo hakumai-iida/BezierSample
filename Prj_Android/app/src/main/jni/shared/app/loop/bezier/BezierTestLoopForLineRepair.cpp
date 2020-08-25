@@ -135,12 +135,13 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTempAdjust( 0,0, 20000,20000 );
     m_pLayerLineRepair->addData( pPOD );
     
     // 土台：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,0, bucketPalOfs );
+    pFP->set( 0,0 );
     pPOD->addData( pFP );
 
     //-------------------------
@@ -187,12 +188,13 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTempAdjust( 0,0, 20000,20000 );
     m_pLayerLineRepair->addData( pPOD );
     
     // 土台：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,-1750, bucketPalOfs );
+    pFP->set( 0,-1750 );
     pPOD->addData( pFP );
 
     //-------------------------
@@ -239,12 +241,13 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTempAdjust( 0,0, 20000,20000 );
     m_pLayerLineRepair->addData( pPOD );
     
     // 土台：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 1750,0, bucketPalOfs );
+    pFP->set( 1750,0 );
     pPOD->addData( pFP );
 
     //-------------------------
@@ -291,12 +294,13 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTempAdjust( 0,0, 20000,20000 );
     m_pLayerLineRepair->addData( pPOD );
     
     // 土台：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( 0,1750, bucketPalOfs );
+    pFP->set( 0,1750 );
     pPOD->addData( pFP );
     
     //-------------------------
@@ -343,11 +347,12 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     // オブジェクト確保＆設定
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
+    pPOD->setPalOfsId( bucketPalOfs );
     pPOD->setTempAdjust( 0,0, 20000,20000 );
     m_pLayerLineRepair->addData( pPOD );
     
     // 土台：塗り０
     pFP = CFillPointData::Alloc();
-    pFP->set( -1750,0, bucketPalOfs );
+    pFP->set( -1750,0 );
     pPOD->addData( pFP );
 }

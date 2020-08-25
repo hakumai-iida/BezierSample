@@ -30,6 +30,7 @@
 #include "draw/tex/stroke/StrokeMgr.hpp"
 #include "draw/tex/fill/FillMgr.hpp"
 #include "draw/tex/bmp/BmpDotMgr.hpp"
+#include "draw/tex/bmp_pal/BmpPalMgr.hpp"
 #include "draw/tex/bmp/BmpGenerator.hpp"
 #include "draw/tex/TexCacheMgr.hpp"
 #include "draw/tex/TexStringMgr.hpp"

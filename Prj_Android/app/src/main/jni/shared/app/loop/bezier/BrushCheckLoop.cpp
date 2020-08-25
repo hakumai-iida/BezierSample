@@ -53,12 +53,21 @@ CBrushCheckLoop::CBrushCheckLoop( void ){
 	setId( eLOOP_ID_BRUSH_CHECK );
 
     setDrawLayer( eDP_LAYER_LOOP );
+    
+    // BMP環境リセット
+    CBmpGenerator::Reset();
+    
+    // 領域確保
+    allocForTest();
 }
 
 //------------------------
 // デストラクタ
 //------------------------
-CBrushCheckLoop::~CBrushCheckLoop( void ){}
+CBrushCheckLoop::~CBrushCheckLoop( void ){
+    // 領域開放
+    releaseForTest();
+}
 
 //------------------------
 // 初期化
@@ -134,9 +143,6 @@ void CBrushCheckLoop::init0( void ){
 	addNode( m_pButtonBack );
 	addNode( m_pButtonExit );
     
-    // レイヤーデータ作成
-    allocForTest();
-
     // 初期値
     m_bDot = false;
     m_nCalcNum = 0;
@@ -155,9 +161,7 @@ void CBrushCheckLoop::init0( void ){
 //------------------------
 // 終了
 //------------------------
-void CBrushCheckLoop::exit0( void ){
-    releaseForTest();
-}
+void CBrushCheckLoop::exit0( void ){}
 
 //------------------------
 // 更新

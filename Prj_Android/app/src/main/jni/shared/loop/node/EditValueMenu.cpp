@@ -40,14 +40,14 @@ CEditValueMenu::CEditValueMenu( eGRP grpId, int cW, int cH ): CScrollBarMenu( gr
 // デストラクタ
 //-------------------
 CEditValueMenu::~CEditValueMenu( void ){
-	releaseEditItem();
+	releaseItem();
 }
 
 //-------------------
 // 解放
 //-------------------
-void CEditValueMenu::releaseEditItem( void ){
-	SAFE_DELETE_ARRAY( m_stArrEditItem );
+void CEditValueMenu::releaseItem( void ){
+	SAFE_DELETE_ARRAY( m_stArrItem );
 }
 
 //-------------------
@@ -55,7 +55,7 @@ void CEditValueMenu::releaseEditItem( void ){
 //-------------------
 void CEditValueMenu::setItemNum( int num, bool isBlockRequired ){
 	// 領域の解放
-	releaseEditItem();
+	releaseItem();
     releaseItemBlock();
 
 	// メニュー項目数設定
@@ -66,19 +66,19 @@ void CEditValueMenu::setItemNum( int num, bool isBlockRequired ){
     }
 
 	// 枠の確保
-	m_stArrEditItem = new stEDIT_VALUE_ITEM_MENU_ITEM[m_nItemNum];
+	m_stArrItem = new stEDIT_VALUE_MENU_ITEM[m_nItemNum];
 }
 
 //-------------------
 // アイテム設定
 //-------------------
-bool CEditValueMenu::setItemAt( int id, stEDIT_VALUE_ITEM_MENU_ITEM* pItem, bool isBlock ){
+bool CEditValueMenu::setItemAt( int id, stEDIT_VALUE_MENU_ITEM* pItem, bool isBlock ){
 	// 無効は無視
 	if( id < 0 || id >= m_nItemNum ){ return( false ); }
 	if( pItem == NULL  ){ return( false ); }
 
 	// 丸毎コピー
-	m_stArrEditItem[id] = *pItem;
+	m_stArrItem[id] = *pItem;
 
     setItemBlockAt( id, isBlock );
     
@@ -93,9 +93,9 @@ bool CEditValueMenu::setItemAt( int id, const char* pName, void* pVal, eEDIT_VAL
 	if( id < 0 || id >= m_nItemNum ){ return( false ); }
 
 	// 対象のクリア（セパレーターフラグは前もって指定される想定なので退避＆復元させている）
-	stEDIT_VALUE_ITEM_MENU_ITEM* pItem = &m_stArrEditItem[id];
+	stEDIT_VALUE_MENU_ITEM* pItem = &m_stArrItem[id];
     bool bSeparator = pItem->bSeparator;
-	memset( pItem, 0, sizeof(stEDIT_VALUE_ITEM_MENU_ITEM) );
+	memset( pItem, 0, sizeof(stEDIT_VALUE_MENU_ITEM) );
     pItem-> bSeparator = bSeparator;
 
 	// 設定
@@ -116,7 +116,7 @@ bool CEditValueMenu::setItemAt( int id, const char* pName, void* pVal, eEDIT_VAL
 bool CEditValueMenu::setItemAtAsLabel( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type, int32 min, int32 max, const char** pArrLabel, bool isBlock ){
 	if( !setItemAt( id, pName, pVal, type, min, max, isBlock ) ){ return( false ); }
 
-	m_stArrEditItem[id].pArrLabel = pArrLabel;
+	m_stArrItem[id].pArrLabel = pArrLabel;
 	return( true );
 }
 
@@ -126,7 +126,7 @@ bool CEditValueMenu::setItemAtAsLabel( int id, const char* pName, void* pVal, eE
 bool CEditValueMenu::setItemAtAsBool( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type, bool isBlock ){
 	if( !setItemAt( id, pName, pVal, type, 0, 1, isBlock ) ){ return( false ); }
 
-	m_stArrEditItem[id].bBool = true;
+	m_stArrItem[id].bBool = true;
 
     setItemBlockAt( id, isBlock );
 
@@ -139,8 +139,8 @@ bool CEditValueMenu::setItemAtAsBool( int id, const char* pName, void* pVal, eED
 bool CEditValueMenu::setItemAtAsBit( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type, int bit, bool isBlock ){
 	if( !setItemAtAsBool( id, pName, pVal, type, isBlock ) ){ return( false ); }
 
-	m_stArrEditItem[id].bBit = true;
-	m_stArrEditItem[id].nBit = bit;
+	m_stArrItem[id].bBit = true;
+	m_stArrItem[id].nBit = bit;
 
     setItemBlockAt( id, isBlock );
 
@@ -154,25 +154,25 @@ void CEditValueMenu::setSeparatorAt( int id, bool flag ){
     // 無効は無視
     if( id < 0 || id >= m_nItemNum ){ return; }
     
-    m_stArrEditItem[id].bSeparator = flag;
+    m_stArrItem[id].bSeparator = flag;
 }
 
 
 //-------------------
 // 横幅の取得
 //-------------------
-stEDIT_VALUE_ITEM_MENU_ITEM* CEditValueMenu::getItemAt( int at ){
+stEDIT_VALUE_MENU_ITEM* CEditValueMenu::getItemAt( int at ){
 	if( at < 0 || at >= m_nItemNum ){
 		return( NULL );
 	}
 
-	return( &m_stArrEditItem[at] );
+	return( &m_stArrItem[at] );
 }
 
 //-------------------
 // 横幅の取得
 //-------------------
-stEDIT_VALUE_ITEM_MENU_ITEM* CEditValueMenu::getSelectedItem( void ){
+stEDIT_VALUE_MENU_ITEM* CEditValueMenu::getSelectedItem( void ){
 	return( getItemAt( m_nSelect ) );
 }
 
@@ -180,7 +180,7 @@ stEDIT_VALUE_ITEM_MENU_ITEM* CEditValueMenu::getSelectedItem( void ){
 // 値編集ダイアログの設定
 //-------------------
 void CEditValueMenu::setEditValueDialog( CEditValueDialog* pDialog ){
-	stEDIT_VALUE_ITEM_MENU_ITEM* pItem = getSelectedItem();
+	stEDIT_VALUE_MENU_ITEM* pItem = getSelectedItem();
     const char* pName = pItem->pName;
     const char** pArrLabel = pItem->pArrLabel;
 
@@ -224,7 +224,7 @@ float CEditValueMenu::calcInternalH( void ){
 #if 0
     // メニュー項目のタップ判定がずれてしまうので一旦無効化
     for( int i=0; i<m_nItemNum; i++ ){
-        if( m_stArrEditItem[i].bSeparator ){
+        if( m_stArrItem[i].bSeparator ){
             numSeparator++;
         }
     }
@@ -248,7 +248,7 @@ void CEditValueMenu::onUpdate0( void ){
 
 	m_bChanged = false;
 	if( m_bDecided && m_bEditBoolDirect ){
-		stEDIT_VALUE_ITEM_MENU_ITEM* pItem = getSelectedItem();
+		stEDIT_VALUE_MENU_ITEM* pItem = getSelectedItem();
 
 		// ビット値反転
 		if( pItem->bBit ){
@@ -278,13 +278,13 @@ void CEditValueMenu::onDraw0( void ){
 
 	DWORD rgba;
 	int32 val;
-	stEDIT_VALUE_ITEM_MENU_ITEM* pItem;
+	stEDIT_VALUE_MENU_ITEM* pItem;
 	char* buf = CMemMgr::GetBufFromTempStr();
 	CDrawCell* pDC = CDrawCell::GetFreeCell();
 	float x = m_fX + m_fCenterX - m_fInternalOfsX;
 	float y = m_fY + m_fCenterY - m_fInternalOfsY;
 	for( int i=0; i<m_nItemNum; i++ ){
-		pItem = &m_stArrEditItem[i];
+		pItem = &m_stArrItem[i];
 
         // 表示色
         if( m_nSelect == i ){

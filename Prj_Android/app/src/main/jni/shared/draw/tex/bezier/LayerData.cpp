@@ -106,9 +106,13 @@ void CLayerData::clear( void ){
 
     m_eOption = eBD_OPTION_INVALID;
     
+    m_nRotPowRate = BEZIER_SCALE_RATE;
+    
     m_eDelayType = eDELAY_LOG_INVALID;
     m_nDelayDepth = 0;
     m_nDelayPowerRateX = m_nDelayPowerRateY = 0;
+    m_nDelayPowerRateXForRot = m_nDelayPowerRateYForRot = 0;
+    m_nDelayPowerRateXForScale = m_nDelayPowerRateYForScale = 0;
 }
 
 //--------------------
@@ -153,11 +157,17 @@ void CLayerData::copy( CLayerData* pData ){
     m_eOrderSlot = pData->m_eOrderSlot;
 
     m_eOption = pData->m_eOption;
+    
+    m_nRotPowRate = pData->m_nRotPowRate;
 
     m_eDelayType = pData->m_eDelayType;
-    m_nDelayDepth = pData->m_eDelayType;
+    m_nDelayDepth = pData->m_nDelayDepth;
     m_nDelayPowerRateX = pData->m_nDelayPowerRateX;
     m_nDelayPowerRateY = pData->m_nDelayPowerRateY;
+    m_nDelayPowerRateXForRot = pData->m_nDelayPowerRateXForRot;
+    m_nDelayPowerRateYForRot = pData->m_nDelayPowerRateYForRot;
+    m_nDelayPowerRateXForScale = pData->m_nDelayPowerRateXForScale;
+    m_nDelayPowerRateYForScale = pData->m_nDelayPowerRateYForScale;
 }
 
 //---------------------------
@@ -197,13 +207,18 @@ void CLayerData::read( CInputBuffer* pIB ){
     pIB->readBlock( m_cArrName, LAYER_NAME_LEN );
     m_eOrderType = (eLAYER_ORDER_TYPE)CEnum::ReadEnum( pIB, g_pArrLabelLayerOrderType );
     m_eOrderSlot = (eBD_SLOT)CEnum::ReadEnum( pIB, g_pArrLabelBdSlot );
-
     m_eOption = (eBD_OPTION)CEnum::ReadEnum( pIB, g_pArrLabelBdOption );
+
+    m_nRotPowRate = pIB->readInt16();
     
     m_eDelayType = (eDELAY_LOG)CEnum::ReadEnum( pIB, g_pArrLabelDelayLog );
     m_nDelayDepth = pIB->readInt16();
     m_nDelayPowerRateX = pIB->readInt16();
     m_nDelayPowerRateY = pIB->readInt16();
+    m_nDelayPowerRateXForRot = pIB->readInt16();
+    m_nDelayPowerRateYForRot = pIB->readInt16();
+    m_nDelayPowerRateXForScale = pIB->readInt16();
+    m_nDelayPowerRateYForScale = pIB->readInt16();
 }
 
 //---------------------------
@@ -242,10 +257,16 @@ void CLayerData::write( COutputBuffer* pOB ){
 
     CEnum::WriteEnum( pOB, m_eOption, eBD_OPTION_MAX, g_pArrLabelBdOption );
     
+    pOB->writeInt16( (int16)m_nRotPowRate );
+    
     CEnum::WriteEnum( pOB, m_eDelayType, eDELAY_LOG_MAX, g_pArrLabelDelayLog );
     pOB->writeInt16( (int16)m_nDelayDepth );
     pOB->writeInt16( (int16)m_nDelayPowerRateX );
     pOB->writeInt16( (int16)m_nDelayPowerRateY );
+    pOB->writeInt16( (int16)m_nDelayPowerRateXForRot );
+    pOB->writeInt16( (int16)m_nDelayPowerRateYForRot );
+    pOB->writeInt16( (int16)m_nDelayPowerRateXForScale );
+    pOB->writeInt16( (int16)m_nDelayPowerRateYForScale );
 }
 
 //--------------------------------
@@ -358,67 +379,65 @@ CLayerObject* CLayerData::pasteData( CLayerObject* pObjCopy ){
     return( pNew );
 }
 
-//-----------------------------------------------------------------------------
+//--------------
 // 描画
-//-----------------------------------------------------------------------------
-// [CBezier:Stroke]に対する処理では[pFillGuide]の指定を固定化し切り替え等できなくしている
-// 同様に、[CBezier::Stroke/Dot]へのテストバッファとして[pBufColor]を固定化している
-//（※[pBufColor]で画素が出力されていたら以降のストロークの書き込みは不要とみなすルール）
-//（※フラグ等で色々と切り替えたいところではあるがシンプルさを優先してみる）
-//-----------------------------------------------------------------------------
+//--------------
 int CLayerData::draw( stBEZIER_BASE_PARAM* pBaseParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath ){
 #ifdef BEZIER_TIME_LOG
     if( ! isWorkPath ){
         LOGD( "@BTL---[START:%s] CLayerData::draw\n", m_cArrName );
     }
 #endif
-    
+
+    // work
     int timeForLine = 0;
     int timeForPaint = 0;
 
-    // フックのリセット（※デフォルトではレイヤー単位でテンポラリをリセット）
-    if( ! checkFlag( eLAYER_FLAG_STAY_HOOK ) ){
-        CBezier::ResetHookPoint( checkFlag( eLAYER_FLAG_RESET_HOOK_ALL ) );
-    }
-
-    // タッチのリセット（※デフォルトではレイヤー単位でテンポラリをリセット）
-    if( ! checkFlag( eLAYER_FLAG_STAY_TOUCH ) ){
-        CBezier::ResetTouchPoint( checkFlag( eLAYER_FLAG_RESET_TOUCH_ALL ) );
-    }
-
-    //------------
-    // 描画
-    //------------
+    //--------------------------
+    // レイヤー内のオブジェクトを走査
+    //--------------------------
     CLayerObject* pObj = getDataHead();
     while( pObj != NULL ){
-        //-----------------------------
+        //==================================================================
         // ライン：CLineObjectData
-        //-----------------------------
+        //==================================================================
         if( pObj->isLineObject() ){
             CLineObjectData* pLOD = pObj->getLineObject();
-            // オブジェクトが有効であれば描画
+            
+            // オブジェクトが有効であれば
             if( ! pLOD->checkFlag( eLOD_FLAG_DISABLE ) ){
+                //--------------------------
+                // ライン：事前処理
+                //--------------------------
+                // 指定があればガイドの復旧（※ワークパス時は無視）
+                eSTROKE_GUIDE_TARGET guideTarget = pLOD->getGuideTargetId( pLayerParam->slotIndex );
+                if( IS_STROKE_GUIDE_TARGET_VALID( guideTarget ) ){
+                    if( ! isWorkPath ){
+                        CBezier::RecoverGuide( guideTarget );
+                    }
+                }
+
+                //--------------------------
+                // ライン：描画
+                //--------------------------
                 // アンカーポイントを描画形式データに変換
                 stBEZIER_ANCHOR_POINT* pHead = CBezierDataConv::CreateBezierAnchorPoint( pLOD, pBaseParam, pLayerParam );
 
-                // 指定があればタッチ情報でガイドを構築
-                if( pLOD->checkFlag( eLOD_FLAG_GUIDE_DRAW_BEFORE_STROKE ) ){
-                    CBezier::DrawFillGuideForTouch( pBaseParam );
-                }
-                
-                // タッチの描画
+                // タッチであれば
                 if( pLOD->checkFlag( eLOD_FLAG_TOUCH ) ){
-                    // フリルであれば分岐
+                    // フリルであれば
                     if( pLOD->checkFlag( eLOD_FLAG_TOUCH_IS_FRILL ) ){
                         timeForLine += CBezier::TouchForFrill( pHead, pBaseParam, pLayerParam, pLOD->getTestPalGrp(), isWorkPath );
-                    }else{
+                    }
+                    // 通常のタッチ／ストライプであれば
+                    else{
                         bool isStripe = pLOD->checkFlag( eLOD_FLAG_TOUCH_IS_STRIPE );
                         timeForLine += CBezier::Touch( pHead, pBaseParam, pLayerParam, pLOD->getTestPalGrp(), isStripe, isWorkPath );
                     }
                 }
-                // ストロークの描画
+                // ストロークであれば
                 else{
-                    // ドットフラグ（※指定があれば線ではなく点を描く）
+                    // ドットか？（※指定があれば線ではなく点を描く）
                     bool isDot = pLOD->checkFlag( eLOD_FLAG_DOT );
 
                     timeForLine += CBezier::Stroke( pHead, pBaseParam, pLayerParam,
@@ -427,55 +446,118 @@ int CLayerData::draw( stBEZIER_BASE_PARAM* pBaseParam, stBEZIER_LAYER_PARAM* pLa
                 
                 // 描画形式データを解放
                 CBezierDataConv::ReleaseBezierAnchorPoint( pHead );
-                
-                // 指定があればガイドのクリア
-                if( pLOD->checkFlag( eLOD_FLAG_GUIDE_RESET_AFTER_STROKE ) ){
-                    bool isFull = pLOD->checkFlag( eLOD_FLAG_GUIDE_RESET_FULL );
-                    CBmpGenerator::ResetGuide( isFull );
+
+                //--------------------------
+                // ライン：後始末
+                //--------------------------
+                // 指定があればガ出力色をフォーカス（※出力色をもちこすガイドリセット）
+                if( pLOD->checkFlag( eLOD_FLAG_FOCUS_OUT_COL_AFTER_STROKE ) ){
+                    CFill::AdjustFillGuideForOutCol( pBaseParam->pBufFillGuide, pBaseParam->texW, pBaseParam->texH );
+                }
+                // 指定があればガイドのリセット
+                else if( pLOD->checkFlag( eLOD_FLAG_RESET_GUIDE_AFTER_STROKE ) ){
+                    CBmpGenerator::ResetFillGuideBuf();
+                }
+
+                // 指定があればマスクのリセット
+                if( pLOD->checkFlag( eLOD_FLAG_RESET_MASK_AFTER_STROKE ) ){
+                    CBmpGenerator::ResetFillGuardBuf();
                 }
             }
         }
-        //-----------------------------
+        //==================================================================
         // ペイント：CPaintObjectData
-        //-----------------------------
+        //==================================================================
         else if( pObj->isPaintObject() ){
             CPaintObjectData* pPOD = pObj->getPaintObject();
             
-            // オブジェクトが有効であれば描画
+            // オブジェクトが有効であれば
             if( ! pPOD->checkFlag( ePOD_FLAG_DISABLE ) ){
+                //--------------------------
+                // ペイント：事前処理
+                //--------------------------
+                // 指定があればガイドの復旧（※ワークパス時は無視）
+                eSTROKE_GUIDE_TARGET guideTarget = pPOD->getGuideTargetId( pLayerParam->slotIndex );
+                if( IS_STROKE_GUIDE_TARGET_VALID( guideTarget ) ){
+                    if( ! isWorkPath ){
+                        CBezier::RecoverGuide( guideTarget );
+                    }
+                }
+
+                //--------------------------
+                // ペイント：描画
+                //--------------------------
                 stBEZIER_FILL_POINT* pHead = CBezierDataConv::CreateBezierFillPoint( pPOD, pBaseParam, pLayerParam );
                 timeForPaint += CBezier::Fill( pHead, pBaseParam, pLayerParam, pPOD->getTestPalGrp(), isWorkPath );
                 CBezierDataConv::ReleaseBezierFillPoint( pHead );
 
-                // ガイドは塗るたびにクリア（※指定があれば持ち越す）
-                if( ! pPOD->checkFlag( ePOD_FLAG_STAY_GUIDE_AFTER_FILL ) ){
-                    bool isFull = pPOD->checkFlag( ePOD_FLAG_GUIDE_RESET_FULL );
-                    CBmpGenerator::ResetGuide( isFull );
+                //--------------------------
+                // ペイント：後始末
+                //--------------------------
+                // 指定があればガ出力色をフォーカス（※出力色をもちこすガイドリセット）
+                if( pPOD->checkFlag( ePOD_FLAG_FOCUS_OUT_COL_AFTER_FILL ) ){
+                    CFill::AdjustFillGuideForOutCol( pBaseParam->pBufFillGuide, pBaseParam->texW, pBaseParam->texH );
+                }
+                // 塗りガイドのリセット（※指定があれば持ち越す）
+                else if( ! pPOD->checkFlag( ePOD_FLAG_STAY_GUIDE_AFTER_FILL ) ){
+                    CBmpGenerator::ResetFillGuideBuf();
+                }
+                
+                // 指定があればマスクのリセット
+                if( pPOD->checkFlag( ePOD_FLAG_RESET_MASK_AFTER_FILL ) ){
+                    CBmpGenerator::ResetFillGuardBuf();
                 }
             }
         }
-        //---------------------------------------------------------------
-        // スロット：CSlotObjectData（※開発用＝作業パス指定がある場合のみ処理する）
-        //---------------------------------------------------------------
+        //==============================================================================
+        // スロット：CSlotObjectData
+        // スロットはパーツ間の呼び出しを制御するものなので、この時点で役割を終えている（※描画要素は無い）
+        //==============================================================================
         else if( pObj->isSlotObject() ){
-            // ワークパス指定があれば開発用に表示
-            if( isWorkPath ){
-                CSlotObjectData* pSOD = pObj->getSlotObject();
-                if( ! pSOD->checkFlag( eSOD_FLAG_DISABLE ) ){
+            CSlotObjectData* pSOD = pObj->getSlotObject();
+
+            // オブジェクトが有効であれば
+            if( ! pSOD->checkFlag( eSOD_FLAG_DISABLE ) ){
+                // ワークパス指定があれば開発用に表示
+                if( isWorkPath ){
                     stBEZIER_SLOT_POINT* pHead = CBezierDataConv::CreateBezierSlotPoint( pSOD, pBaseParam, pLayerParam );
                     CBezier::SlotForDev( pHead, pBaseParam );
                     CBezierDataConv::ReleaseBezierSlotPoint( pHead );
                 }
             }
         }
+        //===========================================================================
         // ここまできたら困る
+        //===========================================================================
         else{
             LOGE( "@ CLayerData::draw: UNKNOWN OBJECT: type=%d\n", pObj->getObjectType() );
         }
 
+        // 次のオブジェクトへ
         pObj = pObj->getNext();
     }
     
+    //----------------------------
+    // レイヤー：後始末
+    //----------------------------
+    // 一時フックのリセット（※指定があれば持ち越す）
+    if( ! checkFlag( eLAYER_FLAG_STAY_HOOK_TEMP ) ){
+        CBezier::ResetHookPoint( false );
+    }
+
+    // 一時タッチのリセット（※指定があれば持ち越す）
+    if( ! checkFlag( eLAYER_FLAG_STAY_TOUCH_TEMP ) ){
+        CBezier::ResetTouchPoint( false );
+    }
+
+    // 一時ガイドのリセット（※指定があれば持ち越す）
+    if( ! checkFlag( eLAYER_FLAG_STAY_GUIDE_TEMP ) ){
+        CBezier::ResetGuidePoint( false );
+    }
+
+    //----------------------------
+    // レイヤー：処理時間
+    //----------------------------
     int total = timeForLine + timeForPaint;
 
 #ifdef BEZIER_TIME_LOG
@@ -502,11 +584,17 @@ void CLayerData::applyRateScale( int rateScale ){
     // [m_eOrderSlot]は無視
 
     // [m_eOption]は無視
-    
+
+    // [m_nRotPowRate]は無視（割合なので）
+
     // [m_eDelayType]は無視
     // [m_eDelayDepth]は無視
-    m_nDelayPowerRateX = (m_nDelayPowerRateX * rateScale)/BEZIER_SCALE_RATE;
-    m_nDelayPowerRateY = (m_nDelayPowerRateY * rateScale)/BEZIER_SCALE_RATE;
+    m_nDelayPowerRateX = m_nDelayPowerRateX*rateScale/BEZIER_SCALE_RATE;
+    m_nDelayPowerRateY = m_nDelayPowerRateY*rateScale/BEZIER_SCALE_RATE;
+    // [m_nDelayPowerRateXForRot]は無視（角度なので）
+    // [m_nDelayPowerRateYForRot]は無視（角度なので）
+    // [m_nDelayPowerRateXForScale]は無視（割合なので）
+    // [m_nDelayPowerRateYForScale]は無視（割合なので）
 }
 
 //---------------------------------------------------------
@@ -514,44 +602,60 @@ void CLayerData::applyRateScale( int rateScale ){
 //---------------------------------------------------------
 void CLayerData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 7 + eLAYER_FLAG_MAX );
+    pMenu->setItemNum( 4 + 8 + eLAYER_FLAG_MAX );
     
     int id = 0;
     
     // 値
     pMenu->setItemAtAsLabel( id++, "ORDER_TYPE", &m_eOrderType, eEDIT_VALUE_TYPE_INT32,
                              eLAYER_ORDER_TYPE_INVALID, eLAYER_ORDER_TYPE_MAX-1, g_pArrLabelLayerOrderType );
+
     pMenu->setItemAtAsLabel( id++, "ORDER_SLOT", &m_eOrderSlot, eEDIT_VALUE_TYPE_INT32,
                              eBD_SLOT_INVALID, eBD_SLOT_MAX-1, g_pArrLabelBdSlot );
 
-    pMenu->setSeparatorAt( id, true );
-
     pMenu->setItemAtAsLabel( id++, "OPTION", &m_eOption, eEDIT_VALUE_TYPE_INT32,
                              eBD_OPTION_INVALID, eBD_OPTION_MAX-1, g_pArrLabelBdOption );
+    
+    pMenu->setItemAt( id++, "ROT_POW_RATE", &m_nRotPowRate, eEDIT_VALUE_TYPE_INT32, BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
 
     pMenu->setSeparatorAt( id, true );
 
     // 遅延調整
     pMenu->setItemAtAsLabel( id++, "DLY: TYPE", &m_eDelayType, eEDIT_VALUE_TYPE_INT32,
                              eDELAY_LOG_INVALID, eDELAY_LOG_MAX-1, g_pArrLabelDelayLog );
+
     pMenu->setItemAt( id++, "DLY: DEPTH", &m_nDelayDepth, eEDIT_VALUE_TYPE_INT32, 0, DELAY_LOG_DEPTH );
+    
     pMenu->setItemAt( id++, "DLY: POW_RATE_X", &m_nDelayPowerRateX, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
     pMenu->setItemAt( id++, "DLY: POW_RATE_Y", &m_nDelayPowerRateY, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "DLY: POW_RATE_OFS_ROT_X", &m_nDelayPowerRateXForRot, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "DLY: POW_RATE_OFS_ROT_Y", &m_nDelayPowerRateYForRot, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "DLY: POW_RATE_OFS_SCALE_X", &m_nDelayPowerRateXForScale, eEDIT_VALUE_TYPE_INT32,
+                      BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
+
+    pMenu->setItemAt( id++, "DLY: POW_RATE_OFS_SCALE_Y", &m_nDelayPowerRateYForScale, eEDIT_VALUE_TYPE_INT32,
                       BEZIER_SCALE_RATE_MIN, BEZIER_SCALE_RATE_MAX );
 
     pMenu->setSeparatorAt( id, true );
     
     // フラグ
     pMenu->setItemAtAsBit( id++, "FLAG: DISABLE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_DISABLE );
-    pMenu->setItemAtAsBit( id++, "FLAG: STAY_HOOK", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_STAY_HOOK );
-    pMenu->setItemAtAsBit( id++, "FLAG: RESET_HOOK_ALL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_RESET_HOOK_ALL );
-    pMenu->setItemAtAsBit( id++, "FLAG: STAY_TOUCH", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_STAY_TOUCH );
-    pMenu->setItemAtAsBit( id++, "FLAG: RESET_TOUCH_ALL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_RESET_TOUCH_ALL );
+    pMenu->setItemAtAsBit( id++, "FLAG: STAY_HOOK_TEMP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_STAY_HOOK_TEMP );
+    pMenu->setItemAtAsBit( id++, "FLAG: STAY_TOUCH_TEMP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_STAY_TOUCH_TEMP );
+    pMenu->setItemAtAsBit( id++, "FLAG: STAY_GUIDE_TEMP", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_STAY_GUIDE_TEMP );
+    pMenu->setItemAtAsBit( id++, "FLAG: INVALID FOR SUITED", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_INVALID_FOR_SUITED );
+    pMenu->setItemAtAsBit( id++, "FLAG: VALID FOR SUITED", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_VALID_FOR_SUITED );
     pMenu->setItemAtAsBit( id++, "FLAG: OPEN_COVER", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_OPEN_COVER );
     pMenu->setItemAtAsBit( id++, "FLAG: CLOSE_COVER", &m_nFlag, eEDIT_VALUE_TYPE_INT32, eLAYER_FLAG_CLOSE_COVER );
 
-    
     // 確定
     pMenu->fixMenu();
 }

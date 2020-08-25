@@ -43,7 +43,7 @@ CBmpGenParam* CBmpGenerator::CreateBmpGenParam( CBmpDotSettingData* pSetting,
     CMemMgr::PushTargetField( eMEM_FIELD_D_APP );
     CBmpGenParam* pBmpGenParam = new CBmpGenParam();
     CMemMgr::PopTargetField();
-
+    
     //----------------------------------------------
     // 対象の設定
     //----------------------------------------------
@@ -96,7 +96,7 @@ CBmpGenParam* CBmpGenerator::CreateBmpGenParam( CBmpDotSettingData* pSetting,
         // スロット設定の検索（※無効は無視）
         param.slot = pCell->slot;
         CBmpDotSettingSlotData* pSlot = pSetting->searchSlot( pCell->slot, pCell->slotIndex );
-        if( pSlot == NULL ){ continue; }
+        if( pSlot == NULL || pSlot->isInvalid() ){ continue; }
 
         // スロット指定からパラメータの設定
         param.category = pSlot->getCategory();
@@ -105,6 +105,15 @@ CBmpGenParam* CBmpGenerator::CreateBmpGenParam( CBmpDotSettingData* pSetting,
         param.form = pSlot->getForm();
         param.subId = pSlot->getSubId();
         param.dir = pSlot->getDir();
+        
+#if 1
+        // スーツ時はサブIDを見る（※着ぐるみ用の別素材）
+        if( isSuited ){
+            if( param.slot == eBD_SLOT_AmBase || param.slot == eBD_SLOT_LgBase ){
+                param.subId = 1;
+            }
+        }
+#endif
         
         tempT = pSlot->getAdjForT() + adjForT;
         tempS = pSlot->getAdjForS() + adjForS;

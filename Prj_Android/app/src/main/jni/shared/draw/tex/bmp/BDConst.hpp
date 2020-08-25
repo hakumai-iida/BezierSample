@@ -20,6 +20,7 @@
   +----------------------------------------------------------------+*/
 //-----------------------------------------------------------------
 // 区分[４文字]（※データの種別）
+// TODO: OPTIONはいるか？（※着ぐるみのスーツに対して、付属物のオプション）
 //-----------------------------------------------------------------
 enum eBD_CATEGORY{
     eBD_CATEGORY_INVALID = -1,
@@ -65,20 +66,23 @@ enum eBD_FORM{
 enum eBD_SLOT{
     eBD_SLOT_INVALID = -1,
 #include "inc/BmpDotSlotId.inc"
-    
     eBD_SLOT_MAX,
 };
 
 #define IS_BD_SLOT_VALID( _s )  ((_s)>=(eBD_SLOT)0 && (_s)<eBD_SLOT_MAX)
 
-//-------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 // UID／サブID／スロットインデックス
-//-------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 // ・列挙子ではなく数値を割り当てて管理するもの
 // ・[UID]によりカテゴリ別に[BDP]を特定する
 // ・[サブID]は[BDPD]内で画像的な差分を持つ際に利用する：[AmBase]における接続部位の表示バリエーション等
 // ・スロットインデックスは複数のスロットを指定する際にどこ(左右)を対象とするかの判断に使われる
-//-------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+// [UID]は[4byte]で管理するが、運用上の値域はカテゴリによってかわる想定
+// [FACE/BODY]であれば[2byte]、[SUIT]であれば[3byte]を想定する
+//（※データ追加の頻度として、アリス[FACE/BODY]は少なめ、ロジック[SUIT]は多めを想定している）
+//---------------------------------------------------------------------------------------
 #define BD_UID_INVALID                  UNIQUE_ID_INVALID
 #define BD_UID_MIN                      UNIQUE_ID_MIN
 #define BD_UID_MAX                      UNIQUE_ID_MAX
@@ -91,7 +95,7 @@ enum eBD_SLOT{
 
 #define BD_SLOT_INDEX_INVALID           (-1)
 #define BD_SLOT_INDEX_MIN               0
-#define BD_SLOT_INDEX_MAX               9
+#define BD_SLOT_INDEX_MAX               2
 #define IS_BD_SLOT_INDEX_VALID( _si )   ((_si)>=BD_SLOT_INDEX_MIN && (_si)<=BD_SLOT_INDEX_MAX)
 
 //--------------------------------------------------------------------------------
@@ -186,8 +190,8 @@ public:
     static eBD_CATEGORY GetCategoryForSlot( eBD_SLOT slot );
 
     // BDPD識別名の設定
-    static void SetBmpDotPartName( char* pBuf, eBD_SLOT slot, int subId, eBD_DIR dir );
-
+    static void SetBmpDotPartDataName( char* pBuf, eBD_SLOT slot, int subId, eBD_DIR dir );
+    
 private:
 	// インスタンス生成は不可
 	CBDConst( void ){}

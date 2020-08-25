@@ -300,95 +300,101 @@ float CEditValueDialog::getH( void ){ return( EV_DIALOG_H ); }
 //------------------
 void CEditValueDialog::onUpdate0( void ){
 	m_bChanged = false;
+    bool isRedoValueUpdate = false;
+    
+    // 更新
+    m_pButtonUndo->onUpdate();
+    m_pButtonRedo->onUpdate();
+    m_pButtonMin->onUpdate();
+    m_pButtonMax->onUpdate();
+    m_pButtonZero->onUpdate();
+    m_pButtonNega->onUpdate();
+    m_pButtonCopy->onUpdate();
+    m_pButtonPaste->onUpdate();
+
 
 	// UNDO
-	m_pButtonUndo->onUpdate();
 	if( m_pButtonUndo->isTapped() ){
 		m_bChanged = setValue( m_nValueUndo );
-		return;
 	}
-
 	// REDO
-	m_pButtonRedo->onUpdate();
-	if( m_pButtonRedo->isTapped() ){
+	else if( m_pButtonRedo->isTapped() ){
 		m_bChanged = setValue( m_nValueRedo );
-		return;
 	}
-
 	// Min
-	m_pButtonMin->onUpdate();
-	if( m_pButtonMin->isTapped() ){
-		m_bChanged = setValue( m_nValueMin );
-        m_nValueRedo = getValue();
-		return;
+	else if( m_pButtonMin->isTapped() ){
+		isRedoValueUpdate = m_bChanged = setValue( m_nValueMin );
+        
 	}
-
 	// MAX
-	m_pButtonMax->onUpdate();
-	if( m_pButtonMax->isTapped() ){
-		m_bChanged = setValue( m_nValueMax );
-        m_nValueRedo = getValue();
-		return;
+	else if( m_pButtonMax->isTapped() ){
+		isRedoValueUpdate = m_bChanged = setValue( m_nValueMax );
 	}
-    
     // ZERO
-    m_pButtonZero->onUpdate();
-    if( m_pButtonZero->isTapped() ){
-        m_bChanged = setValue( 0 );
-        m_nValueRedo = getValue();
-        return;
+    else if( m_pButtonZero->isTapped() ){
+        // 用心にリミット
+        int temp = 0;
+        if( temp < m_nValueMin ){ temp = m_nValueMin; }
+        else if( temp > m_nValueMax ){ temp = m_nValueMax; }
+
+        isRedoValueUpdate = m_bChanged = setValue( temp );
     }
-    
     // NEGA
-    m_pButtonNega->onUpdate();
-    if( m_pButtonNega->isTapped() ){
-        m_bChanged = setValue( -getValue() );
-        m_nValueRedo = getValue();
-        return;
+    else if( m_pButtonNega->isTapped() ){
+        // 用心にリミット
+        int temp = -getValue();
+        if( temp < m_nValueMin ){ temp = m_nValueMin; }
+        else if( temp > m_nValueMax ){ temp = m_nValueMax; }
+
+        isRedoValueUpdate = m_bChanged = setValue( temp );
     }
-
 	// Copy
-	m_pButtonCopy->onUpdate();
-	if( m_pButtonCopy->isTapped() ){
+	else if( m_pButtonCopy->isTapped() ){
 		m_nValuePaste = getValue();
-		return;
 	}
-
 	// Paste
-	m_pButtonPaste->onUpdate();
-	if( m_pButtonPaste->isTapped() ){
+	else if( m_pButtonPaste->isTapped() ){
 		// 用心にリミット
 		int temp = m_nValuePaste;
 		if( temp < m_nValueMin ){ temp = m_nValueMin; }
 		else if( temp > m_nValueMax ){ temp = m_nValueMax; }
-		m_bChanged = setValue( temp );
+
+        isRedoValueUpdate = m_bChanged = setValue( temp );
+	}
+    // Inc/Dec
+    else{
+        // Inc
+        int add = 1;
+        for( int i=0; i<m_nDegree; i++ ){
+            m_oArrButtonInc[i].onUpdate();
+            if( m_oArrButtonInc[i].isTapped() ){
+                isRedoValueUpdate = m_bChanged = addValue( add );
+                if( m_bChanged ){
+                    break;
+                }
+            }
+            add *= 10;
+        }
+
+        // Dec
+        if( ! m_bChanged ){
+            int sub = -1;
+            for( int i=0; i<m_nDegree; i++ ){
+                m_oArrButtonDec[i].onUpdate();
+                if( m_oArrButtonDec[i].isTapped() ){
+                    isRedoValueUpdate = m_bChanged = addValue( sub );
+                    if( m_bChanged ){
+                        break;
+                    }
+                }
+                sub *= 10;
+            }
+        }
+    }
+    
+    if( isRedoValueUpdate ){
         m_nValueRedo = getValue();
-		return;
-	}
-
-	// Inc
-	int add = 1;
-	for( int i=0; i<m_nDegree; i++ ){
-		m_oArrButtonInc[i].onUpdate();
-		if( m_oArrButtonInc[i].isTapped() ){
-			m_bChanged = addValue( add );
-			m_nValueRedo = getValue();
-			return;
-		}
-		add *= 10;
-	}
-
-	// Dec
-	int sub = -1;
-	for( int i=0; i<m_nDegree; i++ ){
-		m_oArrButtonDec[i].onUpdate();
-		if( m_oArrButtonDec[i].isTapped() ){
-			m_bChanged = addValue( sub );
-			m_nValueRedo = getValue();
-			return;
-		}
-		sub *= 10;
-	}
+    }
 }
 
 //------------------

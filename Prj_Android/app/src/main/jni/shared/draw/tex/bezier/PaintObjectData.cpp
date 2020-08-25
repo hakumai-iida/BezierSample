@@ -72,6 +72,13 @@ CPaintObjectData::~CPaintObjectData( void ){
     clear();    // リスト解放
 }
 
+//---------------------------
+// ガイド対象IDの取得
+//---------------------------
+eSTROKE_GUIDE_TARGET CPaintObjectData::getGuideTargetId( int slotIndex ){
+    return( CStroke::AdjustGuideTargetForSlotIndex( m_eGuideTargetId, slotIndex ) );
+}
+
 //--------------------
 // クリア（※データの破棄）
 //--------------------
@@ -90,8 +97,10 @@ void CPaintObjectData::clear( void ){
     
     // 各種値
     m_eBucketId = eBUCKET_INVALID;
-    m_eDefaultPalOfsId = ePAL_OFS_INVALID;
+    m_ePalOfsId = ePAL_OFS_INVALID;
+    m_nDarkOfs = 0;
     m_eTestPalOfsId = ePAL_OFS_INVALID;
+    m_eGuideTargetId = eSTROKE_GUIDE_TARGET_INVALID;
 }
 
 //--------------------
@@ -119,8 +128,10 @@ void CPaintObjectData::copy( CPaintObjectData* pData ){
 
     // 各種値
     m_eBucketId = pData->m_eBucketId;
-    m_eDefaultPalOfsId = pData->m_eDefaultPalOfsId;
+    m_ePalOfsId = pData->m_ePalOfsId;
+    m_nDarkOfs = pData->m_nDarkOfs;
     m_eTestPalOfsId = pData->m_eTestPalOfsId;
+    m_eGuideTargetId = pData->m_eGuideTargetId;
 }
 
 //---------------------------
@@ -143,8 +154,10 @@ void CPaintObjectData::read( CInputBuffer* pIB ){
     
     // 各種値
     m_eBucketId = (eBUCKET)CEnum::ReadEnum( pIB, g_pArrLabelBucket );
-    m_eDefaultPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_ePalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_nDarkOfs = pIB->readInt16();
     m_eTestPalOfsId = (ePAL_OFS)CEnum::ReadEnum( pIB, g_pArrLabelPalOfs );
+    m_eGuideTargetId = (eSTROKE_GUIDE_TARGET)CEnum::ReadEnum( pIB, g_pArrLabelStrokeGuideTarget );
 }
 
 //---------------------------
@@ -166,8 +179,10 @@ void CPaintObjectData::write( COutputBuffer* pOB ){
 
     // 各種値
     CEnum::WriteEnum( pOB, m_eBucketId, eBUCKET_MAX, g_pArrLabelBucket );
-    CEnum::WriteEnum( pOB, m_eDefaultPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_ePalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    pOB->writeInt16( (int16)m_nDarkOfs );
     CEnum::WriteEnum( pOB, m_eTestPalOfsId, ePAL_OFS_MAX, g_pArrLabelPalOfs );
+    CEnum::WriteEnum( pOB, m_eGuideTargetId, eSTROKE_GUIDE_TARGET_MAX, g_pArrLabelStrokeGuideTarget );
 }
 
 //---------------------------
@@ -264,8 +279,10 @@ void CPaintObjectData::applyRateScale( int rateScale ){
     }
     
     // [m_eBucketId]は無視
-    // [m_eDefaultPalOfsId]は無視
+    // [m_ePalOfsId]は無視
+    // [m_nDarkOfs]は無視
     // [m_eTestPalOfsId]は無視
+    // [m_eGuideTargetId]は無視
 }
 
 //---------------------------------------------------------
@@ -273,18 +290,26 @@ void CPaintObjectData::applyRateScale( int rateScale ){
 //---------------------------------------------------------
 void CPaintObjectData::setEditValueMenu( CEditValueMenu* pMenu ){
     // 編集項目数設定
-    pMenu->setItemNum( 3 + 4 + ePOD_FLAG_MAX );
+    pMenu->setItemNum( 5 + 4 + ePOD_FLAG_MAX );
     
     int id = 0;
     
     // 値
     pMenu->setItemAtAsLabel( id++, "BUCKET_ID", &m_eBucketId, eEDIT_VALUE_TYPE_INT32,
                              eBUCKET_INVALID, eBUCKET_MAX-1, g_pArrLabelBucket );
-    pMenu->setItemAtAsLabel( id++, "DEF_PAL_F_ID", &m_eDefaultPalOfsId, eEDIT_VALUE_TYPE_INT32,
+
+    pMenu->setItemAtAsLabel( id++, "PAL_F_ID", &m_ePalOfsId, eEDIT_VALUE_TYPE_INT32,
                              ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
+    
+    pMenu->setItemAt( id++, "DARK_OFS", &m_nDarkOfs, eEDIT_VALUE_TYPE_INT32,
+                      -BEZIER_PAL_MAX_LEVEL_FOR_BRIGHT, BEZIER_PAL_MAX_LEVEL_FOR_DARK );
+
     pMenu->setItemAtAsLabel( id++, "TEST_PAL_F_ID", &m_eTestPalOfsId, eEDIT_VALUE_TYPE_INT32,
                              ePAL_OFS_INVALID, ePAL_OFS_MAX-1, g_pArrLabelPalOfs );
     
+    pMenu->setItemAtAsLabel( id++, "GUIDE", &m_eGuideTargetId, eEDIT_VALUE_TYPE_INT32,
+                             eSTROKE_GUIDE_TARGET_INVALID, eSTROKE_GUIDE_TARGET_MAX-1, g_pArrLabelStrokeGuideTarget );
+
     pMenu->setSeparatorAt( id, true );
 
     // 一時調整値（※この値は保存されない＝修正後に[applyTempAdjust]で調整を適用する想定）
@@ -298,8 +323,9 @@ void CPaintObjectData::setEditValueMenu( CEditValueMenu* pMenu ){
     // フラグ
     pMenu->setItemAtAsBit( id++, "FLAG: DISABLE", &m_nFlag, eEDIT_VALUE_TYPE_INT32, ePOD_FLAG_DISABLE );
     pMenu->setItemAtAsBit( id++, "FLAG: STAY_GUIDE_AFTER_FILL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, ePOD_FLAG_STAY_GUIDE_AFTER_FILL );
-    pMenu->setItemAtAsBit( id++, "FLAG: GUIDE_RESET_FULL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, ePOD_FLAG_GUIDE_RESET_FULL );
-    
+    pMenu->setItemAtAsBit( id++, "FLAG: FOCUS_OUT_COL_AFTER_FILL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, ePOD_FLAG_FOCUS_OUT_COL_AFTER_FILL );
+    pMenu->setItemAtAsBit( id++, "FLAG: RESET_MASK_AFTER_FILL", &m_nFlag, eEDIT_VALUE_TYPE_INT32, ePOD_FLAG_RESET_MASK_AFTER_FILL );
+
     // 確定
     pMenu->fixMenu();
 }

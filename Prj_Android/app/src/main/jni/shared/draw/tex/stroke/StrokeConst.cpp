@@ -30,12 +30,24 @@ const char* g_pArrLabelStrokeType[] = {
 };
 
 //------------------
+// フリルラベル
+//------------------
+const char* g_pArrLabelStrokeFrill[] = {
+    "TEST_CIRCLE",
+    "TEST_TRIANGLE",
+    "TEST_SQUARE",
+    
+    "FLUFFY_SQUARE_MAIN",
+    "FLUFFY_SQUARE_SUB",
+
+    NULL,
+};
+
+//------------------
 // フック対象ラベル
 //------------------
 const char* g_pArrLabelStrokeHookTarget[] = {
-    //-----------------------------------------------------
-    // 一時枠（※同一レイヤー内部でフックする場合のテンポラリ）
-    //-----------------------------------------------------
+    // テンポラリ
     "TEMP_A",    "TEMP_B",    "TEMP_C",    "TEMP_D",
     "TEMP_E",    "TEMP_F",    "TEMP_G",    "TEMP_H",
     "TEMP_I",    "TEMP_J",    "TEMP_K",    "TEMP_L",
@@ -43,31 +55,24 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "TEMP_Q",    "TEMP_R",    "TEMP_S",    "TEMP_T",
     "TEMP_U",    "TEMP_V",    "TEMP_W",    "TEMP_X",
     "TEMP_Y",    "TEMP_Z",
+    
+    // パーツ
+    "PART_A",   "PART_B",   "PART_C",   "PART_D",
+    "PART_E",   "PART_F",   "PART_G",   "PART_H",
+    "PART_I",   "PART_J",   "PART_K",   "PART_L",
+    "PART_M",   "PART_N",   "PART_O",   "PART_P",
+    "PART_Q",   "PART_R",   "PART_S",   "PART_T",
+    "PART_U",   "PART_V",   "PART_W",   "PART_X",
+    "PART_Y",   "PART_Z",
 
-    //-----------------------------------------------------
-    // 顔／頭（※パーツ単位での細かな組み替えが行われるので用途を限定）
-    //-----------------------------------------------------
-    // 首と顔の接続：[NkBase/FcBase]
-    "NECK_TO_FACE_L",         "NECK_TO_FACE_R",
-
-    // 頭の上部と土台に接続：[HdTop(HdCap)/HdBase]
+    // 特定
     "HEAD_TOP_L",             "HEAD_TOP_R",
-
-    // 頭の左右と土台に接続：[HdSide/HdBase]（※閉じる必要がない場合は[HdBase]側で無視する）
     "HEAD_SIDE_L",            "HEAD_SIDE_R",
-
-    // 輪郭と生え際の接続：[FcHairLine/FcBase]
     "HAIR_LINE_L",            "HAIR_LINE_R",
-
-    //-----------------------------------------------------
-    // 特殊（※区分をまたぐもの）
-    //-----------------------------------------------------
-    // 腕から肩（広背筋）：[AmBase/UpBase]
+    "NECK_TO_FACE_L",         "NECK_TO_FACE_R",
     "ARM_TO_BACK_L",          "ARM_TO_BACK_R",
     
-    //-----------------------------------------------------
-    // 上半身（※パーツ単位での組み替えがないので汎用的な枠でもつ）
-    //-----------------------------------------------------
+    // 上半身
     "UP_A",    "UP_B",    "UP_C",    "UP_D",
     "UP_E",    "UP_F",    "UP_G",    "UP_H",
     "UP_I",    "UP_J",    "UP_K",    "UP_L",
@@ -76,9 +81,7 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "UP_U",    "UP_V",    "UP_W",    "UP_X",
     "UP_Y",    "UP_Z",
 
-    //-----------------------------------------------------
-    // 下半身（※パーツ単位での組み替えがないので汎用的な枠でもつ）
-    //-----------------------------------------------------
+    // 下半身
     "LOW_A",   "LOW_B",   "LOW_C",   "LOW_D",
     "LOW_E",   "LOW_F",   "LOW_G",   "LOW_H",
     "LOW_I",   "LOW_J",   "LOW_K",   "LOW_L",
@@ -87,9 +90,7 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "LOW_U",   "LOW_V",   "LOW_W",   "LOW_X",
     "LOW_Y",   "LOW_Z",
 
-    //-----------------------------------------------------
-    // スーツ（※パーツ単位での組み替えがないので汎用的な枠でもつ）
-    //-----------------------------------------------------
+    // スーツ
     "SUIT_A",   "SUIT_B",   "SUIT_C",   "SUIT_D",
     "SUIT_E",   "SUIT_F",   "SUIT_G",   "SUIT_H",
     "SUIT_I",   "SUIT_J",   "SUIT_K",   "SUIT_L",
@@ -98,11 +99,7 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "SUIT_U",   "SUIT_V",   "SUIT_W",   "SUIT_X",
     "SUIT_Y",   "SUIT_Z",
 
-    //-----------------------------------------------------------------
-    // 腕（※パーツ単位での組み替えがないので汎用的な枠でもつ）
-    // 素材作成時は[ARM_*_0]を指定する（※実行時にスロットインデックスで補正される）
-    //（※胴体等のスロットからアクセスする場合は[*_0/*_1]により左右の切り替えが可能）
-    //-----------------------------------------------------------------
+    // 腕
     "ARM_A_0",  "ARM_A_1",  "ARM_B_0",  "ARM_B_1",
     "ARM_C_0",  "ARM_C_1",  "ARM_D_0",  "ARM_D_1",
     "ARM_E_0",  "ARM_E_1",  "ARM_F_0",  "ARM_F_1",
@@ -117,11 +114,7 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "ARM_W_0",  "ARM_W_1",  "ARM_X_0",  "ARM_X_1",
     "ARM_Y_0",  "ARM_Y_1",  "ARM_Z_0",  "ARM_Z_1",
 
-    //-------------------------------------------------------------------
-    // 脚（※パーツ単位での組み替えがないので汎用的な枠でもつ）
-    // 素材作成時は[LEG_*_0]を指定する（※実行時にスロットインデックスで補正される）
-    //（※胴体等のスロットからアクセスする場合は[*_0/*_1]により左右の切り替えが可能）
-    //-------------------------------------------------------------------
+    // 脚
     "LEG_A_0",  "LEG_A_1",  "LEG_B_0",  "LEG_B_1",
     "LEG_C_0",  "LEG_C_1",  "LEG_D_0",  "LEG_D_1",
     "LEG_E_0",  "LEG_E_1",  "LEG_F_0",  "LEG_F_1",
@@ -136,6 +129,10 @@ const char* g_pArrLabelStrokeHookTarget[] = {
     "LEG_W_0",  "LEG_W_1",  "LEG_X_0",  "LEG_X_1",
     "LEG_Y_0",  "LEG_Y_1",  "LEG_Z_0",  "LEG_Z_1",
 
+    // フリル
+    "FRILL_TEMP_A",     "FRILL_TEMP_B",
+    "FRILL_CONNECT_0",  "FRILL_CONNECT_1",
+
     NULL,
 };
 
@@ -144,44 +141,60 @@ const char* g_pArrLabelStrokeHookTarget[] = {
 //------------------
 const char* g_pArrLabelStrokeTouchTarget[] = {
     // 一時枠
-    "TEMP_A",
-    "TEMP_B",
-    "TEMP_C",
-    "TEMP_D",
+    "TEMP_A",    "TEMP_B",    "TEMP_C",    "TEMP_D",
+    "TEMP_E",    "TEMP_F",    "TEMP_G",    "TEMP_H",
 
-    // 固定枠（※１枠につき左右の２つ）
-    "A0",       "A1",
-    "B0",       "B1",
-    "C0",       "C1",
-    "D0",       "D1",
-    "E0",       "E1",
-    "F0",       "F1",
-    "G0",       "G1",
-    "H0",       "H1",
-    
-    "I0",       "I1",
-    "J0",       "J1",
-    "K0",       "K1",
-    "L0",       "L1",
-    "M0",       "M1",
-    "N0",       "N1",
-    "O0",       "O1",
-    "P0",       "P1",
+    // 顔／頭
+    "FACE_0",    "FACE_1",
+    "HEAD_0",    "HEAD_1",
+
+    // 上半身
+    "UP_A",    "UP_B",    "UP_C",    "UP_D",
+    "UP_E",    "UP_F",    "UP_G",    "UP_H",
+
+    // 下半身
+    "LOW_A",    "LOW_B",    "LOW_C",    "LOW_D",
+    "LOW_E",    "LOW_F",    "LOW_G",    "LOW_H",
+
+    // スーツ
+    "SUIT_A",    "SUIT_B",    "SUIT_C",    "SUIT_D",
+    "SUIT_E",    "SUIT_F",    "SUIT_G",    "SUIT_H",
+
+    // 腕
+    "ARM_A_0",  "ARM_A_1",    "ARM_B_0",  "ARM_B_1",
+    "ARM_C_0",  "ARM_C_1",    "ARM_D_0",  "ARM_D_1",
+    "ARM_E_0",  "ARM_E_1",    "ARM_F_0",  "ARM_F_1",
+    "ARM_G_0",  "ARM_G_1",    "ARM_H_0",  "ARM_H_1",
+
+    // 脚
+    "LEG_A_0",  "LEG_A_1",    "LEG_B_0",  "LEG_B_1",
+    "LEG_C_0",  "LEG_C_1",    "LEG_D_0",  "LEG_D_1",
+    "LEG_E_0",  "LEG_E_1",    "LEG_F_0",  "LEG_F_1",
+    "LEG_G_0",  "LEG_G_1",    "LEG_H_0",  "LEG_H_1",
     
     NULL,
 };
 
 //------------------
-// フリルラベル
+// ガイド対象ラベル
 //------------------
-const char* g_pArrLabelStrokeFrill[] = {
-    "TEST_CIRCLE",
-    "TEST_TRIANGLE",
-    "TEST_SQUARE",
+const char* g_pArrLabelStrokeGuideTarget[] = {
+    "TEMP_A",    "TEMP_B",    "TEMP_C",    "TEMP_D",
+
+    "FACE_A",    "FACE_B",    "FACE_C",    "FACE_D",
+    "HEAD_A",    "HEAD_B",    "HEAD_C",    "HEAD_D",
+    "BODY_A",    "BODY_B",    "BODY_C",    "BODY_D",
+    "SUIT_A",    "SUIT_B",    "SUIT_C",    "SUIT_D",
+
+    "ARM_A_0",   "ARM_A_1",   "ARM_B_0",   "ARM_B_1",
+    "ARM_C_0",   "ARM_C_1",   "ARM_D_0",   "ARM_D_1",
+
+    "LEG_A_0",   "LEG_A_1",   "LEG_B_0",   "LEG_B_1",
+    "LEG_C_0",   "LEG_C_1",   "LEG_D_0",   "LEG_D_1",
 
     NULL,
 };
-
+    
 /*+----------------------------------------------------------------+
   |	Prototype	プロトタイプ宣言
   +----------------------------------------------------------------+*/

@@ -25,10 +25,10 @@
   |	Program		プログラム実装
   +----------------------------------------------------------------+*/
 //-------------------------------------------------------------
-// 座標計算：調整値[Ｈ/Ｖ]
+// 座標計算：調整値[Ｈ/Ｖ]（アンカーポイント）
 //-------------------------------------------------------------
 void CAdjustCalc::CalcRateXYForHV( int* pOutRateX, int* pOutRateY, int rX0, int rY0,
-                                CAdjustablePoint* pAP, float fixedAdjustRateH, float fixedAdjustRateV ){
+                                   CAdjustablePoint* pAP, float fixedAdjustRateH, float fixedAdjustRateV ){
     // 無効値はこない前提（※ここにくる値は正常であるはず）
 #if 0
     if( pOutRateX == NULL || pOutRateY == NULL || pAP == NULL ){
@@ -76,10 +76,10 @@ void CAdjustCalc::CalcRateXYForHV( int* pOutRateX, int* pOutRateY, int rX0, int 
 }
 
 //-----------------------------------------------------------------------------
-// [adjustH]: 調整値による結合半径の算出
+// [adjustH]: 調整値による結合半径の算出（アンカーポイント）
 //-----------------------------------------------------------------------------
 void CAdjustCalc::CalcRateRForH( int *pOutRateR, int *pOutRateOfsR, int rR0, int rOfsForCenter0,
-                                CSlotAdjuster* pSA, float fixedAdjustRateH ){
+                                 CSlotAdjuster* pSA, float fixedAdjustRateH ){
     // 無効値はこない前提（※ここにくる値は正常であるはず）
 #if 0
     if( pOutRateR == NULL || pOutRateOfsR == NULL || pSA == NULL ){
@@ -105,11 +105,11 @@ void CAdjustCalc::CalcRateRForH( int *pOutRateR, int *pOutRateOfsR, int rR0, int
     
     // 出力
     *pOutRateR = rateR;
-    *pOutRateOfsR = (int)(rateR * CConst::ConvBezierRateScale( rOfsForCenter0 ));
+    *pOutRateOfsR = (int)(rateR * CConst::ConvBezierScaleRate( rOfsForCenter0 ));
 }
 
 //-------------------------------------------------------------
-// 座標計算：遅延ログ
+// 座標計算：遅延ログ（アンカーポイント）
 //-------------------------------------------------------------
 void CAdjustCalc::CalcRateXYForDelayLog( int* pOutRateX, int* pOutRateY, int rX0, int rY0,
                                          bool isReverseH, bool isReverseV, float rot,
@@ -162,7 +162,46 @@ void CAdjustCalc::CalcRateXYForDelayLog( int* pOutRateX, int* pOutRateY, int rX0
 }
 
 //-------------------------------------------------------------
-// 角度計算：遅延ログ
+// 座標計算：遅延ログ（レイヤー）
+//-------------------------------------------------------------
+void CAdjustCalc::CalcRateOfsXYForDelayLog( int* pOutRateOfsX, int* pOutRateOfsY,
+                                            bool isReverseH, bool isReverseV,
+                                            CLayerData* pLD, CDelayLog* pDelayLog ){
+    // 無効値はこない前提（※ここにくる値は正常であるはず）
+#if 0
+    if( pOutRateOfsX == NULL || pOutRateOfsY == NULL || pLD == NULL || pDelayLog == NULL ){
+        return;
+    }
+#endif
+    
+    int rOfsX = 0;
+    int rOfsY = 0;
+    
+    //-----------------------
+    // 遅延調整
+    //-----------------------
+    eDELAY_LOG logType = pLD->getDelayType();
+    if( IS_DELAY_LOG_VALID( logType ) ){
+        int depth = pLD->getDelayDepth();
+
+        int rateX = pDelayLog->getDelayRateX( logType, depth );
+        int rateY = pDelayLog->getDelayRateY( logType, depth );
+
+        rOfsX = (rateX * pLD->getDelayPowerRateX()) / BEZIER_SCALE_RATE;
+        rOfsY = (rateY * pLD->getDelayPowerRateY()) / BEZIER_SCALE_RATE;
+  
+        // 指定があれば反転
+        if( isReverseH ){ rOfsX *= -1; }
+        if( isReverseV ){ rOfsY *= -1; }
+    }
+    
+    // 出力
+    *pOutRateOfsX = rOfsX;
+    *pOutRateOfsY = rOfsY;
+}
+
+//-------------------------------------------------------------
+// 角度計算：遅延ログ（レイヤー）
 //-------------------------------------------------------------
 void CAdjustCalc::CalcRateRotForDelayLog( int* pOutRateRot,
                                           bool isReverseH, bool isReverseV,
@@ -186,8 +225,8 @@ void CAdjustCalc::CalcRateRotForDelayLog( int* pOutRateRot,
         int rateX = pDelayLog->getDelayRateX( logType, depth );
         int rateY = pDelayLog->getDelayRateY( logType, depth );
         
-        rateX = (rateX * pLD->getDelayPowerRateX()) / BEZIER_SCALE_RATE;
-        rateY = (rateY * pLD->getDelayPowerRateY()) / BEZIER_SCALE_RATE;
+        rateX = (rateX * pLD->getDelayPowerRateXForRot()) / BEZIER_SCALE_RATE;
+        rateY = (rateY * pLD->getDelayPowerRateYForRot()) / BEZIER_SCALE_RATE;
         
         // 指定があれば反転
         if( isReverseH ){ rateX *= -1; }
@@ -201,7 +240,40 @@ void CAdjustCalc::CalcRateRotForDelayLog( int* pOutRateRot,
 }
 
 //-------------------------------------------------------------
-// 角度計算：テンション
+// スケール計算：遅延ログ（レイヤー）
+//-------------------------------------------------------------
+void CAdjustCalc::CalcRateScaleForDelayLog( int* pOutRateScale, CLayerData* pLD, CDelayLog* pDelayLog ){
+    // 無効値はこない前提（※ここにくる値は正常であるはず）
+#if 0
+    if( pOutRateRot == NULL || pLD == NULL || pDelayLog == NULL ){
+        return;
+    }
+#endif
+    
+    int rateScale = BEZIER_SCALE_RATE;
+
+    //-----------------------
+    // 遅延調整
+    //-----------------------
+    eDELAY_LOG logType = pLD->getDelayType();
+    if( IS_DELAY_LOG_VALID( logType ) ){
+        int depth = pLD->getDelayDepth();
+
+        int rateX = pDelayLog->getDelayRateX( logType, depth );
+        int rateY = pDelayLog->getDelayRateY( logType, depth );
+        
+        rateX = (rateX * pLD->getDelayPowerRateXForScale()) / BEZIER_SCALE_RATE;
+        rateY = (rateY * pLD->getDelayPowerRateYForScale()) / BEZIER_SCALE_RATE;
+        
+        // 移動値と印象を合わせるために反転
+        rateScale += rateX + rateY;
+    }
+
+    *pOutRateScale = rateScale;
+}
+
+//-------------------------------------------------------------
+// スケール計算：テンション（スロット＝パーツ）
 //-------------------------------------------------------------
 void CAdjustCalc::CalcRateRotForT( int* pOutRateRot, CSlotAdjuster* pSA, float fixedAdjustRateT ){
     // 無効値はこない前提（※ここにくる値は正常であるはず）
@@ -229,7 +301,7 @@ void CAdjustCalc::CalcRateRotForT( int* pOutRateRot, CSlotAdjuster* pSA, float f
 }
 
 //-------------------------------------------------------------
-// サイズ計算：サイズ
+// サイズ計算：サイズ（スロット＝パーツ）
 //-------------------------------------------------------------
 void CAdjustCalc::CalcRateScaleForS( int* pOutRateScale, CSlotAdjuster* pSA, float fixedAdjustRateS ){
     // 無効値はこない前提（※ここにくる値は正常であるはず）

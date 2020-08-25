@@ -13,28 +13,31 @@
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
 // 分割ポイント確保枠
-#define BEZIER_DIVISION_POINT_MAX       (1024*GM_P_RATE)
+#define BEZIER_DIVISION_POINT_MAX       (1024)
 
-// テンポラリ確保枠
-#define BEZIER_TEMP_POINT_MAX           (2048*GM_P_RATE)
+// テンポラリ確保枠（※分割ポイント１回分の座標保持枠）
+#define BEZIER_TEMP_POINT_MAX           (64*GM_P_RATE)
 
 // フック枠
-#define BEZIER_HOOK_POINT_MAX           (eSTROKE_HOOK_TARGET_MAX+eJOINT_POINT_MAX)
+#define BEZIER_HOOK_POINT_MAX           (eSTROKE_HOOK_TARGET_TOTAL_MAX+eJOINT_POINT_MAX)
 
 // タッチポイント確保数（※１枠分）
-#define BEZIER_TOUCH_POINT_MAX          BEZIER_TEMP_POINT_MAX
+#define BEZIER_TOUCH_POINT_MAX          (2048*GM_P_RATE)
+
+// ガイドポイント確保数（※１枠分）
+#define BEZIER_GUIDE_POINT_MAX          (2048*GM_P_RATE)
 
 // ストライプポイント確保数（※ここはストロークによる分割数なのでピクセル率は関係ない）
-#define BEZIER_STRIPE_POINT_MAX         128
+#define BEZIER_STRIPE_POINT_MAX         256
 
-// 塗りガイドポイント確保枠
-#define BEZIER_STRIPE_GUIDE_POINT_MAX   BEZIER_TEMP_POINT_MAX
+// ストライプストロークのガイドポイント確保枠（※塗りポイント検出用）
+#define BEZIER_STRIPE_GUIDE_POINT_MAX   (2048*GM_P_RATE)
 
-// ワークパスのテクスチャサイズ（※ワークなので[GM_P_RATE]は無視しておく）
-#define BEZIER_WORK_DOT_SIZE            1024
+// ワークパスのテクスチャサイズ（※小さな四角や三角の描画用）
+#define BEZIER_WORK_DOT_SIZE            ((10*GM_P_RATE)*(10*GM_P_RATE))
 
-// エッジ塗りつぶし基本サイズ（※[3*10*2*GM_P_RATE]あれば大丈夫だと思われるが用心して大きめに）
-#define BEZIER_EDGE_FILL_GUIDE_SIZE     (64*GM_P_RATE)
+// エッジ塗りつぶしで利用する塗りガイド領域サイズ（※一辺[64]で最大３倍のスケールを想定／開発時の拡大表示までは対応しない）
+#define BEZIER_EDGE_FILL_GUIDE_SIZE     (3*64*GM_P_RATE)
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
@@ -42,16 +45,24 @@
 /*+----------------------------------------------------------------+
   |	Global		グローバルデータ型定義
   +----------------------------------------------------------------+*/
-// 制御
+// 管理
+bool CBezier::s_bDispOffTouch;
+bool CBezier::s_bDispOffStripe;
+bool CBezier::s_bDispOffFrill;
+bool CBezier::s_bDispOffEdge;
+bool CBezier::s_bDispOffFillOption;
+
 bool CBezier::s_bDispDirVectorAlways;
 bool CBezier::s_bDispOffDirVectorAlways;
 bool CBezier::s_bDispPathActiveAlways;
 bool CBezier::s_bDispOnlyAnchorPoint;
 
-// 分割点ワーク
+// 分割点
 stBEZIER_DIVISION_POINT* CBezier::s_stArrDivisionPoint;
 int CBezier::s_nUseDivisionPoint;
+#ifdef BEZIER_USE_NUM_CHECK
 int CBezier::s_nUseDivisionPointMax;
+#endif
 
 // テンポラリ
 float* CBezier::s_fArrTempPointX;
@@ -59,13 +70,16 @@ float* CBezier::s_fArrTempPointY;
 float* CBezier::s_fArrTempPointX0;
 float* CBezier::s_fArrTempPointY0;
 float* CBezier::s_fArrTempStrokeSize;
+#ifdef BEZIER_USE_NUM_CHECK
+int CBezier::s_nUseTempPointMax;
+#endif
 
-// フック点ワーク
+// フック
 bool* CBezier::s_bArrHookPoint;
 float* CBezier::s_fArrHookPointX;
 float* CBezier::s_fArrHookPointY;
 
-// タッチワーク
+// タッチ
 int* CBezier::s_nArrTouchPointNum;
 float** CBezier::s_fArrArrTouchPointX;
 float** CBezier::s_fArrArrTouchPointY;
@@ -74,21 +88,35 @@ float** CBezier::s_fArrArrTouchPointX0;
 float** CBezier::s_fArrArrTouchPointY0;
 float* CBezier::s_fArrTouchPoint0;
 float* CBezier::s_fArrTouchWorkForLen0;
+#ifdef BEZIER_USE_NUM_CHECK
+int CBezier::s_nUseTouchPointMax;
+#endif
 
-int CBezier::s_nTouchStrokePointCur;
-int CBezier::s_nTouchStrokePointMax;
-int CBezier::s_nTouchStrokePointLimit;
+// ガイド
+int* CBezier::s_nArrGuidePointNum;
+float** CBezier::s_fArrArrGuidePointX;
+float** CBezier::s_fArrArrGuidePointY;
+float* CBezier::s_fArrGuidePoint;
+#ifdef BEZIER_USE_NUM_CHECK
+int CBezier::s_nUseGuidePointMax;
+#endif
 
-// ストライプワーク
+// ストライプ
 int CBezier::s_nStripePointNum;
 BYTE* CBezier::s_nArrStripePalGrp;
 float* CBezier::s_fArrStripePointX;
 float* CBezier::s_fArrStripePointY;
+#ifdef BEZIER_USE_NUM_CHECK
+int CBezier::s_nUseStripePointMax;
+#endif
 
-// ストライプ用ガイドワーク
+// ストライプ用ガイド
 int CBezier::s_nNumStripeGuidePoint;
-int* CBezier::s_nArrStripeGuidePointX;
-int* CBezier::s_nArrStripeGuidePointY;
+float* CBezier::s_fArrStripeGuidePointX;
+float* CBezier::s_fArrStripeGuidePointY;
+#ifdef BEZIER_USE_NUM_CHECK
+int CBezier::s_nUseStripeGuidePointMax;
+#endif
 
 // エッジ塗り
 int CBezier::s_nBufSizeForEdgeFillGuide;
@@ -97,15 +125,11 @@ int CBezier::s_nOfsXForEdgeFillGuide;
 int CBezier::s_nOfsYForEdgeFillGuide;
 stBEZIER_ANCHOR_POINT* CBezier::s_pApForEdgeFillGuide;
 
-// バッファ情報
-int CBezier::s_nLeftForStrokeBuf;
-int CBezier::s_nRightForStrokeBuf;
-int CBezier::s_nTopForStrokeBuf;
-int CBezier::s_nBottomForStrokeBuf;
-int CBezier::s_nLeftForColorBuf;
-int CBezier::s_nRightForColorBuf;
-int CBezier::s_nTopForColorBuf;
-int CBezier::s_nBottomForColorBuf;
+// スキップストローク
+int CBezier::s_nSkipStrokePointCur;
+int CBezier::s_nSkipStrokePointMax;
+int CBezier::s_nSkipStrokePointLimitForHead;
+int CBezier::s_nSkipStrokePointLimitForTail;
 
 // パラメータ
 stBEZIER_BASE_PARAM*  CBezier::s_pBaseParam;
@@ -113,11 +137,14 @@ stBEZIER_LAYER_PARAM* CBezier::s_pLayerParam;
 
 // 塗りつぶし対象
 BYTE* CBezier::s_pBuf;
+BYTE* CBezier::s_pBufTest;
 BYTE* CBezier::s_pBufFillGuide;
 BYTE* CBezier::s_pBufFillGuard;
-BYTE* CBezier::s_pBufTest;
+BYTE* CBezier::s_pBufTemp;
+
 int CBezier::s_nBufW;
 int CBezier::s_nBufH;
+
 BYTE CBezier::s_nTestPalGrp;
 BYTE CBezier::s_nTestPalGrpForRepair;
 bool CBezier::s_bTouch;
@@ -191,12 +218,6 @@ int CBezier::GetAllocCellNum( void ){
     num += 5;
 
     //---------------------------------------------------------------------------------
-    // s_nArrStripeGuidePointX = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    // s_nArrStripeGuidePointY = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    //---------------------------------------------------------------------------------
-    num += 2;
-
-    //---------------------------------------------------------------------------------
     // s_bArrHookPoint = new bool[BEZIER_HOOK_POINT_MAX];
     // s_fArrHookPointX = new float[BEZIER_HOOK_POINT_MAX];
     // s_fArrHookPointY = new float[BEZIER_HOOK_POINT_MAX];
@@ -216,11 +237,25 @@ int CBezier::GetAllocCellNum( void ){
     num += 8;
 
     //---------------------------------------------------------------------------------
+    // s_nArrGuidePointNum = new int[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrArrGuidePointX = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrArrGuidePointY = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrGuidePoint = new float[eSTROKE_GUIDE_TARGET_MAX*2*BEZIER_GUIDE_POINT_MAX];
+    //---------------------------------------------------------------------------------
+    num += 4;
+
+    //---------------------------------------------------------------------------------
     // s_nArrStripePalGrp = new BYTE[BEZIER_STRIPE_POINT_MAX];
     // s_fArrStripePointX = new float[BEZIER_STRIPE_POINT_MAX];
     // s_fArrStripePointY = new float[BEZIER_STRIPE_POINT_MAX];
     //---------------------------------------------------------------------------------
     num += 3;
+
+    //---------------------------------------------------------------------------------
+    // s_fArrStripeGuidePointX = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+    // s_fArrStripeGuidePointY = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+    //---------------------------------------------------------------------------------
+    num += 2;
 
     //---------------------------------------------------------------------------------
     // s_nBufSizeForEdgeFillGuide = BEZIER_EDGE_FILL_GUIDE_SIZE;
@@ -244,6 +279,11 @@ int CBezier::GetAllocCellNum( void ){
 int CBezier::GetAllocSizeK( void ){
     int size = 0;
 
+#ifdef BEZIER_USE_NUM_CHECK
+    int size0 = 0;
+    LOGD( "@ === CHECK BEZIER ALLOC SIZE ==\n" );
+#endif
+    
     //---------------------------------
     // CAnchorPointData::Init()
     // CFillPointData::Init()
@@ -254,18 +294,56 @@ int CBezier::GetAllocSizeK( void ){
     // CLayerData::Init()
     //---------------------------------
     size += CAnchorPointData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CAnchorPointData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     size += CFillPointData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CFillPointData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+    
     size += CSlotPointData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CSlotPointData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     size += CLineObjectData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CLineObjectData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     size += CPaintObjectData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CPaintObjectData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     size += CSlotObjectData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CSlotObjectData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     size += CLayerData::GetAllocSize();
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [CLayerData]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
 
     //---------------------------------------------------------------------------------
     // s_stArrDivisionPoint = new stBEZIER_DIVISION_POINT[BEZIER_DIVISION_POINT_MAX];
     //---------------------------------------------------------------------------------
     size += sizeof(stBEZIER_DIVISION_POINT) * BEZIER_DIVISION_POINT_MAX;
-    
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_stArrDivisionPoint]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     //---------------------------------------------------------------------------------
     // s_fArrTempPointX = new float[BEZIER_TEMP_POINT_MAX];
     // s_fArrTempPointY = new float[BEZIER_TEMP_POINT_MAX];
@@ -274,12 +352,10 @@ int CBezier::GetAllocSizeK( void ){
     // s_fArrTempStrokeSize = new float[BEZIER_TEMP_POINT_MAX];
     //---------------------------------------------------------------------------------
     size += 5 * sizeof(float) * BEZIER_TEMP_POINT_MAX;
-
-    //---------------------------------------------------------------------------------
-    // s_nArrStripeGuidePointX = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    // s_nArrStripeGuidePointY = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    //---------------------------------------------------------------------------------
-    size += 2 * sizeof(int) * BEZIER_STRIPE_GUIDE_POINT_MAX;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_fArrTemp*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
 
     //---------------------------------------------------------------------------------
     // s_bArrHookPoint = new bool[BEZIER_HOOK_POINT_MAX];
@@ -288,7 +364,11 @@ int CBezier::GetAllocSizeK( void ){
     //---------------------------------------------------------------------------------
     size += sizeof(bool) * BEZIER_HOOK_POINT_MAX;
     size += 2 * sizeof(float) * BEZIER_HOOK_POINT_MAX;
-    
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nArrHookPoint*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     //---------------------------------------------------------------------------------
     // s_nArrTouchPointNum = new int[eSTROKE_TOUCH_TARGET_MAX];
     // s_fArrArrTouchPointX = new float*[eSTROKE_TOUCH_TARGET_MAX];
@@ -305,6 +385,24 @@ int CBezier::GetAllocSizeK( void ){
     size += 2 * sizeof(float*) * eSTROKE_TOUCH_TARGET_MAX;
     size += sizeof(float) * eSTROKE_TOUCH_TARGET_MAX * 2 * BEZIER_TOUCH_POINT_MAX;
     size += sizeof(float) * BEZIER_TOUCH_POINT_MAX;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nArrTouch*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
+    //---------------------------------------------------------------------------------
+    // s_nArrGuidePointNum = new int[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrArrGuidePointX = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrArrGuidePointY = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    // s_fArrGuidePoint = new float[eSTROKE_GUIDE_TARGET_MAX*2*BEZIER_GUIDE_POINT_MAX];
+    //---------------------------------------------------------------------------------
+    size += sizeof(int) * eSTROKE_GUIDE_TARGET_MAX;
+    size += 2 * sizeof(float*) * eSTROKE_GUIDE_TARGET_MAX;
+    size += sizeof(float) * eSTROKE_GUIDE_TARGET_MAX * 2 * BEZIER_GUIDE_POINT_MAX;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nArrGuide*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
 
     //---------------------------------------------------------------------------------
     // s_nArrStripePalGrp = new BYTE[BEZIER_STRIPE_POINT_MAX];
@@ -313,12 +411,30 @@ int CBezier::GetAllocSizeK( void ){
     //---------------------------------------------------------------------------------
     size += sizeof(BYTE) * BEZIER_STRIPE_POINT_MAX;
     size += 2 * sizeof(float) * BEZIER_STRIPE_POINT_MAX;
-    
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nArrStripe*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
+    //---------------------------------------------------------------------------------
+    // s_fArrStripeGuidePointX = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+    // s_fArrStripeGuidePointY = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+    //---------------------------------------------------------------------------------
+    size += 2 * sizeof(int) * BEZIER_STRIPE_GUIDE_POINT_MAX;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nArrStripeGuidePoint*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+
     //---------------------------------------------------------------------------------
     // s_nBufSizeForEdgeFillGuide = BEZIER_EDGE_FILL_GUIDE_SIZE;
     // s_pBufForEdgeFillGuide = new BYTE[s_nBufSizeForEdgeFillGuide*s_nBufSizeForEdgeFillGuide];
     //---------------------------------------------------------------------------------
     size += sizeof(BYTE) * BEZIER_EDGE_FILL_GUIDE_SIZE * BEZIER_EDGE_FILL_GUIDE_SIZE;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_pBufForEdgeFillGuide]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
 
     //---------------------------------------------------------------------------------
     // s_pDotForWorkPathTriangle = new BYTE[BEZIER_WORK_DOT_SIZE];
@@ -326,6 +442,14 @@ int CBezier::GetAllocSizeK( void ){
     // s_pDotForWorkPathPlus = new BYTE[BEZIER_WORK_DOT_SIZE];
     //---------------------------------------------------------------------------------
     size += 3 * sizeof(BYTE) * BEZIER_WORK_DOT_SIZE;
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@  [%.1f KB] for [s_nDotForWorkPath*]\n", (size-size0)/KBf );
+    size0 = size;
+#endif
+    
+#ifdef BEZIER_USE_NUM_CHECK
+    LOGD( "@ === TOTAL [%.1f KB] FOR BEZIER ==\n", size/KBf );
+#endif
 
     // キロ単位にして返す
     int sizeK = (size+KB-1)/KB;
@@ -408,10 +532,7 @@ bool CBezier::OnCreate( void ){
     s_fArrTempPointX0 = new float[BEZIER_TEMP_POINT_MAX];
     s_fArrTempPointY0 = new float[BEZIER_TEMP_POINT_MAX];
     s_fArrTempStrokeSize = new float[BEZIER_TEMP_POINT_MAX];
-    
-    s_nArrStripeGuidePointX = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    s_nArrStripeGuidePointY = new int[BEZIER_STRIPE_GUIDE_POINT_MAX];
-    
+        
     s_bArrHookPoint = new bool[BEZIER_HOOK_POINT_MAX];
     s_fArrHookPointX = new float[BEZIER_HOOK_POINT_MAX];
     s_fArrHookPointY = new float[BEZIER_HOOK_POINT_MAX];
@@ -425,10 +546,18 @@ bool CBezier::OnCreate( void ){
     s_fArrTouchPoint0 = new float[eSTROKE_TOUCH_TARGET_MAX*2*BEZIER_TOUCH_POINT_MAX];
     s_fArrTouchWorkForLen0 = new float[BEZIER_TOUCH_POINT_MAX];
 
+    s_nArrGuidePointNum = new int[eSTROKE_GUIDE_TARGET_MAX];
+    s_fArrArrGuidePointX = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    s_fArrArrGuidePointY = new float*[eSTROKE_GUIDE_TARGET_MAX];
+    s_fArrGuidePoint = new float[eSTROKE_GUIDE_TARGET_MAX*2*BEZIER_GUIDE_POINT_MAX];
+
     s_nArrStripePalGrp = new BYTE[BEZIER_STRIPE_POINT_MAX];
     s_fArrStripePointX = new float[BEZIER_STRIPE_POINT_MAX];
     s_fArrStripePointY = new float[BEZIER_STRIPE_POINT_MAX];
     
+    s_fArrStripeGuidePointX = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+    s_fArrStripeGuidePointY = new float[BEZIER_STRIPE_GUIDE_POINT_MAX];
+
     s_nBufSizeForEdgeFillGuide = BEZIER_EDGE_FILL_GUIDE_SIZE;
     s_pBufForEdgeFillGuide = new BYTE[s_nBufSizeForEdgeFillGuide*s_nBufSizeForEdgeFillGuide];
 
@@ -445,7 +574,13 @@ bool CBezier::OnCreate( void ){
         s_fArrArrTouchPointX0[i] = &s_fArrTouchPoint0[(2*i+0)*BEZIER_TOUCH_POINT_MAX];
         s_fArrArrTouchPointY0[i] = &s_fArrTouchPoint0[(2*i+1)*BEZIER_TOUCH_POINT_MAX];
     }
-    
+
+    // ガイドXY配列へバッファの割り当て
+    for( int i=0; i<eSTROKE_GUIDE_TARGET_MAX; i++ ){
+        s_fArrArrGuidePointX[i] = &s_fArrGuidePoint[(2*i+0)*BEZIER_GUIDE_POINT_MAX];
+        s_fArrArrGuidePointY[i] = &s_fArrGuidePoint[(2*i+1)*BEZIER_GUIDE_POINT_MAX];
+    }
+
     // ワークパス用ドット準備
     ReadyDotForWorkPath();
     
@@ -469,9 +604,6 @@ void CBezier::OnDestroy( void ){
     SAFE_DELETE_ARRAY( CBezier::s_fArrTempPointY0 );
     SAFE_DELETE_ARRAY( CBezier::s_fArrTempStrokeSize );
     
-    SAFE_DELETE_ARRAY( CBezier::s_nArrStripeGuidePointX );
-    SAFE_DELETE_ARRAY( CBezier::s_nArrStripeGuidePointY );
-
     SAFE_DELETE_ARRAY( s_bArrHookPoint );
     SAFE_DELETE_ARRAY( s_fArrHookPointX );
     SAFE_DELETE_ARRAY( s_fArrHookPointY );
@@ -485,10 +617,18 @@ void CBezier::OnDestroy( void ){
     SAFE_DELETE_ARRAY( s_fArrTouchPoint0 );
     SAFE_DELETE_ARRAY( s_fArrTouchWorkForLen0 );
 
+    SAFE_DELETE_ARRAY( s_nArrGuidePointNum );
+    SAFE_DELETE_ARRAY( s_fArrArrGuidePointX );
+    SAFE_DELETE_ARRAY( s_fArrArrGuidePointY );
+    SAFE_DELETE_ARRAY( s_fArrGuidePoint );
+
     SAFE_DELETE_ARRAY( s_nArrStripePalGrp );
     SAFE_DELETE_ARRAY( s_fArrStripePointX );
     SAFE_DELETE_ARRAY( s_fArrStripePointY );
     
+    SAFE_DELETE_ARRAY( s_fArrStripeGuidePointX );
+    SAFE_DELETE_ARRAY( s_fArrStripeGuidePointY );
+
     SAFE_DELETE_ARRAY( s_pBufForEdgeFillGuide );
 
     // ワークパス用
@@ -511,25 +651,28 @@ void CBezier::OnDestroy( void ){
     CAnchorPointData::Exit();
 }
 
+#ifdef BEZIER_USE_NUM_CHECK
 //------------------------
-// 情報取得
+// 利用状況取得
 //------------------------
 int CBezier::GetDivisionPointNumMax( void ){ return( BEZIER_DIVISION_POINT_MAX ); }
 int CBezier::GetDivisionPointNumUseMax( void ){ return( s_nUseDivisionPointMax ); }
 
-//----------------------
-// バッファ情報リセット
-//----------------------
-void CBezier::ResetBufInfo( int w, int h ){
-    s_nLeftForStrokeBuf = w;
-    s_nRightForStrokeBuf = -1;
-    s_nTopForStrokeBuf = h;
-    s_nBottomForStrokeBuf = -1;
-    s_nLeftForColorBuf = w;
-    s_nRightForColorBuf = -1;
-    s_nTopForColorBuf = h;
-    s_nBottomForColorBuf = -1;
-}
+int CBezier::GetTempPointNumMax( void ){ return( BEZIER_TEMP_POINT_MAX ); }
+int CBezier::GetTempPointNumUseMax( void ){ return( s_nUseTempPointMax ); }
+
+int CBezier::GetTouchPointNumMax( void ){ return( BEZIER_TOUCH_POINT_MAX ); }
+int CBezier::GetTouchPointNumUseMax( void ){ return( s_nUseTouchPointMax ); }
+
+int CBezier::GetGuidePointNumMax( void ){ return( BEZIER_GUIDE_POINT_MAX ); }
+int CBezier::GetGuidePointNumUseMax( void ){ return( s_nUseGuidePointMax ); }
+
+int CBezier::GetStripePointNumMax( void ){ return( BEZIER_STRIPE_POINT_MAX ); }
+int CBezier::GetStripePointNumUseMax( void ){ return( s_nUseStripePointMax ); }
+
+int CBezier::GetStripeGuidePointNumMax( void ){ return( BEZIER_STRIPE_GUIDE_POINT_MAX ); }
+int CBezier::GetStripeGuidePointNumUseMax( void ){ return( s_nUseStripeGuidePointMax ); }
+#endif
 
 //----------------------
 // フック登録リセット
@@ -565,42 +708,21 @@ void CBezier::ResetTouchPoint( bool isAll ){
     }
 }
 
-//------------------------
-// 全フラグリセット（※開発用）
-//------------------------
-void CBezier::ResetAllFlagForDev( void ){
-    // BmpDotPartData
-    CBmpDotPartData::SetFlagOffAll( eBDPD_FLAG_TEMP_EDIT_TARGET );
-    CBmpDotPartData::SetFlagOffAll( eBDPD_FLAG_TEMP_SELECTED );
-    CBmpDotPartData::SetFlagOffAll( eBDPD_FLAG_TEMP_ACTIVE );
-
-    // LayerData
-    CLayerData::SetFlagOffAll( eLAYER_FLAG_TEMP_SELECTED );
-    CLayerData::SetFlagOffAll( eLAYER_FLAG_TEMP_ACTIVE );
-
-    // LineObjectData
-    CLineObjectData::SetFlagOffAll( eLOD_FLAG_TEMP_SELECTED );
-    CLineObjectData::SetFlagOffAll( eLOD_FLAG_TEMP_ACTIVE );
-
-    // PaintObjectData
-    CPaintObjectData::SetFlagOffAll( ePOD_FLAG_TEMP_SELECTED );
-    CPaintObjectData::SetFlagOffAll( ePOD_FLAG_TEMP_ACTIVE );
-
-    // SlotObjectData
-    CSlotObjectData::SetFlagOffAll( eSOD_FLAG_TEMP_SELECTED );
-    CSlotObjectData::SetFlagOffAll( eSOD_FLAG_TEMP_ACTIVE );
-
-    // AnchorPointData
-    CAnchorPointData::SetFlagOffAll( eAPD_FLAG_TEMP_SELECTED );
-    CAnchorPointData::SetFlagOffAll( eAPD_FLAG_TEMP_ACTIVE );
-
-    // FillPointData
-    CFillPointData::SetFlagOffAll( eFPD_FLAG_TEMP_SELECTED );
-    CFillPointData::SetFlagOffAll( eFPD_FLAG_TEMP_ACTIVE );
-
-    // SlotPointData
-    CSlotPointData::SetFlagOffAll( eSPD_FLAG_TEMP_SELECTED );
-    CSlotPointData::SetFlagOffAll( eSPD_FLAG_TEMP_ACTIVE );
+//----------------------
+// ガイド登録リセット
+//----------------------
+void CBezier::ResetGuidePoint( bool isAll ){
+    if( isAll ){
+        // 全リセット
+        for( int i=0; i<eSTROKE_GUIDE_TARGET_MAX; i++ ){
+            s_nArrGuidePointNum[i] = 0;
+        }
+    }else{
+        // テンポラリだけリセット
+        for( int i=eSTROKE_GUIDE_TARGET_TEMP_START; i<=eSTROKE_GUIDE_TARGET_TEMP_END; i++ ){
+            s_nArrGuidePointNum[i] = 0;
+        }
+    }
 }
 
 //----------------------
@@ -651,11 +773,26 @@ int CBezier::Stroke( stBEZIER_ANCHOR_POINT* pHead, stBEZIER_BASE_PARAM* pParam, 
     return( time );
 }
 
-//----------------------
-// タッチの描画
-//----------------------
+//-------------------------------------
+// タッチの描画（※ストライプもここで処理する）
+//-------------------------------------
 int CBezier::Touch( stBEZIER_ANCHOR_POINT* pHead, stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam,
                     BYTE testPalGrp, bool isStripe, bool isWorkPath ){
+
+    // 指定があれば無視
+    if( IsDispOffTouch() ){
+        if( ! isStripe ){
+            return( 0 );
+        }
+    }
+
+    // 指定があれば無視
+    if( IsDispOffStripe() ){
+        if( isStripe ){
+            return( 0 );
+        }
+    }
+
     // ワークパスには対応しない
     if( isWorkPath ){
         return( 0 );
@@ -681,7 +818,7 @@ int CBezier::Touch( stBEZIER_ANCHOR_POINT* pHead, stBEZIER_BASE_PARAM* pParam, s
 
     // タッチフラグオン
     s_bTouch = true;
-    s_bStripe = isStripe;
+    s_bStripe = isStripe;   // ストライプ指定もフラグで管理
 
     //--------------------------
     // 描画：タッチ
@@ -708,6 +845,12 @@ int CBezier::Touch( stBEZIER_ANCHOR_POINT* pHead, stBEZIER_BASE_PARAM* pParam, s
 //----------------------
 int CBezier::TouchForFrill( stBEZIER_ANCHOR_POINT* pHead, stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam,
                             BYTE testPalGrp, bool isWorkPath ){
+    
+    // 指定があれば無視
+    if( IsDispOffFrill() ){
+        return( 0 );
+    }
+
     // ワークパスには対応しない
     if( isWorkPath ){
         return( 0 );
@@ -785,9 +928,6 @@ int CBezier::Fill( stBEZIER_FILL_POINT* pHead, stBEZIER_BASE_PARAM* pParam, stBE
     
     // 実処理
     DrawFill( pHead );
-
-    // 色アンチ（※タッチによる境界が指定されていれば）
-    DrawFillAntiForTouch( pHead );
     
     // 計測終了
     int time = (int)time_log_stop( eTIME_LOG_ID_BEZIER );
@@ -833,7 +973,7 @@ void CBezier::SlotForDev( stBEZIER_SLOT_POINT* pHead, stBEZIER_BASE_PARAM* pPara
         PutPlusForWorkPath( pSP->x, pSP->y, BEZIER_WP_SLOT_PAL + pSP->workPathPalOfs );
         
         // 次のポイントへ
-        pSP = (stBEZIER_SLOT_POINT*) pSP->pNext;
+        pSP = pSP->pNext;
     }
 }
 
@@ -871,281 +1011,10 @@ void CBezier::BasePointForDev( float x, float y, stBEZIER_BASE_PARAM* pParam, bo
     PutPlusForWorkPathS( x, y, BEZIER_WP_BASE_PAL + palOfs );
 }
 
-//-------------------
-// ワーククリア
-//-------------------
-void CBezier::ClearWork( void ){
-    ClearWorkSetting();
-    ClearWorkPoint();
-    ClearWorkStripePoint();
-}
-
-//-------------------
-// ワーク設定クリア
-//-------------------
-void CBezier::ClearWorkSetting( void ){
-    s_pBaseParam = NULL;
-    s_pLayerParam = NULL;
-
-    s_pBuf = NULL;
-    s_pBufFillGuide = NULL;
-    s_pBufFillGuard = NULL;
-    s_pBufTest = NULL;
-    
-    s_nBufW = s_nBufH = 0;
-
-    s_nTestPalGrp = 0x00;
-    s_nTestPalGrpForRepair = 0x00;
-    s_bTouch = false;
-    s_bStripe = false;
-    s_bFrill = false;
-    s_bWorkPath = false;
-}
-
-//-------------------
-// ワークポイントクリア
-//-------------------
-void CBezier::ClearWorkPoint( void ){
-    s_nUseDivisionPoint = 0;
-    s_nTouchStrokePointCur = 0;
-    s_nTouchStrokePointMax = 0;
-    s_nTouchStrokePointLimit = 0;
-    s_nNumStripeGuidePoint = 0;
-}
-
-//------------------------
-// ストライプ登録クリア
-//------------------------
-void CBezier::ClearWorkStripePoint( void ){
-    s_nStripePointNum = 0;
-}
-
-//-------------------------
-// ワーク設定：ストローク用
-//-------------------------
-bool CBezier::SetBufForStroke( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath ){
-    // 無効確認：データ
-    if( pParam == NULL  ){
-        LOGE( "@ CBezier::SetBufForStroke: INVALID DATA: pParam=%p, pLayerParam=%p\n", pParam, pLayerParam );
-        return( false );
-    }
-    
-    // 無効確認：バッファ
-    if( pParam->pBufLine == NULL || pParam->pBufFillGuide == NULL || pParam->pBufColor == NULL ||
-        pParam->texW <= 0 || pParam->texH <= 0 ){
-        LOGE( "@ CBezier::SetBufForStroke: INVALID PARAM: pBuf=%p, pBufFillGuide=%p, pBufColor=%p, w=%d, h=%d\n",
-              pParam->pBufLine, pParam->pBufFillGuide, pParam->pBufColor, pParam->texW, pParam->texH );
-        return( false );
-    }
-
-    s_pBaseParam = pParam;
-    s_pLayerParam = pLayerParam;
-    s_bWorkPath = isWorkPath;
-
-    s_pBuf = s_pBaseParam->pBufLine;
-    s_pBufFillGuide = s_pBaseParam->pBufFillGuide;
-    s_pBufFillGuard = s_pBaseParam->pBufFillGuard;
-    s_pBufTest = s_pBaseParam->pBufColor;
-    s_nBufW = pParam->texW;
-    s_nBufH = pParam->texH;
-    
-    return( true );
-}
-
-//-------------------------
-// ワーク設定：塗り用
-//-------------------------
-bool CBezier::SetBufForFill( stBEZIER_BASE_PARAM* pParam, stBEZIER_LAYER_PARAM* pLayerParam, bool isWorkPath ){
-    // 無効確認：データ
-    if( pParam == NULL  ){
-        LOGE( "@ CBezier::SetBufForFill: INVALID DATA: pParam=%p, pLayerParam=%p\n", pParam, pLayerParam );
-        return( false );
-    }
-    
-    // 無効確認：バッファ
-    if( pParam->pBufColor == NULL ||  pParam->pBufFillGuide == NULL || pParam->texW <= 0 || pParam->texH <= 0 ){
-        LOGE( "@ CBezier::SetBufForFill: INVALID PARAM: pBufColor=%p, pBufFillGuide=%p, w=%d, h=%d\n",
-              pParam->pBufColor, pParam->pBufFillGuide, pParam->texW, pParam->texH );
-        return( false );
-    }
-
-    s_pBaseParam = pParam;
-    s_pLayerParam = pLayerParam;
-    s_bWorkPath = isWorkPath;
-
-    s_pBuf = s_pBaseParam->pBufColor;
-    s_pBufFillGuide = s_pBaseParam->pBufFillGuide;
-    s_pBufFillGuard = s_pBaseParam->pBufFillGuard;
-    s_nBufW = s_pBaseParam->texW;
-    s_nBufH = s_pBaseParam->texH;
-    
-    // ワークパスの指定であれば出力先をメインバッファへ
-    if( s_bWorkPath ){
-        s_pBuf = s_pBaseParam->pBufLine;
-    }
-    return( true );
-}
-
-//-------------------------
-// ワーク設定：開発用
-//-------------------------
-bool CBezier::SetBufForDev( stBEZIER_BASE_PARAM* pParam ){
-    // 無効確認：データ
-    if( pParam == NULL  ){
-        LOGE( "@ CBezier::SetBufForDev: INVALID DATA: pParam=%p\n", pParam );
-        return( false );
-    }
-    
-    // 無効確認：バッファ
-    if( pParam->pBufLine == NULL || pParam->texW <= 0 || pParam->texH <= 0 ){
-        LOGE( "@ CBezier::SetBufForDev: INVALID PARAM: pBuf=%p, w=%d, h=%d\n", pParam->pBufLine, pParam->texW, pParam->texH );
-        return( false );
-    }
-
-    s_pBaseParam = pParam;
-    
-    s_pBuf = s_pBaseParam->pBufLine;
-    s_nBufW = s_pBaseParam->texW;
-    s_nBufH = s_pBaseParam->texH;
-    
-    return( true );
-}
-
-//--------------------------------------------------------------------------------------
-// 分割点の登録：指定の２ＡＰ間（※[pP1]は追加されない点に注意＝次回の始点になるので重複描画されないように）
-//--------------------------------------------------------------------------------------
-void CBezier::RegistDivisionPointList( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 ){
-    // 始点の登録
-    float strokeSize = pP0->strokeSize;
-    if( pP0->strokeStartRange > 0.0f ){
-        strokeSize = pP0->strokeStartSize;
-    }
-    AddDivisionPoint( pP0->x, pP0->y, strokeSize, true, pP0 );
-
-    //--------------------------------------------
-    // 分割点の登録（※直線であっても諸々の都合上分割する）
-    //--------------------------------------------
-    // 分割数の算出
-    int divNum = CalcDivisionNumForSegment( pP0, pP1 );
-
-    // 分割点の登録（※ここでは始点[i==0]と終点[i==divNum]は追加されない）
-    for( int i=1; i<divNum; i++ ){
-        // t, (1-t)
-        float t1 = ((float)i)/divNum;
-        float tR1 = 1.0f - t1;
-
-        // t^2, (1-t)^2
-        float t2 = t1 * t1;
-        float tR2 = tR1 * tR1;
-        
-        // t^3, (1-t)^3
-        float t3 = t2 * t1;
-        float tR3 = tR2 * tR1;
-        
-        // (1-t)^2*t, (1-t)*t^2
-        float tR2_t1 = tR2 * t1;
-        float tR1_t2 = tR1 * t2;
-
-        // 分割点座標の算出（※ベジェ曲線）
-        float x = pP0->x*tR3 + 3*(pP0->x+pP0->xOut)*tR2_t1 + 3*(pP1->x+pP1->xIn)*tR1_t2 + pP1->x*t3;
-        float y = pP0->y*tR3 + 3*(pP0->y+pP0->yOut)*tR2_t1 + 3*(pP1->y+pP1->yIn)*tR1_t2 + pP1->y*t3;
-        
-        // ストロークサイズ
-        strokeSize = pP0->strokeSize;
-        if( t1 < pP0->strokeStartRange ){
-            // 開始サイズから徐々に基本サイズへ
-            float range = t1 / pP0->strokeStartRange;
-            strokeSize = (1.0f-range)*pP0->strokeStartSize + range*pP0->strokeSize;
-        }else if( tR1 < pP0->strokeEndRange ){
-            // 基本サイズから徐々に終了サイズへ
-            float range = tR1 / pP0->strokeEndRange;
-            strokeSize = (1.0f-range)*pP0->strokeEndSize + range*pP0->strokeSize;
-        }
-        
-        // 分割点リストに登録
-        AddDivisionPoint( x, y, strokeSize, false, pP0 );
-    }
-    
-    // 終点は登録をせずに終了（※次のアンカーポイントの始点と重複するため）
-}
-
-//------------------------------------------------------------
-// 分割数取得（※曲線を何個の直線に分割するかの判定）
-// 各点間のX、Y距離の大きい要素の合計から分割数を決定
-// メモ：浮動小数の割り算の分母になる値なので返値が偶数になるようにしている
-//------------------------------------------------------------
-#define ADD_MAX_DIST_TO_SUM( _dX, _dY ) \
-    distX = (_dX);                      \
-    distY = (_dY);                      \
-    if( distX < 0 ){ distX = -distX; }  \
-    if( distY < 0 ){ distY = -distY; }  \
-    sum += (distX>distY)? distX: distY
-int CBezier::CalcDivisionNumForSegment( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 ){
-    int sum = 0;
-    int distX, distY;
-    
-    // ポイント間（直線距離）
-    ADD_MAX_DIST_TO_SUM( pP1->x-pP0->x, pP1->y-pP0->y );
-    
-    // 方向線：出発
-    ADD_MAX_DIST_TO_SUM( pP0->xOut, pP0->yOut );
-    
-    // 方向線：進入
-    ADD_MAX_DIST_TO_SUM( pP1->xIn, pP1->yIn );
-
-    // 分割数判定（※描画品質と処理負荷の兼ね合いで調整）
-    if( sum < 16 ){
-        return( (sum+1)/2 );
-    }
-    if( sum < 256 ){
-        return( 16 );
-    }
-    if( sum < 1024 ){
-        return( 32 );
-    }
-    
-    return( 64 );
-}
-
-//----------------------
-// 分割点を追加
-//----------------------
-void CBezier::AddDivisionPoint( float x, float y, float strokeSize, bool isEdgeFillCheck, stBEZIER_ANCHOR_POINT* pAP ){
-    // 用心
-    if( s_nUseDivisionPoint >= BEZIER_DIVISION_POINT_MAX ){
-        LOGE( "@ CBezier::AddDivisionPoint: BUF SHORTAGE: use=%d/%d\n", s_nUseDivisionPoint, BEZIER_DIVISION_POINT_MAX);
-        return;
-    }
-    
-    // 登録
-    stBEZIER_DIVISION_POINT *pDP = &s_stArrDivisionPoint[s_nUseDivisionPoint];
-    pDP->x0 = x;
-    pDP->y0 = y;
-    pDP->strokeSize = strokeSize;
-    pDP->isEdgeFillCheck = (isEdgeFillCheck && pAP->strokeEdgeFillSize>0.0f);
-    pDP->pAP = pAP;
-
-    //-------------------------------
-    // アングルの指定が有効であれば変換
-    //-------------------------------
-    if( pAP->angleRateLR != 0.0f || pAP->angleRateUD != 0.0f ){
-        s_pBaseParam->pAnglePlane->calcXY( &x, &y, x, y, pAP->angleSearchKey, pAP->angleRateLR, pAP->angleRateUD );
-    }
-    
-    pDP->x = x;
-    pDP->y = y;
-
-    // 要素数更新＆利用数最大数確認
-    s_nUseDivisionPoint++;
-    if( s_nUseDivisionPoint > s_nUseDivisionPointMax ){
-        s_nUseDivisionPointMax = s_nUseDivisionPoint;
-    }
-}
-
 //----------------------------------------------------------------------------
 // ２点間を線形補間で描画（※ループ内部での判定を避けるために座標計算後に状況毎の描画をしている）
 //---------------------------------------------------------------------------
-static int __stepForDotLine = 0;
+static int __stepDotLineForWorkPath = 0;
 void CBezier::PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POINT* pDP1, stBEZIER_ANCHOR_POINT* pAP ){
     // 分割点間の座標を算出して一時バッファに格納（※返値は登録された座標数）
     int point = CalcThenSetPointForTempBuf( pDP0, pDP1, pAP );
@@ -1154,10 +1023,7 @@ void CBezier::PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POI
     }
     
     // ストロークの取り出し
-    CStroke* pStroke = NULL;
-    if( pAP->type != eSTROKE_TYPE_OFF ){
-        pStroke = CStrokeMgr::GetStroke( pAP->type, pAP->size, pAP->ofsRange );
-    }
+    CStroke* pStroke = GetStrokeWithAnchorPoint( pAP );
 
     //--------------------------------------
     // ワークパス指定があればポイントの出力
@@ -1167,10 +1033,10 @@ void CBezier::PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POI
         if( pStroke == NULL ){
             int step = 8;
             for( int i=0; i<point; i++ ){
-                __stepForDotLine++;
-                if( __stepForDotLine >= step ){
+                __stepDotLineForWorkPath++;
+                if( __stepDotLineForWorkPath >= step ){
                     PutLineDotForWorkPath( (int)s_fArrTempPointX[i], (int)s_fArrTempPointY[i], BEZIER_WP_LINE_PAL + pAP->workPathPalOfsS );
-                    __stepForDotLine = 0;
+                    __stepDotLineForWorkPath = 0;
                 }
             }
         }
@@ -1181,7 +1047,7 @@ void CBezier::PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POI
             }
         }
         
-        // ワークパスはこれで終了
+        // ワークパス時はここで終了
         return;
     }
     
@@ -1190,94 +1056,101 @@ void CBezier::PutDotLinear( stBEZIER_DIVISION_POINT* pDP0, stBEZIER_DIVISION_POI
     //--------------------------------------
     // ストロークが有効なら
     if( pStroke != NULL ){
-        //--------------------------
-        // タッチ指定があれば
-        //--------------------------
-        if( s_bTouch ){
-            // ストライプ時は普通に表示（※タッチのように線の強弱はつけない）
-            if( s_bStripe ){
-                for( int i=0; i<point; i++ ){
-                    if( s_fArrTempStrokeSize[i] > 0.0f ){
-                        PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], s_fArrTempStrokeSize[i], s_nTestPalGrp, pStroke, pAP );
-                    }
-                }
-            }
-            // タッチ時は始まりから終わりにかけてストロークサイズが細くなるように（※長さにばらつきがある線であっても、終端が消える感じになるように）
-            else{
-                for( int i=0; i<point; i++ ){
-                    if( s_fArrTempStrokeSize[i] > 0.0f ){
-                        // [150%〜50%]で調整
-                        float strokeSize = s_fArrTempStrokeSize[i] * (1.5f - ((float)s_nTouchStrokePointCur)/s_nTouchStrokePointLimit);
-                        PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], strokeSize, s_nTestPalGrp, pStroke, pAP );
-                    }
-                }
+        for( int i=0; i<point; i++ ){
+            if( s_fArrTempStrokeSize[i] > 0.0f ){
+                PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], s_fArrTempStrokeSize[i], s_nTestPalGrp, pStroke, pAP );
             }
         }
-        //--------------------------
-        // 通常ストローク
-        //--------------------------
-        else{
+        
+        // ライン修復指定があれば線の引き直し
+        //（※BDP間で線を描く際、先行するBDPの線のエッジに色が塗られてしまうことで線の継ぎ目が欠けたようになるため、指定の塗り色を対象に線を引き直す）
+        if( pAP->bLineRepairTest && s_nTestPalGrpForRepair != s_nTestPalGrp ){
             for( int i=0; i<point; i++ ){
                 if( s_fArrTempStrokeSize[i] > 0.0f ){
-                    PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], s_fArrTempStrokeSize[i], s_nTestPalGrp, pStroke, pAP );
-                }
-            }
-            
-            // ライン修復指定があれば線の引き直し
-            //（※BDP間で線を描く際、先行するBDPの線のエッジに色が塗られてしまうことで線の継ぎ目が欠けたようになるため、指定の塗り色を対象に線を引き直す）
-            if( pAP->bLineRepairTest && s_nTestPalGrpForRepair != s_nTestPalGrp ){
-                for( int i=0; i<point; i++ ){
-                    if( s_fArrTempStrokeSize[i] > 0.0f ){
-                        PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], s_fArrTempStrokeSize[i], s_nTestPalGrpForRepair, pStroke, pAP );
-                    }
+                    PutDotAt( s_fArrTempPointX[i], s_fArrTempPointY[i], s_fArrTempStrokeSize[i], s_nTestPalGrpForRepair, pStroke, pAP );
                 }
             }
         }
     }
 
     // 非タッチストロークにタッチ対象指定があればポイントの登録
-    if( !s_bTouch && pAP->touchTarget != eSTROKE_TOUCH_TARGET_INVALID ){
-        int target = pAP->touchTarget;
+    if( !s_bTouch && IS_STROKE_TOUCH_TARGET_VALID( pAP->touchTarget ) ){
+        eSTROKE_TOUCH_TARGET target = pAP->touchTarget;
         
-        // 用心（※枠が不足していたら困る）
+        // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
         if( (s_nArrTouchPointNum[target]+point) > BEZIER_TOUCH_POINT_MAX ){
-            LOGE( "@ CBezier::PutDotLinear: TOUCH BUF SHORTAGE: touchNum[%d]=(%d+%d) > %d\n",
+            LOGE( "@ CBezier::PutDotLinear: TOUCH POINT BUF SHORTAGE: use[%d]=(%d+%d)/%d\n",
                   target, s_nArrTouchPointNum[target], point, BEZIER_TOUCH_POINT_MAX );
             return;
         }
 
-        // ポイント（※傾き適用前後の両方を保持)
+        // タッチバッファへ出力（傾き適用前後の両方の値）
         memcpy( &s_fArrArrTouchPointX[target][s_nArrTouchPointNum[target]], s_fArrTempPointX, point*sizeof(float) );
         memcpy( &s_fArrArrTouchPointY[target][s_nArrTouchPointNum[target]], s_fArrTempPointY, point*sizeof(float) );
         memcpy( &s_fArrArrTouchPointX0[target][s_nArrTouchPointNum[target]], s_fArrTempPointX0, point*sizeof(float) );
         memcpy( &s_fArrArrTouchPointY0[target][s_nArrTouchPointNum[target]], s_fArrTempPointY0, point*sizeof(float) );
         s_nArrTouchPointNum[target] += point;
+        
+#ifdef BEZIER_USE_NUM_CHECK
+        if( s_nArrTouchPointNum[target] > s_nUseTouchPointMax ){
+            s_nUseTouchPointMax = s_nArrTouchPointNum[target];
+        }
+#endif
     }
     
-    // タッチでなければガイド出力（※ストライプ時も出力縞模様を塗りつぶせるように）
-    if( (!s_bTouch || s_bStripe) && ! pAP->bNoFillGuide ){
-        // 下地色を１ピクセルで出力
-        for( int i=0; i<point; i++ ){
-            int at = s_nBufW*((int)s_fArrTempPointY[i]) + ((int)s_fArrTempPointX[i]);
-            s_pBufFillGuide[at] = BEZIER_PAL_UNDERCOAT_COL;
-        }
+    // タッチでなければガイド出力（※ストライプ時は許可する＝ストローク後の領域を塗りつぶせるように）
+    if( (!s_bTouch || s_bStripe) && !pAP->bNoFillGuide ){
+        // ガイド対象が有効であれば
+        if( IS_STROKE_GUIDE_TARGET_VALID( pAP->guideTarget ) ){
+            eSTROKE_GUIDE_TARGET target = pAP->guideTarget;
 
-        // ストライプ時はガイド値を保持
-        if( s_bStripe ){
-            // 用心（※ガイド登録枠が足りないのは困る）
-            if( (s_nNumStripeGuidePoint+point) > BEZIER_STRIPE_GUIDE_POINT_MAX ){
-                LOGE( "@ CBezier::PutDotLinear: GUIDE BUF SHORTAGE: stripeGuidePoint=(%d+%d) > %d\n",
-                       s_nNumStripeGuidePoint, point, BEZIER_STRIPE_GUIDE_POINT_MAX );
+            // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
+            if( (s_nArrGuidePointNum[target]+point) > BEZIER_GUIDE_POINT_MAX ){
+                LOGE( "@ CBezier::PutDotLinear: GUIDE POINT BUF SHORTAGE: use[%d]=(%d+%d)/%d\n",
+                      target, s_nArrGuidePointNum[target], point, BEZIER_GUIDE_POINT_MAX );
                 return;
             }
 
-            // 塗りつぶし座標の検出用にガイドへ出力した値を保持しておく（※ストライプは頻繁に呼ばれる処理ではないので上のループとは別に処理しておく）
+            // ガイドバッファへ出力（傾き適用後の値のみ）
+            memcpy( &s_fArrArrGuidePointX[target][s_nArrGuidePointNum[target]], s_fArrTempPointX, point*sizeof(float) );
+            memcpy( &s_fArrArrGuidePointY[target][s_nArrGuidePointNum[target]], s_fArrTempPointY, point*sizeof(float) );
+            s_nArrGuidePointNum[target] += point;
+            
+#ifdef BEZIER_USE_NUM_CHECK
+            if( s_nArrGuidePointNum[target] > s_nUseGuidePointMax ){
+                s_nUseGuidePointMax = s_nArrGuidePointNum[target];
+            }
+#endif
+        }
+        // ガイド対象が無効であれば
+        else{
+            // 塗りガイドに下塗り色を出力
             for( int i=0; i<point; i++ ){
-                s_nArrStripeGuidePointX[s_nNumStripeGuidePoint] = (int)s_fArrTempPointX[i];
-                s_nArrStripeGuidePointY[s_nNumStripeGuidePoint] = (int)s_fArrTempPointY[i];
-                s_nNumStripeGuidePoint++;
+                int at = s_nBufW*((int)s_fArrTempPointY[i]) + ((int)s_fArrTempPointX[i]);
+                SET_BFG_UNDERCOAT_COL( s_pBufFillGuide[at] );
             }
         }
+    }
+
+    // ストライプ時はガイド値を保持
+    if( s_bStripe ){
+        // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
+        if( (s_nNumStripeGuidePoint+point) > BEZIER_STRIPE_GUIDE_POINT_MAX ){
+            LOGE( "@ CBezier::PutDotLinear: STRIPE GUIDE POINT BUF SHORTAGE: use=(%d+%d)/%d\n",
+                  s_nNumStripeGuidePoint, point, BEZIER_STRIPE_GUIDE_POINT_MAX );
+            return;
+        }
+
+        // ストライプガイドバッファへ出力（傾き適用後の値のみ）
+        memcpy( &s_fArrStripeGuidePointX[s_nNumStripeGuidePoint], s_fArrTempPointX, point*sizeof(float) );
+        memcpy( &s_fArrStripeGuidePointY[s_nNumStripeGuidePoint], s_fArrTempPointY, point*sizeof(float) );
+        s_nNumStripeGuidePoint += point;
+
+#ifdef BEZIER_USE_NUM_CHECK
+        if( s_nNumStripeGuidePoint > s_nUseStripeGuidePointMax ){
+            s_nUseStripeGuidePointMax = s_nNumStripeGuidePoint;
+        }
+#endif
     }
 }
 
@@ -1288,9 +1161,9 @@ int CBezier::CalcThenSetPointForTempBuf( stBEZIER_DIVISION_POINT* pDP0, stBEZIER
     // ポイント数の算出
     int point = CalcPointNum( pDP0->x, pDP0->y, pDP1->x, pDP1->y );
     
-    // 用心（※座標登録枠が足りない場合は困る）
-    if( point > BEZIER_TEMP_POINT_MAX ){
-        LOGE( "@ CBezier::CalcThenSetPointForTempBuf: TEMP BUF SHORTAGE: point=%d > %d\n", point, BEZIER_TEMP_POINT_MAX );
+    // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
+    if( point >= BEZIER_TEMP_POINT_MAX ){
+        LOGE( "@ CBezier::CalcThenSetPointForTempBuf: TEMP POINT BUF SHORTAGE: use=%d/%d\n", point, BEZIER_TEMP_POINT_MAX);
         return( -1 );
     }
     
@@ -1311,7 +1184,7 @@ int CBezier::CalcThenSetPointForTempBuf( stBEZIER_DIVISION_POINT* pDP0, stBEZIER
     
     // 透明ストローク例外（※次のＡＰが透明であれば終点も登録しておく＝これがないと１ドット欠けた印象になってしまう）
     if( pAP->pNext != NULL ){
-        stBEZIER_ANCHOR_POINT* pNextAP = (stBEZIER_ANCHOR_POINT*)pAP->pNext;
+        stBEZIER_ANCHOR_POINT* pNextAP = pAP->pNext;
         if( pNextAP->type == eSTROKE_TYPE_OFF ){
             s_fArrTempPointX[point] = pDP1->x;
             s_fArrTempPointY[point] = pDP1->y;
@@ -1321,6 +1194,12 @@ int CBezier::CalcThenSetPointForTempBuf( stBEZIER_DIVISION_POINT* pDP0, stBEZIER
             point++;
         }
     }
+    
+#ifdef BEZIER_USE_NUM_CHECK
+    if( point > s_nUseTempPointMax ){
+        s_nUseTempPointMax = point;
+    }
+#endif
 
     return( point );
 }
@@ -1348,12 +1227,19 @@ int CBezier::CalcPointNum( float x0, float y0, float x1, float y1 ){
 // ドットを置く
 //-------------------
 void CBezier::PutDotAt( float x0, float y0, float strokeSize, BYTE testPalGrp, CStroke* pStroke, stBEZIER_ANCHOR_POINT* pAP ){
-    // タッチストローク時に制限値に達していたら無視
-    if( s_bTouch && ! s_bStripe ){
-        if( s_nTouchStrokePointCur >= s_nTouchStrokePointLimit ){
+    // ストローク制限指定があれば
+    if( s_nSkipStrokePointMax > 0 ){
+        s_nSkipStrokePointCur++;
+
+        // 先頭の制限を抜け出せなければ無視
+        if( s_nSkipStrokePointCur <= s_nSkipStrokePointLimitForHead ){
             return;
         }
-        s_nTouchStrokePointCur++;
+        
+        // 末尾の制限に達したら無視
+        if( s_nSkipStrokePointCur > s_nSkipStrokePointLimitForTail ){
+            return;
+        }
     }
 
 #if 0
@@ -1398,51 +1284,157 @@ void CBezier::PutDotAt( float x0, float y0, float strokeSize, BYTE testPalGrp, C
     int iX = iX0 + pCell->ofsX; // １ピクセルを超えるオフセットの適用
     int iY = iY0 + pCell->ofsY; // １ピクセルを超えるオフセットの適用
 
-    // 画素の出力
-    for( int i=0; i<h; i++ ){
-        for( int j=0; j<w; j++ ){
-            int dotAt = w*i + j;
-            int bufAt = s_nBufW*(iY+i) + (iX+j);
-            
-            //------------------------------------------------------------------------------------------------------
-            // ストローク値が有効であれば ＆ 出力に意味があれば（※基本的に不透明になった時点で画素は確定）
-            //（※[isDotPutWhetherMax]の指定によりすでに出力された濃い色を薄めることができる＝黒地に黒を引いた時の境界を浮き出させる等）
-            //------------------------------------------------------------------------------------------------------
-            if( pDot[dotAt] > 0x00 && (pAP->isDotPutWhetherMax || s_pBuf[bufAt] < pAP->dotPutMax) ){
-                bool checkResult;
-                if( pAP->isDotPutOnOut ){
-                    // 直近に出力した領域へのみ描き込み可能（※ガードされていたら不可）
-                    checkResult = ((s_pBufFillGuide[bufAt]&BEZIER_PAL_UNDERCOAT_FILL_OUT_FLAG)!=0x00) && (s_pBufFillGuard[bufAt]==0);
-                }else{
-                    // 未出力領域へのみ描き込み可能（※ガードされていたら不可）
-                    checkResult = ((s_pBufFillGuide[bufAt]&BEZIER_PAL_UNDERCOAT_FILL_DONE_FLAG)==0x00) && (s_pBufFillGuard[bufAt]==0);
-                }
+    //============================================================================
+    // 消去ストローク（※減算）
+    //============================================================================
+    if( pAP->isDotErase ){
+        // 画素の出力
+        for( int i=0; i<h; i++ ){
+            for( int j=0; j<w; j++ ){
+                int dotAt = w*i + j;
+                int bufAt = s_nBufW*(iY+i) + (iX+j);
+                
+                //-----------------------------------------------------------------------
+                // ストローク値が有効であれば ＆ 消去に意味があれば（※アルファがなければ消去の意味はない）
+                //-----------------------------------------------------------------------
+                if( pDot[dotAt] > 0x00 && s_pBuf[bufAt] > 0x00 && s_pBufFillGuard[bufAt] == 0 ){
+                    bool checkResult;
+                    if( pAP->isDotPutForce ){
+                        checkResult = true;
+                    }else if( pAP->isDotPutOnOutCol ){
+                        // 出力色の上なら書き込む
+                        checkResult = IS_BFG_OUT_COL( s_pBufFillGuide[bufAt] );
+                    }else{
+                        // パレットテストに通れば書き込む
+                        checkResult = (BP_CONV_DOT_TO_PAL_GRP(s_pBufTest[bufAt]) == testPalGrp);
+                    }
 
-                //------------------
-                // テストに通過したら
-                //------------------
-                if( (checkResult&&BEZIER_CONV_DOT_TO_PAL_GRP(s_pBufTest[bufAt])==testPalGrp) || pAP->isDotPutForce ){
-                    //---------------------------------------------
-                    // 出力値の算出：[dotPutRateBase]で出力の強さの調整
-                    //---------------------------------------------
-                    int val = (0xFF*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
-                    val = (val*pAP->dotPutRateBase)/100;
+                    //------------------
+                    // テストに通過したら
+                    //------------------
+                    if( checkResult ){
+                        //---------------------------------------------
+                        // 出力値の算出：[dotPutRateBase]で出力の強さの調整
+                        //---------------------------------------------
+                        int val = (0xFF*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+                        val = (val*pAP->dotPutRateBase)/100;
 
-                    //--------------------------------------------------------------------------------------
-                    // 色味の減算（※ここは単純な引き算）
-                    //--------------------------------------------------------------------------------------
-                    if( pAP->isDotErase ){
-                        // 消去時は単純に引き算
+                        //---------------------------------------------
+                        // 色味の減算（※ここは単純な引き算）
+                        //---------------------------------------------
                         if( val >= s_pBuf[bufAt] ){
                             s_pBuf[bufAt] = 0;
                         }else{
                             s_pBuf[bufAt] -= val;
                         }
+                        
+                        // ストロークバッファの利用状況更新は不要（※画素が増えていないので）
                     }
-                    //--------------------------------------------------------------------------------------
-                    // 色味の加算（※濃い方に薄い方を足すイメージ）：[dotPutRateStrong/dotPutRateWeak]で重ね合わせの調整
-                    //--------------------------------------------------------------------------------------
-                    else{
+                }
+            }
+        }
+    }
+#if 1
+    //============================================================================
+    // 固定ストローク（※加算）
+    //============================================================================
+    // 基本的な設定の場合は処理を浮かせられるのでここで分岐させる
+    else if( !pAP->isDotPutWhetherMax && !pAP->isDotPutForce &&
+             pAP->dotPutRateBase >= 100 && pAP->dotPutRateStrong >= 100 && pAP->dotPutRateWeak >= 100 ){
+        // さらに分岐：出力領域への書き込み
+        if( pAP->isDotPutOnOutCol ){
+            // 画素の出力
+            for( int i=0; i<h; i++ ){
+                for( int j=0; j<w; j++ ){
+                    int dotAt = w*i + j;
+                    int bufAt = s_nBufW*(iY+i) + (iX+j);
+                    
+                    // ストローク値が有効であれば ＆ 出力に意味があれば ＆ ガードされていなければ
+                    if( pDot[dotAt] > 0x00 && s_pBuf[bufAt] < pAP->dotPutMax && s_pBufFillGuard[bufAt] == 0 ){
+                        // 出力色の上なら書き込む
+                        if( IS_BFG_OUT_COL( s_pBufFillGuide[bufAt] ) ){
+                            // 出力値の算出
+                            int val = s_pBuf[bufAt] + (0xFF*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+
+                            // 線バッファへ出力
+                            if( val >= pAP->dotPutMax ){
+                                s_pBuf[bufAt] = (BYTE)pAP->dotPutMax;
+                            }else{
+                                s_pBuf[bufAt] = (BYTE)val;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // 未出力領域への書き込み
+        else{
+            // 画素の出力
+            for( int i=0; i<h; i++ ){
+                for( int j=0; j<w; j++ ){
+                    int dotAt = w*i + j;
+                    int bufAt = s_nBufW*(iY+i) + (iX+j);
+                    
+                    // ストローク値が有効であれば ＆ 出力に意味があれば ＆ ガードされていなければ
+                    if( pDot[dotAt] > 0x00 && s_pBuf[bufAt] < pAP->dotPutMax && s_pBufFillGuard[bufAt] == 0 ){
+                        // パレットテストに通れば出力
+                        if( BP_CONV_DOT_TO_PAL_GRP(s_pBufTest[bufAt]) == testPalGrp ){
+                            // 出力値の算出
+                            int val = s_pBuf[bufAt] + (0xFF*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+
+                            // 線バッファへ出力
+                            if( val >= pAP->dotPutMax ){
+                                s_pBuf[bufAt] = (BYTE)pAP->dotPutMax;
+                            }else{
+                                s_pBuf[bufAt] = (BYTE)val;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+#endif
+    //============================================================================
+    // 変動ストローク（※加算）
+    //============================================================================
+    // ここまできたら変動するパラメータの影響をうける
+    else{
+        // 画素の出力
+        for( int i=0; i<h; i++ ){
+            for( int j=0; j<w; j++ ){
+                int dotAt = w*i + j;
+                int bufAt = s_nBufW*(iY+i) + (iX+j);
+                
+                //------------------------------------------------------------------------------------------------------
+                // ストローク値が有効であれば ＆ 出力に意味があれば（※基本的に不透明になった時点で画素は確定）
+                //（※[isDotPutWhetherMax]の指定によりすでに出力された濃い色を薄めることができる＝黒地に黒を引いた時の境界を浮き出させる等）
+                //------------------------------------------------------------------------------------------------------
+                if( pDot[dotAt] > 0x00 && (pAP->isDotPutWhetherMax || s_pBuf[bufAt] < pAP->dotPutMax) && s_pBufFillGuard[bufAt] == 0 ){
+                    bool checkResult;
+                    if( pAP->isDotPutForce ){
+                        checkResult = true;
+                    }else if( pAP->isDotPutOnOutCol ){
+                        // 出力色の上なら書き込む
+                        checkResult = IS_BFG_OUT_COL( s_pBufFillGuide[bufAt] );
+                    }else{
+                        // パレットテストに通れば書き込む
+                        checkResult = (BP_CONV_DOT_TO_PAL_GRP(s_pBufTest[bufAt]) == testPalGrp);
+                    }
+
+                    //------------------
+                    // テストに通過したら
+                    //------------------
+                    if( checkResult ){
+                        //---------------------------------------------
+                        // 出力値の算出：[dotPutRateBase]で出力の強さの調整
+                        //---------------------------------------------
+                        int val = (0xFF*pDot[dotAt]) / STROKE_DOT_OUT_PRECISION_MAX;
+                        val = (val*pAP->dotPutRateBase)/100;
+
+                        //--------------------------------------------------------------------------------------
+                        // 色味の加算（※濃い方に薄い方を足すイメージ）：[dotPutRateStrong/dotPutRateWeak]で重ね合わせの調整
+                        //--------------------------------------------------------------------------------------
                         int temp;
                         if( val > s_pBuf[bufAt] ){
                             temp = (val*pAP->dotPutRateStrong + s_pBuf[bufAt]*pAP->dotPutRateWeak)/100;
@@ -1450,26 +1442,219 @@ void CBezier::PutDotAt( float x0, float y0, float strokeSize, BYTE testPalGrp, C
                             temp = (s_pBuf[bufAt]*pAP->dotPutRateStrong + val*pAP->dotPutRateWeak)/100;
                         }
 
-                        // ストロークバッファへ出力
+                        // 線バッファへ出力
                         if( temp >= pAP->dotPutMax ){
                             s_pBuf[bufAt] = (BYTE)pAP->dotPutMax;
                         }else{
                             s_pBuf[bufAt] = (BYTE)temp;
                         }
                     }
-                    
-                    // ストロークバッファの利用状況更新
-                    UpdateStrokeBufInfo( iX+j, iY+i );
                 }
             }
         }
     }
+    
+    // ベジェに対して新たに線が描かれたであろう領域を通知（※厳密ではないが全ての出力で判定はしたくないので）
+    CBmpGenerator::UpdateLineBufInfo( iX, iY );        // 左上
+    CBmpGenerator::UpdateLineBufInfo( iX+w, iY+h );    // 右下
 }
 
-//--------------------------------------
+//--------------------------------------------------------------------------------------
+// 分割点の登録：指定の２ＡＰ間（※[pP1]は追加されない点に注意＝次回の始点になるので重複描画されないように）
+//--------------------------------------------------------------------------------------
+void CBezier::RegistDivisionPointList( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 ){
+    // 始点の登録（※開始点なのでエッジ埋め指定あり）
+    float strokeSize = pP0->strokeSize * pP0->strokeStartSize;
+    AddDivisionPoint( pP0->x, pP0->y, strokeSize, true, pP0 );
+
+    //--------------------------------------------
+    // 分割点の登録（※直線であっても諸々の都合上分割する）
+    //--------------------------------------------
+    // 分割数の算出
+    int divNum = CalcDivisionNumForSegment( pP0, pP1 );
+
+    // 分割点の登録（※ここでは始点[i==0]と終点[i==divNum]は追加されない）
+    for( int i=1; i<divNum; i++ ){
+        // t, (1-t)
+        float t1 = ((float)i)/divNum;
+        float tR1 = 1.0f - t1;
+
+        // t^2, (1-t)^2
+        float t2 = t1 * t1;
+        float tR2 = tR1 * tR1;
+        
+        // t^3, (1-t)^3
+        float t3 = t2 * t1;
+        float tR3 = tR2 * tR1;
+        
+        // (1-t)^2*t, (1-t)*t^2
+        float tR2_t1 = tR2 * t1;
+        float tR1_t2 = tR1 * t2;
+
+        // 分割点座標の算出（※ベジェ曲線）
+        float x = pP0->x*tR3 + 3*(pP0->x+pP0->xOut)*tR2_t1 + 3*(pP1->x+pP1->xIn)*tR1_t2 + pP1->x*t3;
+        float y = pP0->y*tR3 + 3*(pP0->y+pP0->yOut)*tR2_t1 + 3*(pP1->y+pP1->yIn)*tR1_t2 + pP1->y*t3;
+        
+        // ストロークサイズ
+        strokeSize = pP0->strokeSize;
+        
+        // レンジ指定が共に０なら
+        if( pP0->strokeStartRange <= 0 && pP0->strokeEndRange <= 0 ){
+            strokeSize *= (1.0f-t1)*pP0->strokeStartSize + t1*pP0->strokeEndSize;
+        }
+        // 開始レンジが有効なら
+        else if( t1 < pP0->strokeStartRange ){
+            // 開始サイズから徐々に基本サイズへ
+            float range = t1 / pP0->strokeStartRange;
+            strokeSize *= (1.0f-range)*pP0->strokeStartSize + range;
+        }
+        // 終了レンジが有効なら
+        else if( tR1 < pP0->strokeEndRange ){
+            // 基本サイズから徐々に終了サイズへ
+            float range = tR1 / pP0->strokeEndRange;
+            strokeSize *= (1.0f-range)*pP0->strokeEndSize + range;
+        }
+        
+        // 分割点リストに登録（※各分割点はエッジ埋め指定は不要）
+        AddDivisionPoint( x, y, strokeSize, false, pP0 );
+    }
+    
+    // 終点は登録をせずに終了（※次のアンカーポイントの始点と重複するため）
+}
+
+//------------------------------------------------------------
+// 分割数取得（※曲線を何個の直線に分割するかの判定）
+// 各点間のX、Y距離の大きい要素の合計から分割数を決定
+// メモ：浮動小数の割り算の分母になる値なので返値が偶数になるようにしている
+//------------------------------------------------------------
+#define ADD_MAX_DIST_TO_SUM( _dX, _dY ) \
+    distX = (_dX);                      \
+    distY = (_dY);                      \
+    if( distX < 0 ){ distX = -distX; }  \
+    if( distY < 0 ){ distY = -distY; }  \
+    sum += (distX>distY)? distX: distY
+int CBezier::CalcDivisionNumForSegment( stBEZIER_ANCHOR_POINT* pP0, stBEZIER_ANCHOR_POINT* pP1 ){
+    int sum = 0;
+    int distX, distY;
+    
+    // ポイント間（直線距離）
+    ADD_MAX_DIST_TO_SUM( pP1->x-pP0->x, pP1->y-pP0->y );
+    
+    // 方向線：出発
+    ADD_MAX_DIST_TO_SUM( pP0->xOut, pP0->yOut );
+    
+    // 方向線：進入
+    ADD_MAX_DIST_TO_SUM( pP1->xIn, pP1->yIn );
+
+    // 分割数判定（※描画品質と処理負荷の兼ね合いで調整）
+    if( sum < 16 ){
+        return( (sum+1)/2 );
+    }
+    if( sum < 256 ){
+        return( 16 );
+    }
+    if( sum < 1024 ){
+        return( 32 );
+    }
+    
+    return( 64 );
+}
+
+//---------------------------
+// 分割点を追加
+//---------------------------
+void CBezier::AddDivisionPoint( float x, float y, float strokeSize, bool isEdgeFillCheck, stBEZIER_ANCHOR_POINT* pAP ){
+    // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
+    if( s_nUseDivisionPoint >= BEZIER_DIVISION_POINT_MAX ){
+        LOGE( "@ CBezier::AddDivisionPoint: DIV POINT BUF SHORTAGE: use=%d/%d\n", s_nUseDivisionPoint, BEZIER_DIVISION_POINT_MAX);
+        return;
+    }
+    
+    // 登録枠の確保
+    stBEZIER_DIVISION_POINT *pDP = &s_stArrDivisionPoint[s_nUseDivisionPoint];
+
+    // 傾き前の座標（※計算で利用する）
+    pDP->x0 = x;
+    pDP->y0 = y;
+
+    //-----------------------------------------------
+    // アングルの指定が有効であれば変換（※分割点の座標を傾ける）
+    //-----------------------------------------------
+    if( pAP->angleRateLR != 0.0f || pAP->angleRateUD != 0.0f ){
+        s_pBaseParam->pAnglePlane->calcXY( &x, &y, x, y, pAP->angleSearchKey, pAP->angleRateLR, pAP->angleRateUD );
+    }
+
+    // 傾き後の座標（※実描画座標）
+    pDP->x = x;
+    pDP->y = y;
+
+    pDP->strokeSize = strokeSize;
+    pDP->pAP = pAP;
+    
+    // エッジ塗り確認要求の設定（※自身と一つ手前のストロークが共に有効である必要がある）
+    pDP->isEdgeFillCheck = false;
+    if( isEdgeFillCheck && pAP->strokeEdgeFillSize > 0.0f ){
+        if( GetStrokeWithAnchorPoint( pAP ) != NULL && GetStrokeWithAnchorPoint( pAP->pPrev ) != NULL ){
+            pDP->isEdgeFillCheck = true;
+        }
+    }
+
+    // 登録枠数更新
+    s_nUseDivisionPoint++;
+    
+#ifdef BEZIER_USE_NUM_CHECK
+    if( s_nUseDivisionPoint > s_nUseDivisionPointMax ){
+        s_nUseDivisionPointMax = s_nUseDivisionPoint;
+    }
+#endif
+}
+
+//---------------------------
+// タッチポイントの反転
+//---------------------------
+void CBezier::ReverseTouchPoint( eSTROKE_TOUCH_TARGET targetTouchId, int atFrom, int atTo ){
+    // 範囲が有効であれば
+    if( atTo > atFrom ){
+        float temp;
+        float* arrX = s_fArrArrTouchPointX[targetTouchId];
+        float* arrY = s_fArrArrTouchPointY[targetTouchId];
+        float* arrX0 = s_fArrArrTouchPointX0[targetTouchId];
+        float* arrY0 = s_fArrArrTouchPointY0[targetTouchId];
+
+        int numSwap = ((atTo+1)-atFrom)/2;
+        while( numSwap > 0 ){
+            // Ｘ座標スワップ
+            temp = arrX[atTo];
+            arrX[atTo] = arrX[atFrom];
+            arrX[atFrom] = temp;
+            
+            // Ｙ座標スワップ
+            temp = arrY[atTo];
+            arrY[atTo] = arrY[atFrom];
+            arrY[atFrom] = temp;
+
+            // Ｘ座標（傾き前）スワップ
+            temp = arrX0[atTo];
+            arrX0[atTo] = arrX0[atFrom];
+            arrX0[atFrom] = temp;
+            
+            // Ｙ座標（傾き前）スワップ
+            temp = arrY0[atTo];
+            arrY0[atTo] = arrY0[atFrom];
+            arrY0[atFrom] = temp;
+
+            // 値の更新
+            numSwap--;
+            atFrom++;
+            atTo--;
+        }
+    }
+}
+
+//---------------------------
 // フックの登録／設定
-//--------------------------------------
-void CBezier::resolveHookPoint( stBEZIER_ANCHOR_POINT* pBAP ){
+//---------------------------
+void CBezier::ResolveHookPoint( stBEZIER_ANCHOR_POINT* pBAP ){
     //--------------------------------------
     // システムフックが有効であれば
     //--------------------------------------
@@ -1513,17 +1698,24 @@ void CBezier::resolveHookPoint( stBEZIER_ANCHOR_POINT* pBAP ){
 }
 
 //---------------------------
-// ストライプポイントの追加
+// ストライプ塗りポイントの追加
 //---------------------------
 void CBezier::AddStripePoint( BYTE palOfsGrp, float x, float y ){
-    // 用心
+    // 登録枠の確認（※このエラーがでたら登録枠数を増やすこと）
     if( s_nStripePointNum >= BEZIER_STRIPE_POINT_MAX ){
-        LOGE( "@ CBezier::AddStripePoint: BUF SHORTAGE: num=%d >= %d\n", s_nStripePointNum, BEZIER_STRIPE_POINT_MAX );
+        LOGE( "@ CBezier::AddStripePoint: STRIPE POINT BUF SHORTAGE: use=%d/%d\n", s_nStripePointNum, BEZIER_STRIPE_POINT_MAX );
         return;
     }
+
     
     s_nArrStripePalGrp[s_nStripePointNum] = palOfsGrp;
     s_fArrStripePointX[s_nStripePointNum] = x;
     s_fArrStripePointY[s_nStripePointNum] = y;
     s_nStripePointNum++;
+    
+#ifdef BEZIER_USE_NUM_CHECK
+    if( s_nStripePointNum > s_nUseStripePointMax ){
+        s_nUseStripePointMax = s_nStripePointNum;
+    }
+#endif
 }
