@@ -135,8 +135,6 @@
 		E7C34BB920B415D400F7BDF5 /* Mover.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BB120B415D300F7BDF5 /* Mover.cpp */; };
 		E7C34BBA20B415D400F7BDF5 /* Drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BB220B415D300F7BDF5 /* Drawer.cpp */; };
 		E7C34BBC20B415D400F7BDF5 /* Spring.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BB520B415D400F7BDF5 /* Spring.cpp */; };
-		E7D34AE9247176CC00989B28 /* FontCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34AE2247176CB00989B28 /* FontCheckLoop.cpp */; };
-		E7D34AEC247176CC00989B28 /* DrawCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34AE5247176CB00989B28 /* DrawCheckLoop.cpp */; };
 		E7D34B15247177B200989B28 /* BrushCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B06247177B100989B28 /* BrushCheckLoop.cpp */; };
 		E7D34B17247177B200989B28 /* StrokeCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B08247177B100989B28 /* StrokeCheckLoop.cpp */; };
 		E7D34B18247177B200989B28 /* BezierTestLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B09247177B200989B28 /* BezierTestLoop.cpp */; };
@@ -468,10 +466,6 @@
 		E7C34BB220B415D300F7BDF5 /* Drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Drawer.cpp; sourceTree = "<group>"; };
 		E7C34BB420B415D300F7BDF5 /* Fade.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Fade.hpp; sourceTree = "<group>"; };
 		E7C34BB520B415D400F7BDF5 /* Spring.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spring.cpp; sourceTree = "<group>"; };
-		E7D34AE1247176CB00989B28 /* DrawCheckLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DrawCheckLoop.hpp; sourceTree = "<group>"; };
-		E7D34AE2247176CB00989B28 /* FontCheckLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontCheckLoop.cpp; sourceTree = "<group>"; };
-		E7D34AE5247176CB00989B28 /* DrawCheckLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawCheckLoop.cpp; sourceTree = "<group>"; };
-		E7D34AE6247176CC00989B28 /* FontCheckLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FontCheckLoop.hpp; sourceTree = "<group>"; };
 		E7D34B03247177B100989B28 /* BezierTestLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierTestLoop.hpp; sourceTree = "<group>"; };
 		E7D34B04247177B100989B28 /* StrokeCheckLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeCheckLoop.hpp; sourceTree = "<group>"; };
 		E7D34B06247177B100989B28 /* BrushCheckLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BrushCheckLoop.cpp; sourceTree = "<group>"; };
@@ -1091,17 +1085,6 @@
 			path = obj;
 			sourceTree = "<group>";
 		};
-		E7D34ADF2471766B00989B28 /* system */ = {
-			isa = PBXGroup;
-			children = (
-				E7D34AE1247176CB00989B28 /* DrawCheckLoop.hpp */,
-				E7D34AE5247176CB00989B28 /* DrawCheckLoop.cpp */,
-				E7D34AE6247176CC00989B28 /* FontCheckLoop.hpp */,
-				E7D34AE2247176CB00989B28 /* FontCheckLoop.cpp */,
-			);
-			path = system;
-			sourceTree = "<group>";
-		};
 		E7D34AFC2471777E00989B28 /* bezier */ = {
 			isa = PBXGroup;
 			children = (
@@ -1167,7 +1150,6 @@
 		FEC55D5A1D507BC90000DFA5 /* loop */ = {
 			isa = PBXGroup;
 			children = (
-				E7D34ADF2471766B00989B28 /* system */,
 				E7D34AFC2471777E00989B28 /* bezier */,
 				FE48E04E1DA9D57F00A20945 /* DebugMenuLoop.hpp */,
 				FE48E04D1DA9D57F00A20945 /* DebugMenuLoop.cpp */,
@@ -1488,7 +1470,6 @@
 				E738234B21D1310D0049F3BB /* BmpGeneratorForOrder.cpp in Sources */,
 				E762C90E20C0EE6E00678C67 /* Fill.cpp in Sources */,
 				E7D34B17247177B200989B28 /* StrokeCheckLoop.cpp in Sources */,
-				E7D34AEC247176CC00989B28 /* DrawCheckLoop.cpp in Sources */,
 				E77451E520B5052000429BBD /* Const.cpp in Sources */,
 				E76FA29520B4F04900377936 /* ImgMgr.cpp in Sources */,
 				E795BB3E24F5813A007C38B4 /* BezierForSub.cpp in Sources */,
@@ -1601,7 +1582,6 @@
 				E76FA28520B4EF9700377936 /* FrameBufferMgr.cpp in Sources */,
 				FEC55EFD1D507BC90000DFA5 /* List.cpp in Sources */,
 				FEC55F091D507BC90000DFA5 /* util_encrypt.cpp in Sources */,
-				E7D34AE9247176CC00989B28 /* FontCheckLoop.cpp in Sources */,
 				E755397C22F5D73C006820E2 /* CsvCell.cpp in Sources */,
 				FEC55F011D507BC90000DFA5 /* FileMgr.cpp in Sources */,
 				E744247420B4058100B0169E /* TouchNode.cpp in Sources */,
