@@ -137,10 +137,6 @@ enum eLOOP_ID{
     
     eLOOP_ID_DEBUG_MENU,
 
-    // system
-    eLOOP_ID_DRAW_CHECK,
-    eLOOP_ID_FONT_CHECK,
-    
     // bezier
     eLOOP_ID_STROKE_CHECK,
     eLOOP_ID_BRUSH_CHECK,

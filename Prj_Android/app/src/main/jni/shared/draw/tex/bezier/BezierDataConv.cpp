@@ -386,7 +386,6 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                 eBRUSH brushId = pData->getBrushId();
                 if( IS_BRUSH_VALID( brushId ) ){
 #ifdef ENABLE_FIXED_BRUSH
-#if 0
                     // 基本ブラシの場合、指定があれば強制ブラシで差し替え
                     if( brushId == eBRUSH_C_BASE && IS_BRUSH_VALID( s_eFixedBrush ) ){
                         brushId = (eBRUSH)(eBRUSH_C_BASE + (s_eFixedBrush-eBRUSH_C_BASE));
@@ -401,7 +400,6 @@ stBEZIER_ANCHOR_POINT* CBezierDataConv::CreateBezierAnchorPoint( CLineObjectData
                     if( brushId == eBRUSH_C_FRILL && IS_BRUSH_VALID( s_eFixedBrush ) ){
                         brushId = (eBRUSH)(eBRUSH_C_FRILL + (s_eFixedBrush-eBRUSH_C_BASE));
                     }
-#endif
 #endif
                     CDefBinTable<CBrushBinData>* pTable = CDefTable::GetBrushTable();
                     pBin = pTable->getDataAt( brushId );

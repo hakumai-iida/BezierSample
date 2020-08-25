@@ -18,8 +18,6 @@ enum STEP{
 	eSTEP_SELECT,
 };
 
-//#define CHECK_SYSTEM
-
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
   +----------------------------------------------------------------+*/
@@ -30,13 +28,6 @@ enum STEP{
 // ラベル：ループ名
 //---------------------------------
 static const char* _pArrMenu[] = {
-#ifdef CHECK_SYSTEM
-    // system
-	"System: Check Draw",
-    "System: Check Font",
-#endif
-
-    // bezier
     //"Bezier: Check Stroke",
     "Bezier: Check Brush",
     "Bezier: Test",
@@ -48,13 +39,6 @@ static const char* _pArrMenu[] = {
 // 飛び先：ループID
 //--------------------------
 static int _nArrLoopId[] = {
-#ifdef CHECK_SYSTEM
-    // system
-	eLOOP_ID_DRAW_CHECK,
-    eLOOP_ID_FONT_CHECK,
-#endif
-
-    // bezier
     //eLOOP_ID_STROKE_CHECK,
     eLOOP_ID_BRUSH_CHECK,
     eLOOP_ID_BEZIER_TEST,

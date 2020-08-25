@@ -19,17 +19,10 @@
 #define CHECK_BRUSH             eBRUSH_C_BASE
 #define CHECK_BRUSH_FOR_TOUCH   eBRUSH_C_BASE
 #define CHECK_PAL_OFS           ePAL_OFS_C_SKIN
-#if 0
 #define CHECK_PAL_OFS_STRIPE_A  ePAL_OFS_C_STRIPE_A
 #define CHECK_PAL_OFS_STRIPE_B  ePAL_OFS_C_STRIPE_B
 #define CHECK_PAL_OFS_FRILL_A   ePAL_OFS_C_FRILL_A
 #define CHECK_PAL_OFS_FRILL_B   ePAL_OFS_C_FRILL_B
-#else
-#define CHECK_PAL_OFS_STRIPE_A  ((ePAL_OFS)0)
-#define CHECK_PAL_OFS_STRIPE_B  ((ePAL_OFS)0)
-#define CHECK_PAL_OFS_FRILL_A   ((ePAL_OFS)0)
-#define CHECK_PAL_OFS_FRILL_B   ((ePAL_OFS)0)
-#endif
 
 //-------------------------------------------------
 // 動作指定

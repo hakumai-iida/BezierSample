@@ -38,7 +38,7 @@
     CAdjustablePoint* pAdj;                                         \
     eBRUSH brush = eBRUSH_C_BASE;                                   \
     eBUCKET bucket = eBUCKET_TEST_MONO;                             \
-    ePAL_OFS bucketPalOfs = (ePAL_OFS)0/*_C_FRILL_A*/
+    ePAL_OFS bucketPalOfs = ePAL_OFS_C_FRILL_A
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義

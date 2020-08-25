@@ -27,12 +27,10 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/app/loop/bezier/BezierTestLoopForDelay.cpp \
 				   	shared/app/loop/bezier/BezierTestLoopForHook.cpp \
 				   	shared/app/loop/bezier/BezierTestLoopForLineRepair.cpp \
+				   	shared/app/loop/bezier/BezierTestLoopForTouch.cpp \
 				   	shared/app/loop/bezier/BrushCheckLoop.cpp \
 				   	shared/app/loop/bezier/StrokeCheckLoop.cpp \
 				   	\
-				   	shared/app/loop/system/DrawCheckLoop.cpp \
-				   	shared/app/loop/system/FontCheckLoop.cpp \
-   				   	\
 				   	shared/config/config_for_app.cpp \
    				   	\
 				   	shared/const/Const.cpp \
@@ -87,11 +85,13 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/draw/tex/bezier/Bezier.cpp \
 				   	shared/draw/tex/bezier/BezierConst.cpp \
 				   	shared/draw/tex/bezier/BezierDataConv.cpp \
+				   	shared/draw/tex/bezier/BezierForEdge.cpp \
 				   	shared/draw/tex/bezier/BezierForFill.cpp \
 				   	shared/draw/tex/bezier/BezierForFrill.cpp \
 				   	shared/draw/tex/bezier/BezierForFrillLayerData.cpp \
+				   	shared/draw/tex/bezier/BezierForSub.cpp \
 				   	shared/draw/tex/bezier/BezierForTouch.cpp \
-				   	shared/draw/tex/bezier/BezierSub.cpp \
+				   	shared/draw/tex/bezier/BezierForWork.cpp \
 				   	shared/draw/tex/bezier/FillPointData.cpp \
 				   	shared/draw/tex/bezier/LayerData.cpp \
 				   	shared/draw/tex/bezier/LayerObject.cpp \
@@ -116,8 +116,14 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/draw/tex/bmp/BmpGeneratorForSetting.cpp \
 				   	shared/draw/tex/bmp/BmpGenParam.cpp \
 				   	\
+				   	shared/draw/tex/bmp_pal/BmpPalData.cpp \
+				   	shared/draw/tex/bmp_pal/BmpPalMgr.cpp \
+				   	shared/draw/tex/bmp_pal/BPConst.cpp \
+				   	\
 				   	shared/draw/tex/fill/Fill.cpp \
 				   	shared/draw/tex/fill/FillConst.cpp \
+				   	shared/draw/tex/fill/FillForExe.cpp \
+				   	shared/draw/tex/fill/FillForUndercoat.cpp \
 				   	shared/draw/tex/fill/FillMgr.cpp \
 				   	\
 				   	shared/draw/tex/stroke/StrokeConst.cpp \
@@ -134,6 +140,8 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/loop/LoopTaskReserve.cpp \
 				   	\
 				   	shared/loop/node/Button.cpp \
+				   	shared/loop/node/EditPalDialog.cpp \
+				   	shared/loop/node/EditPalMenu.cpp \
 				   	shared/loop/node/EditValueDialog.cpp \
 				   	shared/loop/node/EditValueMenu.cpp \
 				   	shared/loop/node/Menu.cpp \

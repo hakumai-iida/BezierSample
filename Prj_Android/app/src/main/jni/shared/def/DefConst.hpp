@@ -51,8 +51,7 @@ enum eIMG{
 #define IS_IMG_VALID( _id )     ((_id)>=(eIMG)0 && (_id)<eIMG_MAX)
 
 // パレット画像のヘッダ（※実利用データの先頭判定用）
-//#define eIMG_BMP_PAL_HEAD       eIMG_BMP_PAL_00
-#define eIMG_BMP_PAL_HEAD       ((eIMG)0)
+#define eIMG_BMP_PAL_HEAD       eIMG_BMP_PAL_00
 #define eIMG_BMP_PAL_MAX        8
 
 //-----------------------------------------------------------------
@@ -111,8 +110,7 @@ enum ePAL_OFS{
 #define IS_PAL_OFS_VALID( _id )     ((_id)>=(ePAL_OFS)0 && (_id)<ePAL_OFS_MAX)
 
 // キャラクタパレットのヘッダ（※実利用データの先頭判定用）
-//#define ePAL_OFS_C_HEAD     (ePAL_OFS_C_DEFAULT+1)
-#define ePAL_OFS_C_HEAD     ((ePAL_OFS)0)
+#define ePAL_OFS_C_HEAD     (ePAL_OFS_C_DEFAULT+1)
 
 //-----------------------------------------------------------------
 // eBRUSH: [Bezier.xls/Brush]シート

@@ -9,10 +9,6 @@
   +----------------------------------------------------------------+*/
 #include "env.hpp"
 
-// system
-#include "app/loop/system/DrawCheckLoop.hpp"
-#include "app/loop/system/FontCheckLoop.hpp"
-
 // bezier
 #include "app/loop/bezier/StrokeCheckLoop.hpp"
 #include "app/loop/bezier/BrushCheckLoop.hpp"
@@ -61,11 +57,8 @@ const char* g_pArrDrawLayerLabel[] = {
 const char* g_pArrLoopIdLabel[] = {
     "DEBUG_MENU",
     
-    "DRAW_CHECK",
-    "FONT_CHECK",
     "STROKE_CHECK",
     "BRUSH_CHECK",
-    "BEZIER_EDIT"
     "BEZIER_TEST",
 
     NULL
@@ -189,8 +182,6 @@ CLoop* CLoopMgr::CreateLoopForApp( int loopId ){
     
     switch( loopId ){
     case eLOOP_ID_DEBUG_MENU:           pLoop = new CDebugMenuLoop();       break;
-    case eLOOP_ID_DRAW_CHECK:           pLoop = new CDrawCheckLoop();       break;
-    case eLOOP_ID_FONT_CHECK:           pLoop = new CFontCheckLoop();       break;
     case eLOOP_ID_STROKE_CHECK:         pLoop = new CStrokeCheckLoop();     break;
     case eLOOP_ID_BRUSH_CHECK:          pLoop = new CBrushCheckLoop();      break;
     case eLOOP_ID_BEZIER_TEST:          pLoop = new CBezierTestLoop();      break;
