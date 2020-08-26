@@ -451,11 +451,20 @@ void CBezier::DrawTouchAt( stBEZIER_ANCHOR_POINT* pHead, float x, float y, float
     if( isSubValid ){
         pHead[1].x = subX;
         pHead[1].y = subY;
+
+#if 1
+        // サイズ調整（※実際のデータからの線の伸び具合を方向線へも加味させてみる）
+        float len0 = CMath::Len( x1-x0, y1-y0 );
+        if( len0 > 0.0f ){
+            float len = CMath::Len( pHead[1].x-pHead[0].x, pHead[1].y-pHead[0].y );
+            size *= len/len0;
+        }
+#endif
     }else{
         pHead[1].x = pHead[0].x + ofsX * size;
         pHead[1].y = pHead[0].y + ofsY * size;
     }
-
+    
     pHead[0].xIn *= size;
     pHead[0].yIn *= size;
     pHead[1].xIn *= size;
