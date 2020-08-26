@@ -117,35 +117,35 @@
 ## 動作例  
 
 ↓ 体型パラメータ：体が細い〜太い  
-![ss_00](https://user-images.githubusercontent.com/13220051/88622525-f67da280-d0dd-11ea-976e-76aa455a094f.gif)
+![ss_00](https://user-images.githubusercontent.com/13220051/88622525-f67da280-d0dd-11ea-976e-76aa455a094f.gif)  
 　  
 
 ↓ 体型パラメータ：身長が低い〜高い  
-![ss_01](https://user-images.githubusercontent.com/13220051/88622531-fa112980-d0dd-11ea-8d71-958a6418f945.gif)
-
+![ss_01](https://user-images.githubusercontent.com/13220051/88622531-fa112980-d0dd-11ea-8d71-958a6418f945.gif)  
+　  
 
 ↓ 擬似傾け：左右  
-![ss_04](https://user-images.githubusercontent.com/13220051/88622552-04332800-d0de-11ea-8721-413ad895966e.gif)
+![ss_04](https://user-images.githubusercontent.com/13220051/88622552-04332800-d0de-11ea-8721-413ad895966e.gif)  
 　  
 
 ↓ 擬似傾け：上下  
-![ss_05](https://user-images.githubusercontent.com/13220051/88622563-07c6af00-d0de-11ea-8741-6c5445f1d806.gif)
+![ss_05](https://user-images.githubusercontent.com/13220051/88622563-07c6af00-d0de-11ea-8741-6c5445f1d806.gif)  
 　  
 
 ↓ 移動値適用：髪等のなびき  
-![ss_06](https://user-images.githubusercontent.com/13220051/88622569-0bf2cc80-d0de-11ea-8acb-d1f69a4f4f39.gif)
+![ss_06](https://user-images.githubusercontent.com/13220051/88622569-0bf2cc80-d0de-11ea-8acb-d1f69a4f4f39.gif)  
 　  
-　  
+
 ↓ ストローク切り替え  
-![ss_07](https://user-images.githubusercontent.com/13220051/88622582-12814400-d0de-11ea-8f93-01fe65c302c7.gif)
+![ss_07](https://user-images.githubusercontent.com/13220051/88622582-12814400-d0de-11ea-8f93-01fe65c302c7.gif)  
 　  
 
 ↓ パレット切り替え  
-![ss_08](https://user-images.githubusercontent.com/13220051/88622589-16ad6180-d0de-11ea-987e-de17a28f09fd.gif)
+![ss_08](https://user-images.githubusercontent.com/13220051/88622589-16ad6180-d0de-11ea-987e-de17a28f09fd.gif)  
 　  
 
 ↓ 素材切り替え（ネギの着ぐるみ）によるアニメーション  
-![ss_10](https://user-images.githubusercontent.com/13220051/88622610-20cf6000-d0de-11ea-868d-8522e85778f4.gif)
+![ss_10](https://user-images.githubusercontent.com/13220051/88622610-20cf6000-d0de-11ea-868d-8522e85778f4.gif)  
 　  
 　  
 ↓ 各種表現の適用イメージ  
@@ -155,4 +155,10 @@
 ↓ 各種表現（フリル／ストライプ／タッチ）付きのアニメーション  
 ![anim_00_goth](https://user-images.githubusercontent.com/13220051/91286506-7e33fb00-e7c9-11ea-8d08-502bfdfba14e.gif)  
 　  
+
+↓ iPad(第六世代)環境での出力データそのまま（ストローク＆パレットバリエーション）  
+![chara_01](https://user-images.githubusercontent.com/13220051/91296228-3f0ca680-e7d7-11ea-9c5e-88ae2b02b64b.png)  
+![chara_00](https://user-images.githubusercontent.com/13220051/91296236-416f0080-e7d7-11ea-98b5-87d16ad202c7.png)  
+![chara_02](https://user-images.githubusercontent.com/13220051/91296233-40d66a00-e7d7-11ea-959a-73beee2cd126.png)  
+![chara_03](https://user-images.githubusercontent.com/13220051/91296232-40d66a00-e7d7-11ea-9397-0e337be4bb9e.png)  
 
