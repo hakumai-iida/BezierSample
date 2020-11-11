@@ -15,3 +15,7 @@ dfs\LabelCommon.dfs LabelCommon.dft BmpDotOption.csv	BmpDotOptionLabel.inc
 dfs\BmpDotSlotNum.dfs
 dfs\BmpDotSlotParent.dfs
 dfs\BmpDotSlotCategory.dfs
+dfs\BmpDotSlotIsUp.dfs
+dfs\BmpDotSlotIsLow.dfs
+dfs\BmpDotSlotOrderGroup.dfs
+dfs\BmpDotSlotMaskTarget.dfs

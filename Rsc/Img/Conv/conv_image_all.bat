@@ -7,9 +7,9 @@ move /Y _source\system\debug_ui*.hif IMAGE\.
 bmp2hif /UC _source\system\debug_font.bmp
 move /Y _source\system\debug_font*.hif IMAGE\.
 
-bmp2hif /UC _source\pal\pal_work_path.bmp
-move /Y _source\pal\pal_work_path*.hif IMAGE\.
+bmp2hif /UC _source\pal\pal_bezier_color.bmp
+move /Y _source\pal\pal_bezier_color*.hif IMAGE\.
 
-bmp2hif /UC _source\bmp_pal\bmp_pal_00.bmp
-move /Y _source\bmp_pal\bmp_pal_00*.hif IMAGE\.
+bmp2hif /UC _source\pal\pal_bezier_work_path.bmp
+move /Y _source\pal\pal_bezier_work_path*.hif IMAGE\.
 
