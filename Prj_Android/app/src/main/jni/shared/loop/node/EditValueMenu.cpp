@@ -150,16 +150,16 @@ bool CEditValueMenu::setItemAtAsBit( int id, const char* pName, void* pVal, eEDI
 //-------------------
 // セパレータの設定
 //-------------------
-void CEditValueMenu::setSeparatorAt( int id, bool flag ){
+bool CEditValueMenu::setSeparatorAt( int id, bool flag ){
     // 無効は無視
-    if( id < 0 || id >= m_nItemNum ){ return; }
+    if( id < 0 || id >= m_nItemNum ){ return( false ); }
     
     m_stArrItem[id].bSeparator = flag;
+    return( true );
 }
 
-
 //-------------------
-// 横幅の取得
+// 対象の取得
 //-------------------
 stEDIT_VALUE_MENU_ITEM* CEditValueMenu::getItemAt( int at ){
 	if( at < 0 || at >= m_nItemNum ){
@@ -170,7 +170,7 @@ stEDIT_VALUE_MENU_ITEM* CEditValueMenu::getItemAt( int at ){
 }
 
 //-------------------
-// 横幅の取得
+// 選択対象の取得
 //-------------------
 stEDIT_VALUE_MENU_ITEM* CEditValueMenu::getSelectedItem( void ){
 	return( getItemAt( m_nSelect ) );
@@ -196,7 +196,7 @@ void CEditValueMenu::setEditValueDialog( CEditValueDialog* pDialog ){
 	else{
         int min = pItem->nMin;
         int max = pItem->nMax;
-        
+
 		pDialog->set( pItem->pVal, pItem->eType, min, max );
 	}
 
@@ -204,10 +204,13 @@ void CEditValueMenu::setEditValueDialog( CEditValueDialog* pDialog ){
 	pDialog->setLabel( pArrLabel );
     
 	pDialog->fixDialog();
+               
+    // 項目がブロックされていたら暗転させる
+    pDialog->setBlock( checkItemBlockedAt( m_nSelect ) );
 }
 
 //-------------------
-// 横幅の取得
+// 内部横幅の取得
 //-------------------
 float CEditValueMenu::calcInternalW( void ){
     // ここではタイトル幅は計算にいれないでおく（※事前に値が確定しないため）
@@ -216,7 +219,7 @@ float CEditValueMenu::calcInternalW( void ){
 }
 
 //-------------------
-// 縦幅の取得
+// 内部縦幅の取得
 //-------------------
 float CEditValueMenu::calcInternalH( void ){
     int numSeparator = 0;
@@ -305,7 +308,8 @@ void CEditValueMenu::onDraw0( void ){
         if( pItem->bSeparator ){
             pDC->clear();
             pDC->setRect( m_fCenterW, 2 );
-            pDC->setRGBA( 0x40404080 );
+            if( isDark() ){ pDC->setRGBA( SM_ITEM_SEPARATOR_RGBA_DARK ); }
+            else{ pDC->setRGBA( SM_ITEM_SEPARATOR_RGBA ); }
             pDC->draw( x, y-2 );
 
 #if 0
@@ -349,8 +353,7 @@ void CEditValueMenu::onDraw0( void ){
             if( val == INVALID_VAL ){ pLabel = ENUM_INVALID_LABEL; }
             else if( val >= 0 && val <= pItem->nMax ){ pLabel = pItem->pArrLabel[val]; }
             sprintf( buf, "%s", pLabel );
-        }
-
+        }        
         // 数値形式
 		else{ sprintf( buf, "%d", val ); }
 

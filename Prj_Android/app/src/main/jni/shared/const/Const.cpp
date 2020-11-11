@@ -381,6 +381,21 @@ DWORD CConst::GetUseAlertRGBA( float rate ){
 }
 
 //--------------------------------
+// 抽選
+//--------------------------------
+int CConst::Lottery( int val, int numCand, int* arrWeight ){
+    int hit = 0;
+    while( hit < numCand ){
+        if( val < arrWeight[hit] ){
+            break;
+        }
+        val -= arrWeight[hit++];
+    }
+    
+    return( hit );
+}
+
+//--------------------------------
 // フラグ：判定
 //--------------------------------
 bool CConst::CheckFlag( int flag, int bit ){

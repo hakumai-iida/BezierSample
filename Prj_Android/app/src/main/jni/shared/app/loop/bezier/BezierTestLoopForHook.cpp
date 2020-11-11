@@ -26,13 +26,16 @@
 //#define BASE_FOR_EDGE_FILL_TEST
 
 // フック[Hook]設定有効（オン／オフの効果確認用）
-#define ENABLE_HOOK_SETTING
+//#define ENABLE_HOOK_SETTING
 
 // 線修復[LineRepair]設定有効（オン／オフの効果確認用）
 #define ENABLE_LINE_REPAIR_SETTING
 
 // 遅延（※レイヤー直接描画はジョイントが使えないので角度のつなぎ調整は行われない）
 #define DELAY_TEST
+
+// フックテスト
+#define HOOK_TEST
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
@@ -86,7 +89,7 @@ void CBezierTestLoop::allocForLayerForHookA( void ){
     pAP->set( -2000,-4000, 0,0, 0,0 );
 #ifdef ENABLE_HOOK_SETTING
     #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
     #endif
 #endif
 #ifdef BASE_FOR_EDGE_FILL_TEST
@@ -112,7 +115,7 @@ void CBezierTestLoop::allocForLayerForHookA( void ){
 #ifdef ENABLE_HOOK_SETTING
     pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_C );
     #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
     #endif
 #endif
 #ifdef BASE_FOR_EDGE_FILL_TEST
@@ -231,6 +234,18 @@ void CBezierTestLoop::allocForLayerForHookB( void ){
     pFP = CFillPointData::Alloc();
     pFP->set( 0,0 );
     pPOD->addData( pFP );
+    
+#ifdef HOOK_TEST
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setFlagOn( eLOD_FLAG_DOT );
+    m_pLayerHookB->addData( pLOD );
+
+    // 点０
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 1000,1000, 0,0, 0,0 );
+    pAP->setHookTargetId( eSTROKE_HOOK_TARGET_UP_A );
+    pLOD->addData( pAP );
+#endif
 }
 
 //-----------------------------------------
@@ -246,6 +261,17 @@ void CBezierTestLoop::allocForLayerForHookC( void ){
     m_pLayerHookC->setDelayPowerRateForXY( 1000, -1000 );
     m_pLayerHookC->setDelayPowerRateForRot( 800, -800 );
     m_pLayerHookC->setDelayPowerRateForScale( 3000, -3000 );
+#endif
+    
+#ifdef HOOK_TEST
+    m_pLayerHookC->setHookTargetId(  eSTROKE_HOOK_TARGET_UP_A );
+    
+    // 適用除外テスト：選択時
+    //m_pLayerHookC->setFlagOn( eLAYER_FLAG_TEMP_SELECTED );
+    
+    // 適用除外テスト：大きな要素が個別パーツ表示される際
+    //m_pLayerHookC->setFlagOn( eLAYER_FLAG_TOO_LARGE );
+    //CBezier::SetDispIndividualPart( true );
 #endif
 
     //-----------------------
@@ -295,7 +321,7 @@ void CBezierTestLoop::allocForLayerForHookC( void ){
 #ifdef ENABLE_HOOK_SETTING
     pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_D );
     #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
     #endif
 #endif
 #ifdef BASE_FOR_EDGE_FILL_TEST

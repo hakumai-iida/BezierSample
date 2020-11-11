@@ -29,11 +29,11 @@ enum eMEM_FIELD{
     eMEM_FIELD_D_BASE,        // 動的：for [shared/rank, shared/store, shared/blockchain, shared/touch]
     eMEM_FIELD_D_CSV,         // 動的：for [各種CsvTable]
     eMEM_FIELD_D_DRAW,        // 動的：for [shared/draw/]
-    eMEM_FIELD_D_STROKE,      // 動的：for [shared/draw/tex/stroke/]（※解像度調整）
-    eMEM_FIELD_D_FILL,        // 動的：for [shared/draw/tex/fill/]（※解像度調整）
-    eMEM_FIELD_D_BEZIER,      // 動的：for [shared/draw/tex/bezier/]（※解像度調整）
-    eMEM_FIELD_D_BMP,         // 動的：for [shared/draw/tex/bmp/]
-    eMEM_FIELD_D_BMP_PAL,     // 動的：for [shared/draw/tex/bmp_pal/]
+    eMEM_FIELD_D_STROKE,      // 動的：for [shared/draw/bezier/stroke/]（※解像度調整）
+    eMEM_FIELD_D_FILL,        // 動的：for [shared/draw/bezier/fill/]（※解像度調整）
+    eMEM_FIELD_D_BEZIER,      // 動的：for [shared/draw/bezier/]（※解像度調整）
+    eMEM_FIELD_D_BMP_DOT,     // 動的：for [shared/draw/bmp/dot/]
+    eMEM_FIELD_D_BMP_PAL,     // 動的：for [shared/draw/bmp/pal/]
     eMEM_FIELD_D_TEX,         // 動的：for [shared/draw/tex/]
     eMEM_FIELD_D_OBJ,         // 動的：for [shared/obj, shared/app/obj/]
     eMEM_FIELD_D_BG,          // 動的：for [shared/app/bg]

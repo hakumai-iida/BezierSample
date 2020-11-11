@@ -40,7 +40,6 @@ protected:
     int  m_nItemNum;        // 要素数
     int  m_nNumInBlock;     // 一行／一列内の要素数（※２次元メニュー用）
 
-    bool m_bSeOff;          // ＳＥを鳴らさない
     bool m_bScrollY;        // Ｙ方向へのスクロールか？
 
     // 入力領域
@@ -68,7 +67,6 @@ public:
 
 	// 取得
 	virtual inline void setItemNum( int num, bool isBlockRequired=false ){ m_nItemNum = num; }
-	virtual inline void setSeOff( bool flag ){ m_bSeOff = flag; }
 	virtual inline bool isDecided( void ){ return( m_bDecided ); }
     virtual inline bool isBlocked( void ){ return( m_bBlocked ); }
 	virtual inline bool isPressedLong( void ){ return( m_bPressedLong ); }

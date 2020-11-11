@@ -59,8 +59,9 @@
 #include "const/Const.hpp"
 #include "def/DefConst.hpp"
 #include "draw/DrawConst.hpp"
-#include "draw/tex/bmp/BDConst.hpp"
-#include "draw/tex/bezier/BezierConst.hpp"
+#include "draw/bmp/dot/BDConst.hpp"
+#include "draw/bmp/pal/BPConst.hpp"
+#include "draw/bezier/BezierConst.hpp"
 
 // 入出力
 #include "sys/data/InputBuffer.hpp"

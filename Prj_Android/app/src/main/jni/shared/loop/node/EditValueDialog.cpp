@@ -8,8 +8,6 @@
   +----------------------------------------------------------------+*/
 #include "env.hpp"
 #include "EditValueDialog.hpp"
-
-// RGB値の参照
 #include "StrMenu.hpp"
 
 /*+----------------------------------------------------------------+
@@ -300,6 +298,12 @@ float CEditValueDialog::getH( void ){ return( EV_DIALOG_H ); }
 //------------------
 void CEditValueDialog::onUpdate0( void ){
 	m_bChanged = false;
+    
+    // ブロックされていたら抜ける
+    if( m_bBlocked ){
+        return;
+    }
+    
     bool isRedoValueUpdate = false;
     
     // 更新
@@ -404,6 +408,11 @@ void CEditValueDialog::onDraw0( void ){
 	CDrawCell* pDC = CDrawCell::GetFreeCell();
 
     DWORD rgba;
+
+    // ブロック時は暗転（※個々のボタンを管理するのが面倒なので強引に）
+    if( m_bBlocked ){
+        CDrawCell::SetRGBA( 0x808080FF );
+    }
     
     if( isDark() ){ rgba = EV_DIALOG_RGBA_DARK; }
     else{ rgba = EV_DIALOG_RGBA; }
@@ -568,6 +577,11 @@ void CEditValueDialog::onDraw0( void ){
 			pDC->draw( m_fX + (EV_DIALOG_W - (64+2) - (i+1)*(32+1)) + 16, m_fY + (32+2) - 1 );
 		}
 	}
+
+    // 暗転のリセット
+    if( m_bBlocked ){
+        CDrawCell::ResetRGBA();
+    }
 }
 
 //---------------------

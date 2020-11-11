@@ -20,6 +20,8 @@
 #include "loop/node/EditValueMenu.hpp"
 #include "loop/node/EditValueDialog.hpp"
 
+#include "draw/bmp/BmpTex.hpp"
+
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
@@ -48,7 +50,7 @@ protected:
     CEditValueDialog* m_pDialogEV;
 
     // ワーク
-    CTex* m_pTex;
+    CBmpTex* m_pBmpTex;
     CLayerData* m_pLayer;
 
     bool m_bDot;

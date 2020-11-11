@@ -159,7 +159,7 @@ private:
 	CMemMgr( void ){};
 	virtual ~CMemMgr( void ){};
     
-    // アプリ依存メモリ確保
+    // アプリ依存メモリ確保（※[config_for_app.cpp]で実装される）
     static bool AllocForApp( void );
 };
 #endif	// __MEM_MGR_HPP__

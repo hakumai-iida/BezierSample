@@ -51,7 +51,6 @@
 
 // ガイド確認
 #define GUIDE_TEST
-#define GUIDE_TEST_AT_PAINT
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体定義
@@ -255,7 +254,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pFP->set( -2000,-1500 );
     //pFP->setOption( eFILL_OPTION_RESERVE, -1 );     // 明るく
     pFP->setOption( eFILL_OPTION_RESERVE, +1 );     // 暗く
-    pFP->setOptionOfsXY( +8, +8 );
+    pFP->setOfsXYForOption( +8, +8 );
     pPOD->addData( pFP );
 #endif
     
@@ -332,7 +331,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( -3600, 900, 0, 2000, 0, -2000 );
-    pAP->setStroke( 0,20000, 0,5000 );
+    pAP->setStroke( 20000,0, 5000,0 );
 #ifdef EDGE_FILL_TEST
     pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
@@ -352,7 +351,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( -1400, -1800, -1000, 0, 1000, 0 );
-    pAP->setStroke( 0,5000, 0,2500 );
+    pAP->setStroke( 5000,0, 2500,0 );
 #ifdef EDGE_FILL_TEST
     pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
@@ -372,7 +371,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( 1000, -800, 1600, -800, -1600, 800 );
-    pAP->setStroke( 3333,2500, 3333,5000 );
+    pAP->setStroke( 2500,3333, 5000,3333 );
 #ifdef EDGE_FILL_TEST
     pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
@@ -392,7 +391,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( 3200, 1600, -2000, 0, 0, 800 );
-    pAP->setStroke( 0,5000, 0,10000 );
+    pAP->setStroke( 5000,0, 10000,0 );
 #ifdef EDGE_FILL_TEST
     pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画される（角度が深いので）
 #endif
@@ -412,7 +411,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( -300, 3000, 1600, 0, -800, 0 );
-    pAP->setStroke( 0,10000, 0,20000 );
+    pAP->setStroke( 10000,0, 20000,0 );
 #ifdef EDGE_FILL_TEST
     pAP->setStrokeEdgeFillSize( 10000 );    // ここは描画されない（角度が浅いので）
 #endif
@@ -490,13 +489,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 明暗：食い込み：１
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_INTO, -1 );     // 明るく
-    pFP->setOptionOfsXY( -10, -10 );
+    pFP->setOfsXYForOption( -10, -10 );
     pPOD->addData( pFP );
 
     // 明暗：食い込み：２
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_INTO, +1 );     // 暗く
-    pFP->setOptionOfsXY( +10, +10 );
+    pFP->setOfsXYForOption( +10, +10 );
     pPOD->addData( pFP );
     #endif
 #endif
@@ -618,7 +617,7 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // [タッチ]: 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,0, 0,0, 0,-500 );
-    pAP->setStroke( 0,20000, 0,0 );
+    pAP->setStroke( 20000,0, 0,0 );
     pAP->setFlagOn( eAPD_FLAG_DOT_ON_OUT_COL );             // 出力色上に描画する
     pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_H );
     pAP->setTouchBase( 0, 10000, 0 );
@@ -735,8 +734,8 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 明色塗り：アンチ（※座標に意味はない）
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, -2 );
-    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_A );
-    pFP->setOptionStroke( 2, 6 );
+    pFP->setTouchForOption( eSTROKE_TOUCH_TARGET_TEMP_A );
+    pFP->setStrokeForOption( 2, 6 );
     pPOD->addData( pFP );
     #endif
 
@@ -790,8 +789,8 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 暗色塗り：アンチ（※座標に意味はない）
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, +3 );
-    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_B );
-    pFP->setOptionStroke( 2, 0 );
+    pFP->setTouchForOption( eSTROKE_TOUCH_TARGET_TEMP_B );
+    pFP->setStrokeForOption( 2, 0 );
     pPOD->addData( pFP );
     #endif
 
@@ -849,14 +848,14 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pFP = CFillPointData::Alloc();
     pFP->set( -1500,1300 );
     pFP->setOption( eFILL_OPTION_POINT_AFTER_FILL, +3 );   // 暗く
-    pFP->setOptionStroke( 15, 0 );      // 最大15：[基本ストローク最大＝５]×[倍率最大＝３００％]
+    pFP->setStrokeForOption( 15, 0 );      // 最大15：[基本ストローク最大＝５]×[倍率最大＝３００％]
     pPOD->addData( pFP );
 
     // ポイント（目玉：ハイライト）：塗り２
     pFP = CFillPointData::Alloc();
     pFP->set( -1500+200,1300-200 );
     pFP->setOption( eFILL_OPTION_POINT_AFTER_FILL, -2 );   // 明るく
-    pFP->setOptionStroke( 10, 0 );
+    pFP->setStrokeForOption( 10, 0 );
     pPOD->addData( pFP );
     
     //------------------------------------
@@ -967,13 +966,13 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 全体補正（明）：塗り０
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_COLOR, -1 );   // 明るく
-    pFP->setOptionOfsXY( -5, -5 );            // カラーバッファの左上
+    pFP->setOfsXYForOption( -5, -5 );            // カラーバッファの左上
     pPOD->addData( pFP );
 
     // 全体補正（暗）：塗り１
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_COLOR, +1 );   // 暗く
-    pFP->setOptionOfsXY( +5, +5 );            // カラーバッファの右下
+    pFP->setOfsXYForOption( +5, +5 );            // カラーバッファの右下
     pPOD->addData( pFP );
 #endif
     
@@ -1034,8 +1033,8 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 暗色塗り挙動確認：アンチ（※座標に意味はない）
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, +3 );
-    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_C );
-    pFP->setOptionStroke( 1, 0 );
+    pFP->setTouchForOption( eSTROKE_TOUCH_TARGET_TEMP_C );
+    pFP->setStrokeForOption( 1, 0 );
     pPOD->addData( pFP );
     #endif
 
@@ -1087,8 +1086,8 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     // 広域塗り挙動確認：アンチ（※座標に意味はない）
     pFP = CFillPointData::Alloc();
     pFP->setOption( eFILL_OPTION_ANTI_STROKE_AFTER_FILL, -2 );
-    pFP->setOptionTouch( eSTROKE_TOUCH_TARGET_TEMP_D );
-    pFP->setOptionStroke( 4, 4 );
+    pFP->setTouchForOption( eSTROKE_TOUCH_TARGET_TEMP_D );
+    pFP->setStrokeForOption( 4, 4 );
     pPOD->addData( pFP );
     #endif
 #endif
@@ -1107,33 +1106,21 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pLOD = CLineObjectData::Alloc();
     pLOD->setBrushId( brush );
     pLOD->setFlagOn( eLOD_FLAG_CLOSE_PATH );
-    #ifndef GUIDE_TEST_AT_PAINT
-    pLOD->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
-    #endif
     m_pLayerBase->addData( pLOD );
     
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -2000,+4000, 0,0, 0,0 );
-    #ifdef GUIDE_TEST_AT_PAINT
-    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
-    #endif
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,+4000, 0,0, 0,0 );
-    #ifdef GUIDE_TEST_AT_PAINT
-    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
-    #endif
     pLOD->addData( pAP );
     
     // 点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,+2000, 0,0, 0,0 );
-    #ifdef GUIDE_TEST_AT_PAINT
-    pAP->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
-    #endif
     pLOD->addData( pAP );
     
     // 点３
@@ -1149,9 +1136,6 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pPOD = CPaintObjectData::Alloc();
     pPOD->setBucketId( bucket );
     pPOD->setPalOfsId( bucketPalOfs );
-    #ifdef GUIDE_TEST_AT_PAINT
-    pPOD->setGuideTargetId( eSTROKE_GUIDE_TARGET_TEMP_A );
-    #endif
     m_pLayerBase->addData( pPOD );
     
     // 塗り０
@@ -1159,5 +1143,4 @@ void CBezierTestLoop::allocForLayerForBase( void ){
     pFP->set( -3000,+3000 );
     pPOD->addData( pFP );
 #endif
-
 }

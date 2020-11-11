@@ -253,4 +253,5 @@ void CObj::postDrawForObj( void ){
     // 描画調整リセット
     CDrawCell::ResetOfsXY();
     CDrawCell::ResetAlpha();
+    CDrawCell::ResetRGBA();
 }

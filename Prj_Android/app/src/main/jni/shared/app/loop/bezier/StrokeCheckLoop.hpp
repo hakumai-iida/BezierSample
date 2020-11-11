@@ -18,6 +18,8 @@
 #include "loop/node/Button.hpp"
 #include "loop/node/StrMenu.hpp"
 
+#include "draw/bmp/BmpTex.hpp"
+
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
@@ -47,7 +49,7 @@ protected:
     CStrMenu*   m_pMenuSize;
 
     // ワーク
-    CTex* m_pTex;
+    CBmpTex* m_pBmpTex;
     CLayerData* m_pLayer;
     
     bool m_bDot;

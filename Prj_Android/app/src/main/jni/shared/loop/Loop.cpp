@@ -95,24 +95,26 @@ void CLoop::onUpdate( void ){
 // 描画登録
 //-----------------------
 void CLoop::onRegistForDraw( void ){
-	// 終了済みは無視
+	// 終了済み／スキップ指定があれば無視
 	if( isFinished() ){ return; }
+    if( m_bSkipDraw ){ return; }
 
 	// 自身を登録
-	registForDraw();
+    registForDraw();
 
 	// ループに含まれる要素を登録
 	registForDraw0();
 }
 
 //-----------------------
-// 描画：UI
+// 描画：ノード（開発用のUI）
 //-----------------------
 void CLoop::onDrawNode( void ){
-	// 終了済みは無視
+    // 終了済み／スキップ指定があれば無視
 	if( isFinished() ){ return; }
+    if( m_bSkipDrawNode ){ return; }
 
-    drawUI0();
+    drawNode0();
 
     // ノード表示
 	CNode* pNode = (CNode*) m_oListNode.getHead();
@@ -128,6 +130,7 @@ void CLoop::onDrawNode( void ){
 void CLoop::onDrawLog( void ){
 	// 終了済みは無視
 	if( isFinished() ){ return; }
+    if( m_bSkipDrawLog ){ return; }
 
 	drawLog0();
 }

@@ -50,10 +50,6 @@ enum eIMG{
 
 #define IS_IMG_VALID( _id )     ((_id)>=(eIMG)0 && (_id)<eIMG_MAX)
 
-// パレット画像のヘッダ（※実利用データの先頭判定用）
-#define eIMG_BMP_PAL_HEAD       eIMG_BMP_PAL_00
-#define eIMG_BMP_PAL_MAX        8
-
 //-----------------------------------------------------------------
 // スプライトID: [Draw.xls/Spr]シート
 //-----------------------------------------------------------------

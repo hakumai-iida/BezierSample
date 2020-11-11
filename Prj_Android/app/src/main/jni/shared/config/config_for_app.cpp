@@ -82,22 +82,27 @@ bool CMemMgr::AllocForApp( void ){
     //---------------------------
     // 解像度による変動値の調整
     //---------------------------
+    // stroke
     uint32 kbSizeForStrokeMgr = CStrokeMgr::GetAllocSizeK();
     LOGD( "@ ALLOC SIZE for CStrokeMgr: %dKB\n", kbSizeForStrokeMgr );
     size += kbSizeForStrokeMgr*KB;
     
+    // fill
     uint32 kbSizeForFillMgr = CFillMgr::GetAllocSizeK();
     LOGD( "@ ALLOC SIZE for CFillMgr: %dKB\n", kbSizeForFillMgr );
     size += kbSizeForFillMgr*KB;
 
+    // bezier
     uint32 kbSizeForBezier = CBezier::GetAllocSizeK();
     LOGD( "@ ALLOC SIZE for CBezier: %dKB\n", kbSizeForBezier );
     size += kbSizeForBezier*KB;
 
+    // bmp_dot
     uint32 kbSizeForBmpDotMgr = CBmpDotMgr::GetAllocSizeK();
     LOGD( "@ ALLOC SIZE for CBmpDotMgr: %dKB\n", kbSizeForBmpDotMgr );
     size += kbSizeForBmpDotMgr*KB;
 
+    // bmp_pal
     uint32 kbSizeForBmpPalMgr = CBmpPalMgr::GetAllocSizeK();
     LOGD( "@ ALLOC SIZE for CBmpPalMgr: %dKB\n", kbSizeForBmpPalMgr );
     size += kbSizeForBmpPalMgr*KB;
@@ -135,18 +140,23 @@ bool CMemMgr::AllocForApp( void ){
     //---------------------------------------------------
     uint32 sizeShare = calc_share_size();
 
+    // stroke
     uint32 sizeStroke = (32 + kbSizeForStrokeMgr) * KB;
     uint32 numStroke = 8 + CStrokeMgr::GetAllocCellNum();
 
+    // fill
     uint32 sizeFill = (32 + kbSizeForFillMgr) * KB;
     uint32 numFill = 8 + CFillMgr::GetAllocCellNum();
 
+    // bezier
     uint32 sizeBezier = (32 + kbSizeForBezier ) * KB;
     uint32 numBezier = 8 + CBezier::GetAllocCellNum();
-    
-    uint32 sizeBmp = (32 + kbSizeForBmpDotMgr ) * KB;
-    uint32 numBmp = 8 + CBmpDotMgr::GetAllocCellNum();
 
+    // bmp_dot
+    uint32 sizeBmpDot = (32 + kbSizeForBmpDotMgr ) * KB;
+    uint32 numBmpDot = 8 + CBmpDotMgr::GetAllocCellNum();
+
+    // bmp_pal
     uint32 sizeBmpPal = (32 + kbSizeForBmpPalMgr ) * KB;
     uint32 numBmpPal = 8 + CBmpPalMgr::GetAllocCellNum();
 
@@ -160,7 +170,7 @@ bool CMemMgr::AllocForApp( void ){
     if( !set_field( eMEM_FIELD_D_STROKE,  sizeStroke,   false, numStroke,  "Stroke", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_FILL,      sizeFill,   false,   numFill,  "Fill",   false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BEZIER,  sizeBezier,   false, numBezier,  "Bezier", false ) ){ return( false ); }
-    if( !set_field( eMEM_FIELD_D_BMP,        sizeBmp,   false,    numBmp,  "Bmp",    false ) ){ return( false ); }
+    if( !set_field( eMEM_FIELD_D_BMP_DOT, sizeBmpDot,   false, numBmpDot,  "BmpDot", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BMP_PAL, sizeBmpPal,   false, numBmpPal,  "BmpPal", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_TEX,           1*MB,   false,       128,  "Tex",    false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_OBJ,          32*KB,   false,         8,  "Obj",    false ) ){ return( false ); }

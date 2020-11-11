@@ -28,6 +28,7 @@
 // コンストラクタ
 //-------------------
 CStrMenu::CStrMenu( eGRP grpId, int cW, int cH ): CScrollBarMenu( grpId, cW, cH ){
+    m_nSeparatorStep = 0;
 }
 
 //-------------------
@@ -195,6 +196,18 @@ void CStrMenu::onDraw0( void ){
 	float x = m_fX + m_fCenterX - m_fInternalOfsX;
 	float y = m_fY + m_fCenterY - m_fInternalOfsY;
 	for( int i=0; i<m_nItemNum; i++ ){
+        // 区切り線
+        if( m_nSeparatorStep > 0 && i > 0 ){
+            if( (i%m_nSeparatorStep) == 0 ){
+                pDC->clear();
+                pDC->setRect( m_fCenterW, 2 );
+                if( isDark() ){ pDC->setRGBA( SM_ITEM_SEPARATOR_RGBA_DARK ); }
+                else{ pDC->setRGBA( SM_ITEM_SEPARATOR_RGBA ); }
+                pDC->draw( x, y-2 );
+            }
+        }
+        
+        // メニュー項目
 		pDC->clear();
         pDC->setStr( eFONT_DEBUG, m_pArrItem[i] );
         pDC->setScaleXY( 1.0f, 2.0f );

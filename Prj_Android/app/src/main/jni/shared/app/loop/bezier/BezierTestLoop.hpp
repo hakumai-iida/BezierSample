@@ -18,6 +18,8 @@
 #include "loop/node/Button.hpp"
 #include "loop/node/PullDownMenu.hpp"
 
+#include "draw/bmp/BmpTex.hpp"
+
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
   +----------------------------------------------------------------+*/
@@ -30,6 +32,9 @@
 enum eBEZIER_TEST_MENU_ITEM{
     // データ選択
     eBTMI_SELECT_CHARA,         // キャラクタ選択
+    eBTMI_SELECT_FACE,          // 顔選択
+    eBTMI_SELECT_UP,            // 上半身選択
+    eBTMI_SELECT_LOW,           // 下半身洗濯
     eBTMI_SELECT_COSTUME,       // 着ぐるみ選択
     eBTMI_SELECT_STROKE,        // ストローク選択
     eBTMI_SELECT_COLOR,         // 色選択
@@ -110,6 +115,9 @@ protected:
     //-------------------------
     // ワーク
     //-------------------------
+    float m_fDispRotation;
+    float m_fDispScale;
+
     // 調整値
     float m_fAdjustRateH, m_fAdjustRateVH;
     float m_fAdjustRateV, m_fAdjustRateVV;
@@ -117,9 +125,6 @@ protected:
     float m_fAdjustRateS, m_fAdjustRateVS;
     float m_fAdjustRateLR, m_fAdjustRateVLR;
     float m_fAdjustRateUD, m_fAdjustRateVUD;
-
-    float m_fDispRotation;
-    float m_fDispScale;
 
     // 遅延ログ
     CDelayLog* m_pDelayLog;
@@ -140,19 +145,12 @@ protected:
     float m_fAnimPullCount;
 
     // 設定
-    CBmpDotSettingData m_oSetting;
     int m_nArrMenuVal[eBTMI_MAX];
 
-    //----------------------
-    // テクスチャ
-    //----------------------
-    CTex* m_pTexForLine;        // 線
-    CTex* m_pTexForColor;       // 塗り
-    CTex* m_pTexForPath;        // パス
-    
-    // ログ
-    int m_nBmpGenTimeForPath;
-    int m_nBmpGenTime;
+    //-------------------------
+    // BMPテクスチャ
+    //-------------------------
+    CBmpTex* m_pBmpTex;
 
 #ifdef ENABLE_SS
     bool m_bDumpSS;             // 画像更新時にスクショをダンプするか？
@@ -174,9 +172,6 @@ protected:
 
 	// 表示関連
 	virtual void onDraw0( void );
-	virtual void drawUI0( void ){}
-	virtual void drawLog0( void ){}
-    virtual void registForDraw0( void ){}
 
 private:
     // 更新
@@ -192,15 +187,13 @@ private:
     void fixForAnimButton( void );
         
     // セッティング確定
-    void fixForSetting( bool isRandom );
-
+    void fixForSetting( bool isReset, bool isRandom );
+    
     // メニュー確定
     void fixForMenu( void );
 
     // BMP作成
     void createBmp( void );
-    void createBmpWithLayerData( stBMP_GEN_CREATE_PARAM* pCreateParam );
-    void createBmpWithBmpDot( stBMP_GEN_CREATE_PARAM* pCreateParam );
     
     //------------------------------------------------
     // テストバッファの確保／開放

@@ -41,6 +41,7 @@ public:
 	virtual void enter( void );
 	virtual void exit( void );
 	virtual void setActive( bool flag );
+    virtual void setDark( bool flag );
 	virtual void fixMenu( void );
 
 protected:

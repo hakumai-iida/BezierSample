@@ -41,18 +41,15 @@
     //#define FRILL_DIR_SWAP
 
     // 色の指定
-    #define FRILL_PAL
+    //#define FRILL_PAL
 #else
     // ストライプテスト
-    #define STRIPE_TEST
+    //#define STRIPE_TEST
     //#define STRIPE_SUB_TEST
 #endif
 
-// フックテスト（タッチとストライプのストロークを円の中心へフックする）
-//#define HOOK_TEST
-
 // 色を塗らない（タッチストローク確認用）
-//#define NO_PAINT
+#define NO_PAINT
 
 // 遅延テスト（移動値による形状変化確認用）
 //#define DELAY_TEST
@@ -82,7 +79,9 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     //------------------------------
     CLineObjectData* pLOD;
     CAnchorPointData* pAP;
+#ifdef DELAY_TEST
     CAdjustablePoint* pAdj;
+#endif
 
     //------------------------------
     // 塗りワーク
@@ -95,23 +94,6 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     eBRUSH brush = CHECK_BRUSH;
     ePAL_OFS bucketPalOfs = CHECK_PAL_OFS;
     
-#ifdef HOOK_TEST
-    //----------------------
-    // フックドット確保
-    //----------------------
-    pLOD = CLineObjectData::Alloc();
-    pLOD->setFlagOn( eLOD_FLAG_DOT );
-    pLOD->setBrushId( brush );
-    m_pLayerTouch->addData( pLOD );
-    
-    // 点０：フック
-    pAP = CAnchorPointData::Alloc();
-    pAP->set( 0,0, 0,0, 0,0 );
-    pAP->setFlagOn( eAPD_FLAG_TRANSPARENCY );
-    pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_A );
-    pLOD->addData( pAP );
-#endif
-       
     //----------------------
     // 線オブジェクト確保＆設定
     //----------------------
@@ -234,6 +216,26 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     pAdj->setDelayType( eDELAY_LOG_CLOTH, 4 );
     pAdj->setDelayPowerRate( 2500, 2500 );
     #endif
+#else
+    //-------------------------
+    // 中心のフック
+    //-------------------------
+    // CLOTH
+    pLOD = CLineObjectData::Alloc();
+    pLOD->setFlagOn( eLOD_FLAG_DOT );
+    m_pLayerTouch->addData( pLOD );
+    
+    // 点０：
+    pAP = CAnchorPointData::Alloc();
+    pAP->set( 0,0, 0,0, 0,0 );
+    pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_A );
+    pLOD->addData( pAP );
+
+    #ifdef DELAY_TEST
+    pAdj = pAP->getAdjXY();
+    pAdj->setDelayType( eDELAY_LOG_BUST, 8 );
+    pAdj->setDelayPowerRate( -2000, 2000 );
+    #endif
 #endif
     
 #ifndef NO_PAINT
@@ -267,7 +269,6 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     #endif
     #ifdef STRIPE_TEST
     pLOD->setFlagOn( eLOD_FLAG_TOUCH_IS_STRIPE );
-    pLOD->setFlagOn( eLOD_FLAG_RESET_GUIDE_AFTER_STROKE );  // ガイドの削除（※ゴミが悪さをしないように）
     #endif
 #endif
     m_pLayerTouch->addData( pLOD );
@@ -279,7 +280,7 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,0, 0,0, 0,0 );
     #ifdef FRILL_DIR_SWAP
-    pAP->setFlagOn( eAPD_FLAG_JOINT_OR_FRILL_DIR_SWAP );
+    pAP->setFlagOn( eAPD_FLAG_REVERSE_FRILL_HOOK );
     #endif
     #ifdef FRILL_PAL
     pAP->setStripeOrFrillMainPalOfsId( CHECK_PAL_OFS_FRILL_A );
@@ -289,17 +290,40 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
     pAP->setFrillMainId( FRILL_MAIN );
     pAP->setFrillSubId( FRILL_SUB );
-    //pAP->setTouchRandomOfs( 100, 100 );
-    //pAP->setFrillWidthRate( 8000, 12000 );
+    
+    #if 0
+    pAP->setTouchBase( 10000, 2000, 2700 );
+    pAP->setTouchFront( 10000, 0, -3600, 12, 1 );
+    #endif
+
+    #if 0
+    pAP->setTouchBase( 0, 2000, 2700 );
+    pAP->setTouchBack( 10000, 2000, 3600, 12, 1 );
+    #endif
+    
+    #if 0
+    // ここで指定するサイズは高さにのみ影響する
+    pAP->setTouchBase( 5000, 2000, 900 );
+    pAP->setTouchFront( 10000, 1000, -1800, 6, 0 );
+    pAP->setTouchBack( 10000, -1000, 1800, 6, 1 );  // スキップは後側で指定する
+    #endif
     
     #if 1
-    pAP->setTouchBase( 00000, 2000, 0 );
-    pAP->setTouchBack( 10000, 0, 10000, 12, 1 );
-    #else
-    pAP->setTouchBase( 5000, 2000, 0 );
-    pAP->setTouchFront( 10000, -3000, 10000, 6, 0 );
-    pAP->setTouchBack( 10000, -3000, 10000, 6, 1 );
+    // サイズのオフセットにより正負を跨ぐと反転する
+    //（※フリルで正負を反転するような需要はないとは思うが注意すること）
+    pAP->setTouchBase( 5000, 2000, 900 );
+    pAP->setTouchFront( 10000, -5000, -1800, 6, 0 );
+    pAP->setTouchBack( 10000, 3000, 1800, 6, 1 );  // スキップは後側で指定する
     #endif
+
+    #if 0
+    // 幅の調整をしたい場合は[setFrillWithRate]で指定する
+    pAP->setFrillWidthRate( 15000, 5000 );
+    pAP->setTouchBase( 5000, 2000, 900 );
+    pAP->setTouchFront( 10000, 500, -1800, 6, 0 );
+    pAP->setTouchBack( 10000, -500, 1800, 6, 1 );  // スキップは後側で指定する
+    #endif
+
     pLOD->addData( pAP );
     
 #else   // FRILL_TEST
@@ -309,45 +333,42 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     // [ストライプ]:点Ａ０
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
-    #ifdef STRIPE_SUB_TEST
-    pAP->set( 0,0, 0,0, -1000,0 );
-    #else
-    pAP->set( 0,0, 0,0, 0,-500 );
-    #endif
 
     pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
-#ifdef STRIPE_SUB_TEST
+    #ifdef STRIPE_SUB_TEST
     pAP->setTouchTargetSubId( eSTROKE_TOUCH_TARGET_TEMP_B );
-#endif
+    #endif
 
     pAP->setStripeOrFrillMainPalOfsId( CHECK_PAL_OFS_STRIPE_A );
-    //pAP->setStripeOrFrillSubPalOfsId( CHECK_PAL_OFS_STRIPE_B );
+    pAP->setStripeOrFrillSubPalOfsId( CHECK_PAL_OFS_STRIPE_B );
 
-    //pAP->setTouchRandomOfs( 300, 300 );
-    //pAP->setTouchSkipRate( 5000, 5000 );
-
-#if 1
-    pAP->setTouchBase( 10000, 10000, 0 );
-    pAP->setTouchFront( 10000, 0, 10000, 16, 1, 2000 );
-#else
-    pAP->setTouchBase( 6000, 10000, 0 );
-    pAP->setTouchFront( 3000, 2000, 2000, 8, 0, 3000 );
-    pAP->setTouchBack( 3000, -3000, 2000, 8, 0, 3000 );
-#endif
+    #ifdef STRIPE_SUB_TEST
+    pAP->set( 0,0, 0,0, 0,-500 );
+    
+    // 中央から前後に半分の領域までタッチをつなげて塗りつぶす
+    pAP->setTouchBase( 5000, -10000, 0 );
+    pAP->setTouchFront( 5000, 10000, -900, 5, 0, 3000 );
+    pAP->setTouchBack( 5000, -10000, 900, 5, 0, 3000 );
+    #else
+    pAP->set( 0,0, 0,0, 200,0 );
+    
+    // 外周から中心へ向かってタッチを伸ばして塗りつぶす
+    //（※全領域を指定すると最後のストロークが重複する＆そのストロークをスキップすると塗りつぶされないので元の色が残る）
+    pAP->setTouchBase( 10000, -10000, 900 );
+    pAP->setTouchFront( 10000, 20000, -3600, 16, 1, 0 );
+    #endif
 
     pLOD->addData( pAP );
 
     // 点Ａ１
     pAP = CAnchorPointData::Alloc();
     #ifdef STRIPE_SUB_TEST
-    pAP->set( 0,-5000, -1000,0, 0,0 );
+    pAP->set( 0,-5000, 0,-500, 0,0 );
     #else
-    pAP->set( -6000,-1000, 0,-500, 0,0 );
-    #endif
-    
-    #ifdef HOOK_TEST
+    pAP->set( 0,-1500, 200,0, 0,0 );
     pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_A );
     #endif
+    
     pLOD->addData( pAP );
     
     #else   // STRIPE_TEST
@@ -357,19 +378,33 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     //-----------------------------
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,0, 0,0, 200,0 );
-    pAP->setStroke( 0,20000, 0,0 );
-
+    pAP->setStroke( 20000,0, 0,0 );
     pAP->setTouchTargetId( eSTROKE_TOUCH_TARGET_TEMP_A );
-    //pAP->setTouchRandomOfs( 200, 0/*500*/ );
-    //pAP->setTouchSkipRate( 0/*3000*/, 3000 );
 
 #if 0
-    pAP->setTouchBase( 10000, 10000, 0 );
-    pAP->setTouchFront( 10000, 0, 10000, 24, 1, 2000 );
-#else
-    pAP->setTouchBase( 5000, 10000, 0 );
-    pAP->setTouchFront( 10000, -5000, 10000, 12, 0, 2000 );
-    pAP->setTouchBack( 10000, 5000, -10000, 12, 1, 2000 );
+    // 末尾（左のAP）ろから先頭へぐるりと１周（※最後の１タッチはスキップ）
+    pAP->setTouchBase( 10000, 10000, 900 );
+    pAP->setTouchFront( 10000, 0, -3600, 24, 1, 0 );
+#endif
+
+#if 0
+    // 先頭（左のAP）から末尾へぐるりと１周（※二重線／最後の１タッチはスキップ）
+    pAP->setTouchBase( 0, 10000, 900 );
+    pAP->setTouchBack( 10000, 0, 3600, 24, 1, 3000 );
+#endif
+    
+#if 1
+    // 中央（右のAP）から前後（左のAP）へそれぞれ半周（サイズの増減／二重線／最後の１タッチはスキップ）
+    pAP->setTouchBase( 5000, 10000, 2700 );
+    pAP->setTouchFront( 10000, -3000, -1800, 12, 0, 2000 );
+    pAP->setTouchBack( 10000, 3000, 1800, 12, 1, 2000 );
+#endif
+
+#if 0
+    // サイズ確認：基本サイズが負＆オフセットで０をまたぐ（※負になるとタッチが反転する＝外側へ伸びるので注意）
+    pAP->setTouchBase( 5000, -10000, 2700 );
+    pAP->setTouchFront( 10000, 20000, -1800, 12, 0, 2000 );
+    pAP->setTouchBack( 10000, -20000, 1800, 12, 1, 2000 );
 #endif
        
     pLOD->addData( pAP );
@@ -377,9 +412,6 @@ void CBezierTestLoop::allocForLayerForTouch( void ){
     // 点Ａ１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0,-1500, 200,0, 0,0 );
-    #ifdef HOOK_TEST
-    pAP->setHookTargetId( eSTROKE_HOOK_TARGET_TEMP_A );
-    #endif
     
     pLOD->addData( pAP );
     

@@ -67,6 +67,14 @@ void CScrollBarMenu::setActive( bool flag ){
 	m_oScrollBar.setActive( flag );
 }
 
+//------------------
+// 暗転指定
+//------------------
+void CScrollBarMenu::setDark( bool flag ){
+    CMenu::setDark( flag );
+    m_oScrollBar.setDark( flag );
+}
+
 //-------------------
 // メニュー確定
 //-------------------

@@ -26,12 +26,12 @@
 #include "draw/grp/GrpMgr.hpp"
 #include "draw/DrawCell.hpp"
 #include "draw/DrawCommon.hpp"
-#include "draw/tex/bezier/Bezier.hpp"
-#include "draw/tex/stroke/StrokeMgr.hpp"
-#include "draw/tex/fill/FillMgr.hpp"
-#include "draw/tex/bmp/BmpDotMgr.hpp"
-#include "draw/tex/bmp_pal/BmpPalMgr.hpp"
-#include "draw/tex/bmp/BmpGenerator.hpp"
+#include "draw/bezier/Bezier.hpp"
+#include "draw/bezier/stroke/StrokeMgr.hpp"
+#include "draw/bezier/fill/FillMgr.hpp"
+#include "draw/bmp/BmpGenerator.hpp"
+#include "draw/bmp/dot/BmpDotMgr.hpp"
+#include "draw/bmp/pal/BmpPalMgr.hpp"
 #include "draw/tex/TexCacheMgr.hpp"
 #include "draw/tex/TexStringMgr.hpp"
 #include "draw/tex/TexMgr.hpp"
@@ -215,14 +215,14 @@ public:
     // スクリーンショット予約（※予約の発行されたフレームの描画終了時の内容が出力される）
     static void ReserveScreenShot( const char* pFileName = NULL );
 
+    // フレームバッファ内容を出力する
+    static bool DumpCurFrameBufferToLocal( const char* pFileName );
+
 private:
 	// インスタンス作成は不可
 	CMainRenderer( void ){}
 	virtual ~CMainRenderer( void ){}
-
-    // スクリーンショット出力
-    static bool DumpScreenShotToLocal( const char* pFileName );
-
+    
     // レンダーログ
 #ifdef RENDER_LOG
     static void DrawRenderLog( void );

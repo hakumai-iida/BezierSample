@@ -13,7 +13,7 @@
   |	Include		インクルードヘッダ
   +----------------------------------------------------------------+*/
 #include "env.hpp"
-#include "draw/tex/stroke/StrokeConst.hpp"
+#include "draw/bezier/stroke/StrokeConst.hpp"
 
 // ヘッダの読み込みタイミングの関係で[CEditValueMenu]を宣言
 class CEditValueMenu;

@@ -44,14 +44,14 @@ enum eHIF_IMG_TYPE{
 // WORD   _reserved;	// [06]:予約（０埋め）
 // DWORD* arrBlockOfs;	// [08]:配列：各ブロックへのオフセット
 //-----------------------------------------------------------------
-typedef struct{
+struct stHIF_HEADER{
 	bool	isValid;		// 有効フラグ（※署名＆バージョン判定結果）
 	BYTE*	pSrc;			// ソースバッファ
 
 	// ブロック管理情報
 	int		numBlock;		// ブロック数
 	BYTE*	pBlockOfs;		// ブロックデータオフセット配列ポインタ（※値の参照時は都度解釈）
-} stHIF_HEADER;
+};
 
 #define HIF_HEADER_BIN_SIZE 8
 
@@ -73,7 +73,7 @@ typedef struct{
 // WORD  baseY;			// [22]:基点Y座標
 // BYTE* pBuf;			// [24] バッファ
 //-----------------------------------------------------------------
-typedef struct{
+struct stHIF_BLOCK_INFO{
 	eHIF_IMG_TYPE type;	// 画像種類
 	int delay;			// 表示時間
 	DWORD size;			// サイズ
@@ -86,7 +86,7 @@ typedef struct{
 	int baseX;			// 基点X座標
 	int baseY;			// 基点Y座標
 	BYTE* pBuf;			// データ
-} stHIF_BLOCK_INFO;
+};
 
 #define HIF_BLOCK_INFO_BIN_SIZE 24
 

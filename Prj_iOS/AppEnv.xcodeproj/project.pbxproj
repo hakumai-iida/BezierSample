@@ -9,16 +9,8 @@
 /* Begin PBXBuildFile section */
 		9C50A7061EAA089F00E26988 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C50A7051EAA089F00E26988 /* GameKit.framework */; };
 		E70A37D22110A9070057B6E4 /* bdp in Resources */ = {isa = PBXBuildFile; fileRef = E70A37D12110A9070057B6E4 /* bdp */; };
-		E71AAC22215DBDBF00F1E64A /* JointPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E71AAC21215DBDBF00F1E64A /* JointPoint.cpp */; };
-		E728026721B949A600B7B3D4 /* AnglePlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E728026521B949A500B7B3D4 /* AnglePlane.cpp */; };
 		E72EDFB11EE4F6670046BC2A /* MainViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = E72EDFB01EE4F6670046BC2A /* MainViewController.mm */; };
-		E72F167020E1B01B0056D4B7 /* LayerData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E72F166F20E1B01B0056D4B7 /* LayerData.cpp */; };
-		E72FB104225D785000DB1531 /* BezierForFill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E72FB103225D785000DB1531 /* BezierForFill.cpp */; };
-		E734AFAB20EE38EB0008E085 /* BDConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E734AFA720EE38EB0008E085 /* BDConst.cpp */; };
 		E7351BE01F4D41F60005D89E /* util_str.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7351BDE1F4D41F60005D89E /* util_str.cpp */; };
-		E735F23520E06E36005E6147 /* LineObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E735F23320E06E35005E6147 /* LineObjectData.cpp */; };
-		E738234B21D1310D0049F3BB /* BmpGeneratorForOrder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738234A21D1310D0049F3BB /* BmpGeneratorForOrder.cpp */; };
-		E738234D21D132DF0049F3BB /* BmpGeneratorForAngle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E738234C21D132DF0049F3BB /* BmpGeneratorForAngle.cpp */; };
 		E742F6511953BB8000E10C0D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E742F6501953BB7F00E10C0D /* OpenGLES.framework */; };
 		E744245920B4056D00B0169E /* LoopReserve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E744245120B4056C00B0169E /* LoopReserve.cpp */; };
 		E744245A20B4056D00B0169E /* LoopTaskReserve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E744245420B4056C00B0169E /* LoopTaskReserve.cpp */; };
@@ -36,28 +28,13 @@
 		E744247A20B4058100B0169E /* ScrollBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E744246F20B4058100B0169E /* ScrollBar.cpp */; };
 		E744247D20B4081D00B0169E /* GestureLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E744247C20B4081D00B0169E /* GestureLoop.cpp */; };
 		E74A8C271F3962F100CEFA5A /* DialogHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74A8C211F3962F100CEFA5A /* DialogHelper.cpp */; };
-		E74AA38320E0972900B74C9A /* PaintObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74AA38120E0972900B74C9A /* PaintObjectData.cpp */; };
-		E74BC19E22E564B70014BBFB /* BmpDotOrderData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74BC19D22E564B60014BBFB /* BmpDotOrderData.cpp */; };
-		E74BC1A322E5653E0014BBFB /* BmpDotSettingData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74BC19F22E5653D0014BBFB /* BmpDotSettingData.cpp */; };
-		E74BC1A422E5653E0014BBFB /* BmpDotSettingSlotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E74BC1A122E5653E0014BBFB /* BmpDotSettingSlotData.cpp */; };
-		E750D33F22E4BFCA00A5F9D4 /* BmpGeneratorForSetting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E750D33E22E4BFCA00A5F9D4 /* BmpGeneratorForSetting.cpp */; };
-		E753C0BC21AD15CF006A9555 /* BezierForTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E753C0BB21AD15CF006A9555 /* BezierForTouch.cpp */; };
-		E753C11B20EF16CD00BA5608 /* LayerOrderList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E753C11920EF16CC00BA5608 /* LayerOrderList.cpp */; };
 		E753CA9422F1F49400AC6814 /* FileHeader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E753CA9222F1F49300AC6814 /* FileHeader.cpp */; };
 		E755395C22F5D253006820E2 /* DefConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E755395A22F5D253006820E2 /* DefConst.cpp */; };
 		E755396C22F5D55D006820E2 /* DefTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E755396022F5D55C006820E2 /* DefTable.cpp */; };
 		E755397C22F5D73C006820E2 /* CsvCell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E755397B22F5D73C006820E2 /* CsvCell.cpp */; };
-		E7561B74227701B4005E2CA2 /* BmpDotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7561B72227701B4005E2CA2 /* BmpDotData.cpp */; };
-		E759947420EDBA510098C87C /* SlotPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E759947220EDBA510098C87C /* SlotPointData.cpp */; };
-		E759947720EDBD6A0098C87C /* SlotObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E759947520EDBD690098C87C /* SlotObjectData.cpp */; };
-		E75BB94320D00066004544CD /* FillMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75BB94020D00065004544CD /* FillMgr.cpp */; };
-		E75FB1F9216442B90087AFEB /* BezierForFrillLayerData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E75FB1F8216442B80087AFEB /* BezierForFrillLayerData.cpp */; };
-		E760811B20F6B6FD00BCE2EC /* BmpGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E760811920F6B6FC00BCE2EC /* BmpGenerator.cpp */; };
 		E762173221FAD9B000C02802 /* TouchExObj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E762173021FAD9AF00C02802 /* TouchExObj.cpp */; };
-		E762C90E20C0EE6E00678C67 /* Fill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E762C90C20C0EE6E00678C67 /* Fill.cpp */; };
 		E762C91320C101AE00678C67 /* Math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E762C91220C101AE00678C67 /* Math.cpp */; };
 		E762C91620C101BD00678C67 /* Rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E762C91520C101BD00678C67 /* Rand.cpp */; };
-		E762C91920C1041E00678C67 /* Bezier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E762C91820C1041E00678C67 /* Bezier.cpp */; };
 		E76F9B491B44E26A001019C0 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = E76F99031B44E26A001019C0 /* AppDelegate.mm */; };
 		E76F9B4D1B44E26A001019C0 /* MainView.mm in Sources */ = {isa = PBXBuildFile; fileRef = E76F990A1B44E26A001019C0 /* MainView.mm */; };
 		E76F9B4F1B44E26A001019C0 /* env_native_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E76F990F1B44E26A001019C0 /* env_native_ios.mm */; };
@@ -82,33 +59,17 @@
 		E76FA2BB20B4F17600377936 /* TexCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76FA2B020B4F17600377936 /* TexCache.cpp */; };
 		E76FA2BC20B4F17600377936 /* TexCacheBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76FA2B120B4F17600377936 /* TexCacheBase.cpp */; };
 		E76FA2BF20B4F25300377936 /* DrawCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E76FA2BE20B4F25300377936 /* DrawCommon.cpp */; };
-		E7743A4620FEEB0F00575FC1 /* DelayLog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7743A4520FEEB0F00575FC1 /* DelayLog.cpp */; };
 		E77451E520B5052000429BBD /* Const.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77451E320B5052000429BBD /* Const.cpp */; };
 		E77451E820B50A4000429BBD /* config_for_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77451E720B50A4000429BBD /* config_for_app.cpp */; };
-		E774797B216315BD003FEF71 /* BezierForFrill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E774797A216315BC003FEF71 /* BezierForFrill.cpp */; };
-		E775544D20CF79E400F28074 /* FillPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E775544C20CF79E400F28074 /* FillPointData.cpp */; };
-		E778C71E21020C1E008D54A2 /* BmpDotPack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E778C71C21020C1D008D54A2 /* BmpDotPack.cpp */; };
 		E77AA86A24A1BE28006D7DC6 /* BrushBinData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77AA86924A1BE28006D7DC6 /* BrushBinData.cpp */; };
-		E77AA86D24A1BE45006D7DC6 /* FillConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E77AA86B24A1BE45006D7DC6 /* FillConst.cpp */; };
 		E77C231119604FEB00C88A7C /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7A055111955929B00692021 /* GLKit.framework */; };
 		E77E9D0E20B390D90043BF09 /* env_native_ios_for_dialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = E77E9D0B20B390D80043BF09 /* env_native_ios_for_dialog.mm */; };
-		E78A563321C2D3F40026C347 /* AdjustCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E78A563221C2D3F40026C347 /* AdjustCalc.cpp */; };
 		E792DEC220B4EA0C0064907F /* time_log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E792DEC020B4EA0B0064907F /* time_log.cpp */; };
 		E793036F21755F1B00398828 /* TexMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E793036D21755F1A00398828 /* TexMgr.cpp */; };
 		E795BB2C24F57F8C007C38B4 /* bpd in Resources */ = {isa = PBXBuildFile; fileRef = E795BB2B24F57F8C007C38B4 /* bpd */; };
 		E795BB2E24F57FA8007C38B4 /* BezierTestLoopForTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB2D24F57FA8007C38B4 /* BezierTestLoopForTouch.cpp */; };
-		E795BB3724F5811A007C38B4 /* BPConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3024F58119007C38B4 /* BPConst.cpp */; };
-		E795BB3824F5811A007C38B4 /* BmpPalData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3124F58119007C38B4 /* BmpPalData.cpp */; };
-		E795BB3924F5811A007C38B4 /* inc in Resources */ = {isa = PBXBuildFile; fileRef = E795BB3324F5811A007C38B4 /* inc */; };
-		E795BB3A24F5811A007C38B4 /* BmpPalMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3624F5811A007C38B4 /* BmpPalMgr.cpp */; };
-		E795BB3D24F5813A007C38B4 /* BezierForWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3B24F5813A007C38B4 /* BezierForWork.cpp */; };
-		E795BB3E24F5813A007C38B4 /* BezierForSub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3C24F5813A007C38B4 /* BezierForSub.cpp */; };
-		E795BB4024F58168007C38B4 /* BmpDotSlotCategory.inc in Sources */ = {isa = PBXBuildFile; fileRef = E795BB3F24F58168007C38B4 /* BmpDotSlotCategory.inc */; };
-		E795BB4324F58193007C38B4 /* FillForExe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB4124F58193007C38B4 /* FillForExe.cpp */; };
-		E795BB4424F58193007C38B4 /* FillForUndercoat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB4224F58193007C38B4 /* FillForUndercoat.cpp */; };
 		E795BB4924F581AF007C38B4 /* EditPalDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB4524F581AE007C38B4 /* EditPalDialog.cpp */; };
 		E795BB4A24F581AF007C38B4 /* EditPalMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB4724F581AE007C38B4 /* EditPalMenu.cpp */; };
-		E795BB4C24F587D8007C38B4 /* BezierForEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E795BB4B24F587D8007C38B4 /* BezierForEdge.cpp */; };
 		E79F9AA720D9D24E0084E58B /* PullDownMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E79F9AA520D9D24D0084E58B /* PullDownMenu.cpp */; };
 		E7A05513195593CD00692021 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E742F6521953BB8A00E10C0D /* QuartzCore.framework */; };
 		E7A1A4D81953A89E00C66860 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7A1A4D71953A89E00C66860 /* Foundation.framework */; };
@@ -119,16 +80,7 @@
 		E7A21D5D24BE375C009DF219 /* BezierTestLoopForLineRepair.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A21D5924BE375C009DF219 /* BezierTestLoopForLineRepair.cpp */; };
 		E7A21D5E24BE375C009DF219 /* BezierTestLoopForDelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7A21D5A24BE375C009DF219 /* BezierTestLoopForDelay.cpp */; };
 		E7AEE10822F5F0FE006DCF75 /* DrawConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7AEE10722F5F0FE006DCF75 /* DrawConst.cpp */; };
-		E7AEE10A22F5F2CC006DCF75 /* BezierConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7AEE10922F5F2CC006DCF75 /* BezierConst.cpp */; };
-		E7B033E020F6ADF500CFEE57 /* BmpDotMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B033DE20F6ADF400CFEE57 /* BmpDotMgr.cpp */; };
-		E7B6194120EF055000ECEFAA /* LayerOrderCell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B6194020EF054F00ECEFAA /* LayerOrderCell.cpp */; };
-		E7B6194320EF05FB00ECEFAA /* LayerObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B6194220EF05FB00ECEFAA /* LayerObject.cpp */; };
-		E7B7D3E024A1500100D1443B /* StrokeConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B7D3DF24A1500100D1443B /* StrokeConst.cpp */; };
 		E7B8E00721C004DF001BD334 /* Enum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7B8E00521C004DE001BD334 /* Enum.cpp */; };
-		E7BA910420CF4A6600BD7007 /* AnchorPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BA910320CF4A6500BD7007 /* AnchorPointData.cpp */; };
-		E7BA911120CF6B0300BD7007 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BA910C20CF6B0200BD7007 /* Stroke.cpp */; };
-		E7BA911320CF6B0300BD7007 /* StrokeMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BA910F20CF6B0300BD7007 /* StrokeMgr.cpp */; };
-		E7BBF47E2123F795004218C4 /* StrokeDot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7BBF47D2123F795004218C4 /* StrokeDot.cpp */; };
 		E7C34BB620B415D400F7BDF5 /* Fade.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BA820B415D300F7BDF5 /* Fade.cpp */; };
 		E7C34BB720B415D400F7BDF5 /* Obj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BA920B415D300F7BDF5 /* Obj.cpp */; };
 		E7C34BB820B415D400F7BDF5 /* Updater.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7C34BAD20B415D300F7BDF5 /* Updater.cpp */; };
@@ -138,16 +90,65 @@
 		E7D34B15247177B200989B28 /* BrushCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B06247177B100989B28 /* BrushCheckLoop.cpp */; };
 		E7D34B17247177B200989B28 /* StrokeCheckLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B08247177B100989B28 /* StrokeCheckLoop.cpp */; };
 		E7D34B18247177B200989B28 /* BezierTestLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D34B09247177B200989B28 /* BezierTestLoop.cpp */; };
-		E7D38BF720F4F2F600149A52 /* BmpGenParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7D38BF520F4F2F600149A52 /* BmpGenParam.cpp */; };
-		E7DC4E2B215D98D90092B904 /* SlotAdjuster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DC4E29215D98D80092B904 /* SlotAdjuster.cpp */; };
 		E7DC94DD22F52E5E00E13383 /* GrpMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DC94DA22F52E5D00E13383 /* GrpMgr.cpp */; };
 		E7DC94DE22F52E5E00E13383 /* Grp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DC94DC22F52E5D00E13383 /* Grp.cpp */; };
 		E7DC94E422F52E8B00E13383 /* Num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DC94E022F52E8B00E13383 /* Num.cpp */; };
 		E7DC94E522F52E8B00E13383 /* NumMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DC94E222F52E8B00E13383 /* NumMgr.cpp */; };
-		E7DFD3592276F48F00F5CD4B /* BmpDotPartData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7DFD3582276F48F00F5CD4B /* BmpDotPartData.cpp */; };
-		E7E7AC9020EC3E7600B318E5 /* AdjustablePoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7E7AC8F20EC3E7600B318E5 /* AdjustablePoint.cpp */; };
 		E7F2A95C21A23FEA00D2A368 /* TouchObj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F2A95A21A23FE900D2A368 /* TouchObj.cpp */; };
-		E7FEE25A20F33213004CC0F2 /* BezierDataConv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7FEE25820F33212004CC0F2 /* BezierDataConv.cpp */; };
+		E7F7FC03255C6F5B0023FD66 /* BezierForEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBF4255C6F5A0023FD66 /* BezierForEdge.cpp */; };
+		E7F7FC04255C6F5B0023FD66 /* BezierForFill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBF5255C6F5A0023FD66 /* BezierForFill.cpp */; };
+		E7F7FC07255C6F5B0023FD66 /* BezierConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBF8255C6F5A0023FD66 /* BezierConst.cpp */; };
+		E7F7FC08255C6F5B0023FD66 /* BezierForTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBF9255C6F5A0023FD66 /* BezierForTouch.cpp */; };
+		E7F7FC09255C6F5B0023FD66 /* Bezier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBFB255C6F5A0023FD66 /* Bezier.cpp */; };
+		E7F7FC0D255C6F5B0023FD66 /* BezierForFrillLayerData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FBFF255C6F5B0023FD66 /* BezierForFrillLayerData.cpp */; };
+		E7F7FC0E255C6F5B0023FD66 /* BezierForWork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC00255C6F5B0023FD66 /* BezierForWork.cpp */; };
+		E7F7FC0F255C6F5B0023FD66 /* BezierForSub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC01255C6F5B0023FD66 /* BezierForSub.cpp */; };
+		E7F7FC10255C6F5B0023FD66 /* BezierForFrill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC02255C6F5B0023FD66 /* BezierForFrill.cpp */; };
+		E7F7FC23255C6FFB0023FD66 /* AdjustablePoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC17255C6FFA0023FD66 /* AdjustablePoint.cpp */; };
+		E7F7FC24255C6FFB0023FD66 /* DelayLog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC1A255C6FFA0023FD66 /* DelayLog.cpp */; };
+		E7F7FC25255C6FFB0023FD66 /* JointPoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC1B255C6FFB0023FD66 /* JointPoint.cpp */; };
+		E7F7FC26255C6FFB0023FD66 /* AnglePlane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC1C255C6FFB0023FD66 /* AnglePlane.cpp */; };
+		E7F7FC27255C6FFB0023FD66 /* AdjustCalc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC21255C6FFB0023FD66 /* AdjustCalc.cpp */; };
+		E7F7FC28255C6FFB0023FD66 /* SlotAdjuster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC22255C6FFB0023FD66 /* SlotAdjuster.cpp */; };
+		E7F7FC3D255C70070023FD66 /* FillPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC2D255C70060023FD66 /* FillPointData.cpp */; };
+		E7F7FC3E255C70070023FD66 /* LayerOrderList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC2E255C70060023FD66 /* LayerOrderList.cpp */; };
+		E7F7FC3F255C70070023FD66 /* PaintObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC2F255C70060023FD66 /* PaintObjectData.cpp */; };
+		E7F7FC40255C70070023FD66 /* SlotObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC30255C70060023FD66 /* SlotObjectData.cpp */; };
+		E7F7FC41255C70070023FD66 /* AnchorPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC31255C70060023FD66 /* AnchorPointData.cpp */; };
+		E7F7FC42255C70070023FD66 /* LayerOrderCell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC36255C70070023FD66 /* LayerOrderCell.cpp */; };
+		E7F7FC43255C70070023FD66 /* LayerObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC37255C70070023FD66 /* LayerObject.cpp */; };
+		E7F7FC44255C70070023FD66 /* LineObjectData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC38255C70070023FD66 /* LineObjectData.cpp */; };
+		E7F7FC45255C70070023FD66 /* SlotPointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC3A255C70070023FD66 /* SlotPointData.cpp */; };
+		E7F7FC46255C70070023FD66 /* LayerData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC3B255C70070023FD66 /* LayerData.cpp */; };
+		E7F7FC4F255C70130023FD66 /* Fill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC48255C70120023FD66 /* Fill.cpp */; };
+		E7F7FC50255C70130023FD66 /* FillForExe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC49255C70120023FD66 /* FillForExe.cpp */; };
+		E7F7FC51255C70130023FD66 /* FillForUndercoat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC4A255C70120023FD66 /* FillForUndercoat.cpp */; };
+		E7F7FC52255C70130023FD66 /* FillConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC4B255C70130023FD66 /* FillConst.cpp */; };
+		E7F7FC53255C70130023FD66 /* FillMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC4E255C70130023FD66 /* FillMgr.cpp */; };
+		E7F7FC5C255C701E0023FD66 /* StrokeConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC54255C701D0023FD66 /* StrokeConst.cpp */; };
+		E7F7FC5D255C701E0023FD66 /* StrokeDot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC56255C701E0023FD66 /* StrokeDot.cpp */; };
+		E7F7FC5E255C701E0023FD66 /* StrokeMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC57255C701E0023FD66 /* StrokeMgr.cpp */; };
+		E7F7FC5F255C701E0023FD66 /* Stroke.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC5B255C701E0023FD66 /* Stroke.cpp */; };
+		E7F7FC63255C70270023FD66 /* BezierStructConv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC60255C70270023FD66 /* BezierStructConv.cpp */; };
+		E7F7FC6F255C70370023FD66 /* BmpGeneratorForOrder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC64255C70360023FD66 /* BmpGeneratorForOrder.cpp */; };
+		E7F7FC70255C70370023FD66 /* BmpTex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC65255C70360023FD66 /* BmpTex.cpp */; };
+		E7F7FC71255C70370023FD66 /* BmpGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC66255C70360023FD66 /* BmpGenerator.cpp */; };
+		E7F7FC72255C70370023FD66 /* BmpGeneratorForAngle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC68255C70370023FD66 /* BmpGeneratorForAngle.cpp */; };
+		E7F7FC73255C70370023FD66 /* BmpGeneratorForSetting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC69255C70370023FD66 /* BmpGeneratorForSetting.cpp */; };
+		E7F7FC74255C70370023FD66 /* BmpGenParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC6D255C70370023FD66 /* BmpGenParam.cpp */; };
+		E7F7FC75255C70370023FD66 /* BmpPal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC6E255C70370023FD66 /* BmpPal.cpp */; };
+		E7F7FC88255C707D0023FD66 /* BmpDotMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC79255C707B0023FD66 /* BmpDotMgr.cpp */; };
+		E7F7FC89255C707D0023FD66 /* BmpDotSettingData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC7B255C707C0023FD66 /* BmpDotSettingData.cpp */; };
+		E7F7FC8A255C707D0023FD66 /* BDConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC7C255C707C0023FD66 /* BDConst.cpp */; };
+		E7F7FC8B255C707D0023FD66 /* BmpDotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC7E255C707C0023FD66 /* BmpDotData.cpp */; };
+		E7F7FC8C255C707D0023FD66 /* BmpDotSettingSlotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC7F255C707C0023FD66 /* BmpDotSettingSlotData.cpp */; };
+		E7F7FC8D255C707D0023FD66 /* BmpDotPack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC80255C707C0023FD66 /* BmpDotPack.cpp */; };
+		E7F7FC8E255C707D0023FD66 /* BmpDotPartData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC83255C707C0023FD66 /* BmpDotPartData.cpp */; };
+		E7F7FC8F255C707D0023FD66 /* BmpDotOrderData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FC87255C707D0023FD66 /* BmpDotOrderData.cpp */; };
+		E7F7FCAA255C70B30023FD66 /* BPConst.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FCA6255C70B30023FD66 /* BPConst.cpp */; };
+		E7F7FCAB255C70B30023FD66 /* BmpPalData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FCA8255C70B30023FD66 /* BmpPalData.cpp */; };
+		E7F7FCAC255C70B30023FD66 /* BmpPalMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E7F7FCA9255C70B30023FD66 /* BmpPalMgr.cpp */; };
+		E7F7FCB1255C75BE0023FD66 /* bds in Resources */ = {isa = PBXBuildFile; fileRef = E7F7FCB0255C75BE0023FD66 /* bds */; };
 		FE1448421E383CF900793A14 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E76F99081B44E26A001019C0 /* Images.xcassets */; };
 		FE24F7D81D5414EC002A44D6 /* bin in Resources */ = {isa = PBXBuildFile; fileRef = FE24F7CF1D5414EC002A44D6 /* bin */; };
 		FE24F7D91D5414EC002A44D6 /* image.fpk in Resources */ = {isa = PBXBuildFile; fileRef = FE24F7D01D5414EC002A44D6 /* image.fpk */; };
@@ -204,25 +205,11 @@
 		E712B8612125C0570053F071 /* ImgId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = ImgId.inc; sourceTree = "<group>"; };
 		E712B8632125C06B0053F071 /* val_sin.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = val_sin.inc; sourceTree = "<group>"; };
 		E712B8642125C06C0053F071 /* val_cos.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = val_cos.inc; sourceTree = "<group>"; };
-		E71AAC20215DBDBF00F1E64A /* JointPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = JointPoint.hpp; sourceTree = "<group>"; };
-		E71AAC21215DBDBF00F1E64A /* JointPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JointPoint.cpp; sourceTree = "<group>"; };
-		E728026521B949A500B7B3D4 /* AnglePlane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnglePlane.cpp; sourceTree = "<group>"; };
-		E728026621B949A500B7B3D4 /* AnglePlane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnglePlane.hpp; sourceTree = "<group>"; };
 		E72EDFAF1EE4F6670046BC2A /* MainViewController.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MainViewController.hpp; sourceTree = "<group>"; };
 		E72EDFB01EE4F6670046BC2A /* MainViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MainViewController.mm; sourceTree = "<group>"; };
-		E72F166E20E1B01A0056D4B7 /* LayerData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerData.hpp; sourceTree = "<group>"; };
-		E72F166F20E1B01B0056D4B7 /* LayerData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerData.cpp; sourceTree = "<group>"; };
-		E72F167120E1B8EF0056D4B7 /* LayerObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerObject.hpp; sourceTree = "<group>"; };
-		E72FB103225D785000DB1531 /* BezierForFill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFill.cpp; sourceTree = "<group>"; };
 		E734072722F3504100A5C2BC /* DrawConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DrawConst.hpp; sourceTree = "<group>"; };
-		E734AFA720EE38EB0008E085 /* BDConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BDConst.cpp; sourceTree = "<group>"; };
-		E734AFA920EE38EB0008E085 /* BDConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BDConst.hpp; sourceTree = "<group>"; };
 		E7351BDE1F4D41F60005D89E /* util_str.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util_str.cpp; sourceTree = "<group>"; };
 		E7351BDF1F4D41F60005D89E /* util_str.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util_str.hpp; sourceTree = "<group>"; };
-		E735F23320E06E35005E6147 /* LineObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LineObjectData.cpp; sourceTree = "<group>"; };
-		E735F23420E06E36005E6147 /* LineObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LineObjectData.hpp; sourceTree = "<group>"; };
-		E738234A21D1310D0049F3BB /* BmpGeneratorForOrder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForOrder.cpp; sourceTree = "<group>"; };
-		E738234C21D132DF0049F3BB /* BmpGeneratorForAngle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForAngle.cpp; sourceTree = "<group>"; };
 		E742F6501953BB7F00E10C0D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		E742F6521953BB8A00E10C0D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		E744245120B4056C00B0169E /* LoopReserve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoopReserve.cpp; sourceTree = "<group>"; };
@@ -257,38 +244,12 @@
 		E744247C20B4081D00B0169E /* GestureLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GestureLoop.cpp; sourceTree = "<group>"; };
 		E74A8C211F3962F100CEFA5A /* DialogHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogHelper.cpp; sourceTree = "<group>"; };
 		E74A8C221F3962F100CEFA5A /* DialogHelper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DialogHelper.hpp; sourceTree = "<group>"; };
-		E74AA38120E0972900B74C9A /* PaintObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaintObjectData.cpp; sourceTree = "<group>"; };
-		E74AA38220E0972900B74C9A /* PaintObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PaintObjectData.hpp; sourceTree = "<group>"; };
-		E74BC19C22E564B60014BBFB /* BmpDotOrderData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotOrderData.hpp; sourceTree = "<group>"; };
-		E74BC19D22E564B60014BBFB /* BmpDotOrderData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotOrderData.cpp; sourceTree = "<group>"; };
-		E74BC19F22E5653D0014BBFB /* BmpDotSettingData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotSettingData.cpp; sourceTree = "<group>"; };
-		E74BC1A022E5653D0014BBFB /* BmpDotSettingData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotSettingData.hpp; sourceTree = "<group>"; };
-		E74BC1A122E5653E0014BBFB /* BmpDotSettingSlotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotSettingSlotData.cpp; sourceTree = "<group>"; };
-		E74BC1A222E5653E0014BBFB /* BmpDotSettingSlotData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotSettingSlotData.hpp; sourceTree = "<group>"; };
 		E750263822F67A6C00EC859C /* BrushLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BrushLabel.inc; sourceTree = "<group>"; };
 		E750263922F67A6C00EC859C /* BrushId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BrushId.inc; sourceTree = "<group>"; };
 		E750263A22F67A6D00EC859C /* BucketId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BucketId.inc; sourceTree = "<group>"; };
 		E750263B22F67A6D00EC859C /* BucketLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BucketLabel.inc; sourceTree = "<group>"; };
 		E750263C22F67A7900EC859C /* PalOfsLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = PalOfsLabel.inc; sourceTree = "<group>"; };
 		E750263D22F67A7900EC859C /* PalOfsId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = PalOfsId.inc; sourceTree = "<group>"; };
-		E750BCCD22EE0D60007E18B9 /* BmpDotCategoryId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotCategoryId.inc; sourceTree = "<group>"; };
-		E750BCCE22EE0D60007E18B9 /* BmpDotSlotNum.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotNum.inc; sourceTree = "<group>"; };
-		E750BCCF22EE0D60007E18B9 /* BmpDotSlotLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotLabel.inc; sourceTree = "<group>"; };
-		E750BCD022EE0D60007E18B9 /* BmpDotCategoryLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotCategoryLabel.inc; sourceTree = "<group>"; };
-		E750BCD122EE0D60007E18B9 /* BmpDotEmoId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotEmoId.inc; sourceTree = "<group>"; };
-		E750BCD222EE0D61007E18B9 /* BmpDotSlotParent.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotParent.inc; sourceTree = "<group>"; };
-		E750BCD322EE0D61007E18B9 /* BmpDotSlotId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotId.inc; sourceTree = "<group>"; };
-		E750BCD422EE0D61007E18B9 /* BmpDotDirId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotDirId.inc; sourceTree = "<group>"; };
-		E750BCD522EE0D61007E18B9 /* BmpDotOptionId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotOptionId.inc; sourceTree = "<group>"; };
-		E750BCD622EE0D61007E18B9 /* BmpDotDirLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotDirLabel.inc; sourceTree = "<group>"; };
-		E750BCD722EE0D61007E18B9 /* BmpDotFormId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotFormId.inc; sourceTree = "<group>"; };
-		E750BCD822EE0D61007E18B9 /* BmpDotFormLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotFormLabel.inc; sourceTree = "<group>"; };
-		E750BCD922EE0D61007E18B9 /* BmpDotEmoLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotEmoLabel.inc; sourceTree = "<group>"; };
-		E750BCDA22EE0D61007E18B9 /* BmpDotOptionLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotOptionLabel.inc; sourceTree = "<group>"; };
-		E750D33E22E4BFCA00A5F9D4 /* BmpGeneratorForSetting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForSetting.cpp; sourceTree = "<group>"; };
-		E753C0BB21AD15CF006A9555 /* BezierForTouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForTouch.cpp; sourceTree = "<group>"; };
-		E753C11920EF16CC00BA5608 /* LayerOrderList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerOrderList.cpp; sourceTree = "<group>"; };
-		E753C11A20EF16CD00BA5608 /* LayerOrderList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerOrderList.hpp; sourceTree = "<group>"; };
 		E753CA9222F1F49300AC6814 /* FileHeader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileHeader.cpp; sourceTree = "<group>"; };
 		E753CA9322F1F49300AC6814 /* FileHeader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FileHeader.hpp; sourceTree = "<group>"; };
 		E755395922F5C312006820E2 /* CsvCell.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CsvCell.hpp; sourceTree = "<group>"; };
@@ -297,28 +258,12 @@
 		E755396022F5D55C006820E2 /* DefTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefTable.cpp; sourceTree = "<group>"; };
 		E755396222F5D55C006820E2 /* DefTable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DefTable.hpp; sourceTree = "<group>"; };
 		E755397B22F5D73C006820E2 /* CsvCell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CsvCell.cpp; sourceTree = "<group>"; };
-		E755398722F5E49F006820E2 /* BezierStruct.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierStruct.hpp; sourceTree = "<group>"; };
-		E7561B72227701B4005E2CA2 /* BmpDotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotData.cpp; sourceTree = "<group>"; };
-		E7561B73227701B4005E2CA2 /* BmpDotData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotData.hpp; sourceTree = "<group>"; };
-		E759947220EDBA510098C87C /* SlotPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotPointData.cpp; sourceTree = "<group>"; };
-		E759947320EDBA510098C87C /* SlotPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotPointData.hpp; sourceTree = "<group>"; };
-		E759947520EDBD690098C87C /* SlotObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotObjectData.cpp; sourceTree = "<group>"; };
-		E759947620EDBD690098C87C /* SlotObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotObjectData.hpp; sourceTree = "<group>"; };
-		E75BB94020D00065004544CD /* FillMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillMgr.cpp; sourceTree = "<group>"; };
-		E75BB94220D00066004544CD /* FillMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillMgr.hpp; sourceTree = "<group>"; };
-		E75FB1F8216442B80087AFEB /* BezierForFrillLayerData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFrillLayerData.cpp; sourceTree = "<group>"; };
-		E760811920F6B6FC00BCE2EC /* BmpGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGenerator.cpp; sourceTree = "<group>"; };
-		E760811A20F6B6FD00BCE2EC /* BmpGenerator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpGenerator.hpp; sourceTree = "<group>"; };
 		E762173021FAD9AF00C02802 /* TouchExObj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchExObj.cpp; sourceTree = "<group>"; };
 		E762173121FAD9AF00C02802 /* TouchExObj.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TouchExObj.hpp; sourceTree = "<group>"; };
-		E762C90C20C0EE6E00678C67 /* Fill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fill.cpp; sourceTree = "<group>"; };
-		E762C90D20C0EE6E00678C67 /* Fill.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Fill.hpp; sourceTree = "<group>"; };
 		E762C91120C101AE00678C67 /* Math.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Math.hpp; sourceTree = "<group>"; };
 		E762C91220C101AE00678C67 /* Math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Math.cpp; sourceTree = "<group>"; };
 		E762C91420C101BD00678C67 /* Rand.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Rand.hpp; sourceTree = "<group>"; };
 		E762C91520C101BD00678C67 /* Rand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rand.cpp; sourceTree = "<group>"; };
-		E762C91720C1041E00678C67 /* Bezier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Bezier.hpp; sourceTree = "<group>"; };
-		E762C91820C1041E00678C67 /* Bezier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bezier.cpp; sourceTree = "<group>"; };
 		E76F99021B44E26A001019C0 /* AppDelegate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = AppDelegate.hpp; path = ../Sources/AppDelegate.hpp; sourceTree = "<group>"; };
 		E76F99031B44E26A001019C0 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ../Sources/AppDelegate.mm; sourceTree = "<group>"; };
 		E76F99071B44E26A001019C0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -369,48 +314,23 @@
 		E76FA2B620B4F17600377936 /* TexStringMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TexStringMgr.hpp; sourceTree = "<group>"; };
 		E76FA2BD20B4F25300377936 /* DrawCommon.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DrawCommon.hpp; sourceTree = "<group>"; };
 		E76FA2BE20B4F25300377936 /* DrawCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawCommon.cpp; sourceTree = "<group>"; };
-		E772E06020F4269700F0CD40 /* BezierConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierConst.hpp; sourceTree = "<group>"; };
-		E7743A4420FEEB0F00575FC1 /* DelayLog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DelayLog.hpp; sourceTree = "<group>"; };
-		E7743A4520FEEB0F00575FC1 /* DelayLog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DelayLog.cpp; sourceTree = "<group>"; };
 		E77451D920B4F42C00429BBD /* common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = common.hpp; sourceTree = "<group>"; };
 		E77451E320B5052000429BBD /* Const.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Const.cpp; sourceTree = "<group>"; };
 		E77451E420B5052000429BBD /* Const.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Const.hpp; sourceTree = "<group>"; };
 		E77451E620B505E400429BBD /* config_for_app.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = config_for_app.hpp; sourceTree = "<group>"; };
 		E77451E720B50A4000429BBD /* config_for_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = config_for_app.cpp; sourceTree = "<group>"; };
-		E774797A216315BC003FEF71 /* BezierForFrill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFrill.cpp; sourceTree = "<group>"; };
-		E775544B20CF79E300F28074 /* FillPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillPointData.hpp; sourceTree = "<group>"; };
-		E775544C20CF79E400F28074 /* FillPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillPointData.cpp; sourceTree = "<group>"; };
-		E778C71C21020C1D008D54A2 /* BmpDotPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotPack.cpp; sourceTree = "<group>"; };
-		E778C71D21020C1E008D54A2 /* BmpDotPack.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotPack.hpp; sourceTree = "<group>"; };
 		E77AA86924A1BE28006D7DC6 /* BrushBinData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BrushBinData.cpp; sourceTree = "<group>"; };
-		E77AA86B24A1BE45006D7DC6 /* FillConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillConst.cpp; sourceTree = "<group>"; };
-		E77AA86C24A1BE45006D7DC6 /* FillConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillConst.hpp; sourceTree = "<group>"; };
 		E77E9D0B20B390D80043BF09 /* env_native_ios_for_dialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = env_native_ios_for_dialog.mm; sourceTree = "<group>"; };
-		E78A563121C2D3F40026C347 /* AdjustCalc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AdjustCalc.hpp; sourceTree = "<group>"; };
-		E78A563221C2D3F40026C347 /* AdjustCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdjustCalc.cpp; sourceTree = "<group>"; };
 		E792DEC020B4EA0B0064907F /* time_log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_log.cpp; sourceTree = "<group>"; };
 		E792DEC120B4EA0B0064907F /* time_log.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = time_log.hpp; sourceTree = "<group>"; };
 		E793036D21755F1A00398828 /* TexMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TexMgr.cpp; sourceTree = "<group>"; };
 		E793036E21755F1A00398828 /* TexMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TexMgr.hpp; sourceTree = "<group>"; };
 		E795BB2B24F57F8C007C38B4 /* bpd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bpd; sourceTree = "<group>"; };
 		E795BB2D24F57FA8007C38B4 /* BezierTestLoopForTouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierTestLoopForTouch.cpp; sourceTree = "<group>"; };
-		E795BB3024F58119007C38B4 /* BPConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BPConst.cpp; sourceTree = "<group>"; };
-		E795BB3124F58119007C38B4 /* BmpPalData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpPalData.cpp; sourceTree = "<group>"; };
-		E795BB3224F5811A007C38B4 /* BmpPalMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpPalMgr.hpp; sourceTree = "<group>"; };
-		E795BB3324F5811A007C38B4 /* inc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = inc; sourceTree = "<group>"; };
-		E795BB3424F5811A007C38B4 /* BPConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BPConst.hpp; sourceTree = "<group>"; };
-		E795BB3524F5811A007C38B4 /* BmpPalData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpPalData.hpp; sourceTree = "<group>"; };
-		E795BB3624F5811A007C38B4 /* BmpPalMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpPalMgr.cpp; sourceTree = "<group>"; };
-		E795BB3B24F5813A007C38B4 /* BezierForWork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForWork.cpp; sourceTree = "<group>"; };
-		E795BB3C24F5813A007C38B4 /* BezierForSub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForSub.cpp; sourceTree = "<group>"; };
-		E795BB3F24F58168007C38B4 /* BmpDotSlotCategory.inc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotCategory.inc; sourceTree = "<group>"; };
-		E795BB4124F58193007C38B4 /* FillForExe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillForExe.cpp; sourceTree = "<group>"; };
-		E795BB4224F58193007C38B4 /* FillForUndercoat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillForUndercoat.cpp; sourceTree = "<group>"; };
 		E795BB4524F581AE007C38B4 /* EditPalDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditPalDialog.cpp; sourceTree = "<group>"; };
 		E795BB4624F581AE007C38B4 /* EditPalMenu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EditPalMenu.hpp; sourceTree = "<group>"; };
 		E795BB4724F581AE007C38B4 /* EditPalMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EditPalMenu.cpp; sourceTree = "<group>"; };
 		E795BB4824F581AE007C38B4 /* EditPalDialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = EditPalDialog.hpp; sourceTree = "<group>"; };
-		E795BB4B24F587D8007C38B4 /* BezierForEdge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForEdge.cpp; sourceTree = "<group>"; };
 		E79F9AA520D9D24D0084E58B /* PullDownMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PullDownMenu.cpp; sourceTree = "<group>"; };
 		E79F9AA620D9D24E0084E58B /* PullDownMenu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PullDownMenu.hpp; sourceTree = "<group>"; };
 		E7A055111955929B00692021 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -424,12 +344,6 @@
 		E7A21D5924BE375C009DF219 /* BezierTestLoopForLineRepair.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierTestLoopForLineRepair.cpp; sourceTree = "<group>"; };
 		E7A21D5A24BE375C009DF219 /* BezierTestLoopForDelay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierTestLoopForDelay.cpp; sourceTree = "<group>"; };
 		E7AEE10722F5F0FE006DCF75 /* DrawConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DrawConst.cpp; sourceTree = "<group>"; };
-		E7AEE10922F5F2CC006DCF75 /* BezierConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierConst.cpp; sourceTree = "<group>"; };
-		E7B033DE20F6ADF400CFEE57 /* BmpDotMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotMgr.cpp; sourceTree = "<group>"; };
-		E7B033DF20F6ADF500CFEE57 /* BmpDotMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotMgr.hpp; sourceTree = "<group>"; };
-		E7B6193F20EF054F00ECEFAA /* LayerOrderCell.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerOrderCell.hpp; sourceTree = "<group>"; };
-		E7B6194020EF054F00ECEFAA /* LayerOrderCell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerOrderCell.cpp; sourceTree = "<group>"; };
-		E7B6194220EF05FB00ECEFAA /* LayerObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerObject.cpp; sourceTree = "<group>"; };
 		E7B7D3CE24A10EA800D1443B /* DefBinTable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DefBinTable.hpp; sourceTree = "<group>"; };
 		E7B7D3D224A1294500D1443B /* SprBinData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SprBinData.hpp; sourceTree = "<group>"; };
 		E7B7D3D324A1294500D1443B /* GrpBinData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GrpBinData.hpp; sourceTree = "<group>"; };
@@ -442,18 +356,8 @@
 		E7B7D3DB24A1474900D1443B /* PalOfsBinData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PalOfsBinData.hpp; sourceTree = "<group>"; };
 		E7B7D3DC24A147CC00D1443B /* BrushBinData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BrushBinData.hpp; sourceTree = "<group>"; };
 		E7B7D3DD24A1496900D1443B /* BucketBinData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BucketBinData.hpp; sourceTree = "<group>"; };
-		E7B7D3DE24A14FB900D1443B /* StrokeConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeConst.hpp; sourceTree = "<group>"; };
-		E7B7D3DF24A1500100D1443B /* StrokeConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeConst.cpp; sourceTree = "<group>"; };
 		E7B8E00521C004DE001BD334 /* Enum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Enum.cpp; sourceTree = "<group>"; };
 		E7B8E00621C004DF001BD334 /* Enum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Enum.hpp; sourceTree = "<group>"; };
-		E7BA910220CF4A6400BD7007 /* AnchorPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnchorPointData.hpp; sourceTree = "<group>"; };
-		E7BA910320CF4A6500BD7007 /* AnchorPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnchorPointData.cpp; sourceTree = "<group>"; };
-		E7BA910B20CF6B0200BD7007 /* Stroke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Stroke.hpp; sourceTree = "<group>"; };
-		E7BA910C20CF6B0200BD7007 /* Stroke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stroke.cpp; sourceTree = "<group>"; };
-		E7BA910F20CF6B0300BD7007 /* StrokeMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeMgr.cpp; sourceTree = "<group>"; };
-		E7BA911020CF6B0300BD7007 /* StrokeMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeMgr.hpp; sourceTree = "<group>"; };
-		E7BBF47C2123F794004218C4 /* StrokeDot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeDot.hpp; sourceTree = "<group>"; };
-		E7BBF47D2123F795004218C4 /* StrokeDot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeDot.cpp; sourceTree = "<group>"; };
 		E7C34BA820B415D300F7BDF5 /* Fade.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fade.cpp; sourceTree = "<group>"; };
 		E7C34BA920B415D300F7BDF5 /* Obj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Obj.cpp; sourceTree = "<group>"; };
 		E7C34BAA20B415D300F7BDF5 /* Drawer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Drawer.hpp; sourceTree = "<group>"; };
@@ -472,10 +376,6 @@
 		E7D34B08247177B100989B28 /* StrokeCheckLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeCheckLoop.cpp; sourceTree = "<group>"; };
 		E7D34B09247177B200989B28 /* BezierTestLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierTestLoop.cpp; sourceTree = "<group>"; };
 		E7D34B0C247177B200989B28 /* BrushCheckLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BrushCheckLoop.hpp; sourceTree = "<group>"; };
-		E7D38BF520F4F2F600149A52 /* BmpGenParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGenParam.cpp; sourceTree = "<group>"; };
-		E7D38BF620F4F2F600149A52 /* BmpGenParam.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpGenParam.hpp; sourceTree = "<group>"; };
-		E7DC4E29215D98D80092B904 /* SlotAdjuster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotAdjuster.cpp; sourceTree = "<group>"; };
-		E7DC4E2A215D98D90092B904 /* SlotAdjuster.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotAdjuster.hpp; sourceTree = "<group>"; };
 		E7DC94D922F52E5D00E13383 /* GrpMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = GrpMgr.hpp; sourceTree = "<group>"; };
 		E7DC94DA22F52E5D00E13383 /* GrpMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GrpMgr.cpp; sourceTree = "<group>"; };
 		E7DC94DB22F52E5D00E13383 /* Grp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Grp.hpp; sourceTree = "<group>"; };
@@ -484,14 +384,124 @@
 		E7DC94E122F52E8B00E13383 /* Num.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Num.hpp; sourceTree = "<group>"; };
 		E7DC94E222F52E8B00E13383 /* NumMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NumMgr.cpp; sourceTree = "<group>"; };
 		E7DC94E322F52E8B00E13383 /* NumMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = NumMgr.hpp; sourceTree = "<group>"; };
-		E7DFD3572276F48E00F5CD4B /* BmpDotPartData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotPartData.hpp; sourceTree = "<group>"; };
-		E7DFD3582276F48F00F5CD4B /* BmpDotPartData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotPartData.cpp; sourceTree = "<group>"; };
-		E7E7AC8E20EC3E7600B318E5 /* AdjustablePoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AdjustablePoint.hpp; sourceTree = "<group>"; };
-		E7E7AC8F20EC3E7600B318E5 /* AdjustablePoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdjustablePoint.cpp; sourceTree = "<group>"; };
 		E7F2A95A21A23FE900D2A368 /* TouchObj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TouchObj.cpp; sourceTree = "<group>"; };
 		E7F2A95B21A23FE900D2A368 /* TouchObj.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TouchObj.hpp; sourceTree = "<group>"; };
-		E7FEE25820F33212004CC0F2 /* BezierDataConv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierDataConv.cpp; sourceTree = "<group>"; };
-		E7FEE25920F33212004CC0F2 /* BezierDataConv.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierDataConv.hpp; sourceTree = "<group>"; };
+		E7F7FBF3255C6F590023FD66 /* BezierConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierConst.hpp; sourceTree = "<group>"; };
+		E7F7FBF4255C6F5A0023FD66 /* BezierForEdge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForEdge.cpp; sourceTree = "<group>"; };
+		E7F7FBF5255C6F5A0023FD66 /* BezierForFill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFill.cpp; sourceTree = "<group>"; };
+		E7F7FBF8255C6F5A0023FD66 /* BezierConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierConst.cpp; sourceTree = "<group>"; };
+		E7F7FBF9255C6F5A0023FD66 /* BezierForTouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForTouch.cpp; sourceTree = "<group>"; };
+		E7F7FBFA255C6F5A0023FD66 /* Bezier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Bezier.hpp; sourceTree = "<group>"; };
+		E7F7FBFB255C6F5A0023FD66 /* Bezier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bezier.cpp; sourceTree = "<group>"; };
+		E7F7FBFF255C6F5B0023FD66 /* BezierForFrillLayerData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFrillLayerData.cpp; sourceTree = "<group>"; };
+		E7F7FC00255C6F5B0023FD66 /* BezierForWork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForWork.cpp; sourceTree = "<group>"; };
+		E7F7FC01255C6F5B0023FD66 /* BezierForSub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForSub.cpp; sourceTree = "<group>"; };
+		E7F7FC02255C6F5B0023FD66 /* BezierForFrill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierForFrill.cpp; sourceTree = "<group>"; };
+		E7F7FC17255C6FFA0023FD66 /* AdjustablePoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdjustablePoint.cpp; sourceTree = "<group>"; };
+		E7F7FC18255C6FFA0023FD66 /* SlotAdjuster.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotAdjuster.hpp; sourceTree = "<group>"; };
+		E7F7FC19255C6FFA0023FD66 /* AnglePlane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnglePlane.hpp; sourceTree = "<group>"; };
+		E7F7FC1A255C6FFA0023FD66 /* DelayLog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DelayLog.cpp; sourceTree = "<group>"; };
+		E7F7FC1B255C6FFB0023FD66 /* JointPoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JointPoint.cpp; sourceTree = "<group>"; };
+		E7F7FC1C255C6FFB0023FD66 /* AnglePlane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnglePlane.cpp; sourceTree = "<group>"; };
+		E7F7FC1D255C6FFB0023FD66 /* DelayLog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DelayLog.hpp; sourceTree = "<group>"; };
+		E7F7FC1E255C6FFB0023FD66 /* AdjustablePoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AdjustablePoint.hpp; sourceTree = "<group>"; };
+		E7F7FC1F255C6FFB0023FD66 /* JointPoint.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = JointPoint.hpp; sourceTree = "<group>"; };
+		E7F7FC20255C6FFB0023FD66 /* AdjustCalc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AdjustCalc.hpp; sourceTree = "<group>"; };
+		E7F7FC21255C6FFB0023FD66 /* AdjustCalc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AdjustCalc.cpp; sourceTree = "<group>"; };
+		E7F7FC22255C6FFB0023FD66 /* SlotAdjuster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotAdjuster.cpp; sourceTree = "<group>"; };
+		E7F7FC29255C70050023FD66 /* LayerObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerObject.hpp; sourceTree = "<group>"; };
+		E7F7FC2A255C70050023FD66 /* LayerOrderCell.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerOrderCell.hpp; sourceTree = "<group>"; };
+		E7F7FC2B255C70060023FD66 /* LayerOrderList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerOrderList.hpp; sourceTree = "<group>"; };
+		E7F7FC2C255C70060023FD66 /* SlotPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotPointData.hpp; sourceTree = "<group>"; };
+		E7F7FC2D255C70060023FD66 /* FillPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillPointData.cpp; sourceTree = "<group>"; };
+		E7F7FC2E255C70060023FD66 /* LayerOrderList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerOrderList.cpp; sourceTree = "<group>"; };
+		E7F7FC2F255C70060023FD66 /* PaintObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PaintObjectData.cpp; sourceTree = "<group>"; };
+		E7F7FC30255C70060023FD66 /* SlotObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotObjectData.cpp; sourceTree = "<group>"; };
+		E7F7FC31255C70060023FD66 /* AnchorPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnchorPointData.cpp; sourceTree = "<group>"; };
+		E7F7FC32255C70060023FD66 /* FillPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillPointData.hpp; sourceTree = "<group>"; };
+		E7F7FC33255C70060023FD66 /* SlotObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SlotObjectData.hpp; sourceTree = "<group>"; };
+		E7F7FC34255C70060023FD66 /* LayerData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayerData.hpp; sourceTree = "<group>"; };
+		E7F7FC35255C70060023FD66 /* AnchorPointData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AnchorPointData.hpp; sourceTree = "<group>"; };
+		E7F7FC36255C70070023FD66 /* LayerOrderCell.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerOrderCell.cpp; sourceTree = "<group>"; };
+		E7F7FC37255C70070023FD66 /* LayerObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerObject.cpp; sourceTree = "<group>"; };
+		E7F7FC38255C70070023FD66 /* LineObjectData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LineObjectData.cpp; sourceTree = "<group>"; };
+		E7F7FC39255C70070023FD66 /* PaintObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = PaintObjectData.hpp; sourceTree = "<group>"; };
+		E7F7FC3A255C70070023FD66 /* SlotPointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlotPointData.cpp; sourceTree = "<group>"; };
+		E7F7FC3B255C70070023FD66 /* LayerData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayerData.cpp; sourceTree = "<group>"; };
+		E7F7FC3C255C70070023FD66 /* LineObjectData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LineObjectData.hpp; sourceTree = "<group>"; };
+		E7F7FC47255C70120023FD66 /* FillConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillConst.hpp; sourceTree = "<group>"; };
+		E7F7FC48255C70120023FD66 /* Fill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fill.cpp; sourceTree = "<group>"; };
+		E7F7FC49255C70120023FD66 /* FillForExe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillForExe.cpp; sourceTree = "<group>"; };
+		E7F7FC4A255C70120023FD66 /* FillForUndercoat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillForUndercoat.cpp; sourceTree = "<group>"; };
+		E7F7FC4B255C70130023FD66 /* FillConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillConst.cpp; sourceTree = "<group>"; };
+		E7F7FC4C255C70130023FD66 /* Fill.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Fill.hpp; sourceTree = "<group>"; };
+		E7F7FC4D255C70130023FD66 /* FillMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = FillMgr.hpp; sourceTree = "<group>"; };
+		E7F7FC4E255C70130023FD66 /* FillMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FillMgr.cpp; sourceTree = "<group>"; };
+		E7F7FC54255C701D0023FD66 /* StrokeConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeConst.cpp; sourceTree = "<group>"; };
+		E7F7FC55255C701E0023FD66 /* StrokeDot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeDot.hpp; sourceTree = "<group>"; };
+		E7F7FC56255C701E0023FD66 /* StrokeDot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeDot.cpp; sourceTree = "<group>"; };
+		E7F7FC57255C701E0023FD66 /* StrokeMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StrokeMgr.cpp; sourceTree = "<group>"; };
+		E7F7FC58255C701E0023FD66 /* Stroke.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Stroke.hpp; sourceTree = "<group>"; };
+		E7F7FC59255C701E0023FD66 /* StrokeMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeMgr.hpp; sourceTree = "<group>"; };
+		E7F7FC5A255C701E0023FD66 /* StrokeConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = StrokeConst.hpp; sourceTree = "<group>"; };
+		E7F7FC5B255C701E0023FD66 /* Stroke.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stroke.cpp; sourceTree = "<group>"; };
+		E7F7FC60255C70270023FD66 /* BezierStructConv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BezierStructConv.cpp; sourceTree = "<group>"; };
+		E7F7FC61255C70270023FD66 /* BezierStruct.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierStruct.hpp; sourceTree = "<group>"; };
+		E7F7FC62255C70270023FD66 /* BezierStructConv.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BezierStructConv.hpp; sourceTree = "<group>"; };
+		E7F7FC64255C70360023FD66 /* BmpGeneratorForOrder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForOrder.cpp; sourceTree = "<group>"; };
+		E7F7FC65255C70360023FD66 /* BmpTex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpTex.cpp; sourceTree = "<group>"; };
+		E7F7FC66255C70360023FD66 /* BmpGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGenerator.cpp; sourceTree = "<group>"; };
+		E7F7FC67255C70370023FD66 /* BmpTex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpTex.hpp; sourceTree = "<group>"; };
+		E7F7FC68255C70370023FD66 /* BmpGeneratorForAngle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForAngle.cpp; sourceTree = "<group>"; };
+		E7F7FC69255C70370023FD66 /* BmpGeneratorForSetting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGeneratorForSetting.cpp; sourceTree = "<group>"; };
+		E7F7FC6A255C70370023FD66 /* BmpGenParam.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpGenParam.hpp; sourceTree = "<group>"; };
+		E7F7FC6B255C70370023FD66 /* BmpPal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpPal.hpp; sourceTree = "<group>"; };
+		E7F7FC6C255C70370023FD66 /* BmpGenerator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpGenerator.hpp; sourceTree = "<group>"; };
+		E7F7FC6D255C70370023FD66 /* BmpGenParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpGenParam.cpp; sourceTree = "<group>"; };
+		E7F7FC6E255C70370023FD66 /* BmpPal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpPal.cpp; sourceTree = "<group>"; };
+		E7F7FC78255C707B0023FD66 /* BDConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BDConst.hpp; sourceTree = "<group>"; };
+		E7F7FC79255C707B0023FD66 /* BmpDotMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotMgr.cpp; sourceTree = "<group>"; };
+		E7F7FC7A255C707C0023FD66 /* BmpDotData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotData.hpp; sourceTree = "<group>"; };
+		E7F7FC7B255C707C0023FD66 /* BmpDotSettingData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotSettingData.cpp; sourceTree = "<group>"; };
+		E7F7FC7C255C707C0023FD66 /* BDConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BDConst.cpp; sourceTree = "<group>"; };
+		E7F7FC7D255C707C0023FD66 /* BmpDotPack.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotPack.hpp; sourceTree = "<group>"; };
+		E7F7FC7E255C707C0023FD66 /* BmpDotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotData.cpp; sourceTree = "<group>"; };
+		E7F7FC7F255C707C0023FD66 /* BmpDotSettingSlotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotSettingSlotData.cpp; sourceTree = "<group>"; };
+		E7F7FC80255C707C0023FD66 /* BmpDotPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotPack.cpp; sourceTree = "<group>"; };
+		E7F7FC81255C707C0023FD66 /* BmpDotSettingSlotData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotSettingSlotData.hpp; sourceTree = "<group>"; };
+		E7F7FC82255C707C0023FD66 /* BmpDotPartData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotPartData.hpp; sourceTree = "<group>"; };
+		E7F7FC83255C707C0023FD66 /* BmpDotPartData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotPartData.cpp; sourceTree = "<group>"; };
+		E7F7FC84255C707D0023FD66 /* BmpDotMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotMgr.hpp; sourceTree = "<group>"; };
+		E7F7FC85255C707D0023FD66 /* BmpDotOrderData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotOrderData.hpp; sourceTree = "<group>"; };
+		E7F7FC86255C707D0023FD66 /* BmpDotSettingData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpDotSettingData.hpp; sourceTree = "<group>"; };
+		E7F7FC87255C707D0023FD66 /* BmpDotOrderData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpDotOrderData.cpp; sourceTree = "<group>"; };
+		E7F7FC91255C70980023FD66 /* BmpDotFormLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotFormLabel.inc; sourceTree = "<group>"; };
+		E7F7FC92255C70980023FD66 /* BmpDotFormId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotFormId.inc; sourceTree = "<group>"; };
+		E7F7FC93255C70980023FD66 /* BmpDotCategoryLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotCategoryLabel.inc; sourceTree = "<group>"; };
+		E7F7FC94255C70980023FD66 /* BmpDotCategoryId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotCategoryId.inc; sourceTree = "<group>"; };
+		E7F7FC95255C70980023FD66 /* BmpDotSlotNum.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotNum.inc; sourceTree = "<group>"; };
+		E7F7FC96255C70980023FD66 /* BmpDotSlotOrderGroup.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotOrderGroup.inc; sourceTree = "<group>"; };
+		E7F7FC97255C70980023FD66 /* BmpDotSlotIsLow.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotIsLow.inc; sourceTree = "<group>"; };
+		E7F7FC98255C70990023FD66 /* BmpDotDirId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotDirId.inc; sourceTree = "<group>"; };
+		E7F7FC99255C70990023FD66 /* BmpDotSlotIsUp.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotIsUp.inc; sourceTree = "<group>"; };
+		E7F7FC9A255C70990023FD66 /* BmpDotSlotCategory.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotCategory.inc; sourceTree = "<group>"; };
+		E7F7FC9B255C70990023FD66 /* BmpDotDirLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotDirLabel.inc; sourceTree = "<group>"; };
+		E7F7FC9C255C70990023FD66 /* BmpDotSlotLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotLabel.inc; sourceTree = "<group>"; };
+		E7F7FC9D255C70990023FD66 /* BmpDotOptionLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotOptionLabel.inc; sourceTree = "<group>"; };
+		E7F7FC9E255C70990023FD66 /* BmpDotEmoLabel.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotEmoLabel.inc; sourceTree = "<group>"; };
+		E7F7FC9F255C70990023FD66 /* BmpDotSlotMaskTarget.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotMaskTarget.inc; sourceTree = "<group>"; };
+		E7F7FCA0255C70990023FD66 /* BmpDotSlotParent.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotParent.inc; sourceTree = "<group>"; };
+		E7F7FCA1255C70990023FD66 /* BmpDotOptionId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotOptionId.inc; sourceTree = "<group>"; };
+		E7F7FCA2255C709A0023FD66 /* BmpDotSlotId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotSlotId.inc; sourceTree = "<group>"; };
+		E7F7FCA3255C709A0023FD66 /* BmpDotEmoId.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = BmpDotEmoId.inc; sourceTree = "<group>"; };
+		E7F7FCA4255C70B30023FD66 /* BPConst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BPConst.hpp; sourceTree = "<group>"; };
+		E7F7FCA5255C70B30023FD66 /* BmpPalMgr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpPalMgr.hpp; sourceTree = "<group>"; };
+		E7F7FCA6255C70B30023FD66 /* BPConst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BPConst.cpp; sourceTree = "<group>"; };
+		E7F7FCA7255C70B30023FD66 /* BmpPalData.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BmpPalData.hpp; sourceTree = "<group>"; };
+		E7F7FCA8255C70B30023FD66 /* BmpPalData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpPalData.cpp; sourceTree = "<group>"; };
+		E7F7FCA9255C70B30023FD66 /* BmpPalMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BmpPalMgr.cpp; sourceTree = "<group>"; };
+		E7F7FCAE255C70C90023FD66 /* _FixedDefaultBmpPalData.inc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.pascal; path = _FixedDefaultBmpPalData.inc; sourceTree = "<group>"; };
+		E7F7FCB0255C75BE0023FD66 /* bds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bds; sourceTree = "<group>"; };
 		FE24F7CF1D5414EC002A44D6 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
 		FE24F7D01D5414EC002A44D6 /* image.fpk */ = {isa = PBXFileReference; lastKnownFileType = file; path = image.fpk; sourceTree = "<group>"; };
 		FE24F7D51D5414EC002A44D6 /* shader.fpk */ = {isa = PBXFileReference; lastKnownFileType = file; path = shader.fpk; sourceTree = "<group>"; };
@@ -590,56 +600,6 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
-		E734AFA620EE38580008E085 /* bmp */ = {
-			isa = PBXGroup;
-			children = (
-				E750BCCC22EE0D44007E18B9 /* inc */,
-				E734AFA920EE38EB0008E085 /* BDConst.hpp */,
-				E734AFA720EE38EB0008E085 /* BDConst.cpp */,
-				E74BC1A222E5653E0014BBFB /* BmpDotSettingSlotData.hpp */,
-				E74BC1A122E5653E0014BBFB /* BmpDotSettingSlotData.cpp */,
-				E74BC1A022E5653D0014BBFB /* BmpDotSettingData.hpp */,
-				E74BC19F22E5653D0014BBFB /* BmpDotSettingData.cpp */,
-				E7DFD3572276F48E00F5CD4B /* BmpDotPartData.hpp */,
-				E7DFD3582276F48F00F5CD4B /* BmpDotPartData.cpp */,
-				E74BC19C22E564B60014BBFB /* BmpDotOrderData.hpp */,
-				E74BC19D22E564B60014BBFB /* BmpDotOrderData.cpp */,
-				E7561B73227701B4005E2CA2 /* BmpDotData.hpp */,
-				E7561B72227701B4005E2CA2 /* BmpDotData.cpp */,
-				E778C71D21020C1E008D54A2 /* BmpDotPack.hpp */,
-				E778C71C21020C1D008D54A2 /* BmpDotPack.cpp */,
-				E7B033DF20F6ADF500CFEE57 /* BmpDotMgr.hpp */,
-				E7B033DE20F6ADF400CFEE57 /* BmpDotMgr.cpp */,
-				E7D38BF620F4F2F600149A52 /* BmpGenParam.hpp */,
-				E7D38BF520F4F2F600149A52 /* BmpGenParam.cpp */,
-				E760811A20F6B6FD00BCE2EC /* BmpGenerator.hpp */,
-				E760811920F6B6FC00BCE2EC /* BmpGenerator.cpp */,
-				E738234C21D132DF0049F3BB /* BmpGeneratorForAngle.cpp */,
-				E738234A21D1310D0049F3BB /* BmpGeneratorForOrder.cpp */,
-				E750D33E22E4BFCA00A5F9D4 /* BmpGeneratorForSetting.cpp */,
-			);
-			path = bmp;
-			sourceTree = "<group>";
-		};
-		E73FB60D20FDC8FA00A6FA76 /* adjust */ = {
-			isa = PBXGroup;
-			children = (
-				E7E7AC8E20EC3E7600B318E5 /* AdjustablePoint.hpp */,
-				E7E7AC8F20EC3E7600B318E5 /* AdjustablePoint.cpp */,
-				E7DC4E2A215D98D90092B904 /* SlotAdjuster.hpp */,
-				E7DC4E29215D98D80092B904 /* SlotAdjuster.cpp */,
-				E7743A4420FEEB0F00575FC1 /* DelayLog.hpp */,
-				E7743A4520FEEB0F00575FC1 /* DelayLog.cpp */,
-				E71AAC20215DBDBF00F1E64A /* JointPoint.hpp */,
-				E71AAC21215DBDBF00F1E64A /* JointPoint.cpp */,
-				E728026621B949A500B7B3D4 /* AnglePlane.hpp */,
-				E728026521B949A500B7B3D4 /* AnglePlane.cpp */,
-				E78A563121C2D3F40026C347 /* AdjustCalc.hpp */,
-				E78A563221C2D3F40026C347 /* AdjustCalc.cpp */,
-			);
-			path = adjust;
-			sourceTree = "<group>";
-		};
 		E744244F20B4051100B0169E /* loop */ = {
 			isa = PBXGroup;
 			children = (
@@ -698,84 +658,6 @@
 				E74A8C211F3962F100CEFA5A /* DialogHelper.cpp */,
 			);
 			path = helper;
-			sourceTree = "<group>";
-		};
-		E750BCCC22EE0D44007E18B9 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				E795BB3F24F58168007C38B4 /* BmpDotSlotCategory.inc */,
-				E750BCCD22EE0D60007E18B9 /* BmpDotCategoryId.inc */,
-				E750BCD022EE0D60007E18B9 /* BmpDotCategoryLabel.inc */,
-				E750BCD422EE0D61007E18B9 /* BmpDotDirId.inc */,
-				E750BCD622EE0D61007E18B9 /* BmpDotDirLabel.inc */,
-				E750BCD122EE0D60007E18B9 /* BmpDotEmoId.inc */,
-				E750BCD922EE0D61007E18B9 /* BmpDotEmoLabel.inc */,
-				E750BCD722EE0D61007E18B9 /* BmpDotFormId.inc */,
-				E750BCD822EE0D61007E18B9 /* BmpDotFormLabel.inc */,
-				E750BCD522EE0D61007E18B9 /* BmpDotOptionId.inc */,
-				E750BCDA22EE0D61007E18B9 /* BmpDotOptionLabel.inc */,
-				E750BCD322EE0D61007E18B9 /* BmpDotSlotId.inc */,
-				E750BCCF22EE0D60007E18B9 /* BmpDotSlotLabel.inc */,
-				E750BCCE22EE0D60007E18B9 /* BmpDotSlotNum.inc */,
-				E750BCD222EE0D61007E18B9 /* BmpDotSlotParent.inc */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		E762C90A20C0EE2700678C67 /* bezier */ = {
-			isa = PBXGroup;
-			children = (
-				E772E06020F4269700F0CD40 /* BezierConst.hpp */,
-				E7AEE10922F5F2CC006DCF75 /* BezierConst.cpp */,
-				E755398722F5E49F006820E2 /* BezierStruct.hpp */,
-				E762C91720C1041E00678C67 /* Bezier.hpp */,
-				E762C91820C1041E00678C67 /* Bezier.cpp */,
-				E795BB3C24F5813A007C38B4 /* BezierForSub.cpp */,
-				E72FB103225D785000DB1531 /* BezierForFill.cpp */,
-				E795BB4B24F587D8007C38B4 /* BezierForEdge.cpp */,
-				E795BB3B24F5813A007C38B4 /* BezierForWork.cpp */,
-				E753C0BB21AD15CF006A9555 /* BezierForTouch.cpp */,
-				E774797A216315BC003FEF71 /* BezierForFrill.cpp */,
-				E75FB1F8216442B80087AFEB /* BezierForFrillLayerData.cpp */,
-				E7FEE25920F33212004CC0F2 /* BezierDataConv.hpp */,
-				E7FEE25820F33212004CC0F2 /* BezierDataConv.cpp */,
-				E7BA910220CF4A6400BD7007 /* AnchorPointData.hpp */,
-				E7BA910320CF4A6500BD7007 /* AnchorPointData.cpp */,
-				E775544B20CF79E300F28074 /* FillPointData.hpp */,
-				E775544C20CF79E400F28074 /* FillPointData.cpp */,
-				E759947320EDBA510098C87C /* SlotPointData.hpp */,
-				E759947220EDBA510098C87C /* SlotPointData.cpp */,
-				E72F167120E1B8EF0056D4B7 /* LayerObject.hpp */,
-				E7B6194220EF05FB00ECEFAA /* LayerObject.cpp */,
-				E735F23420E06E36005E6147 /* LineObjectData.hpp */,
-				E735F23320E06E35005E6147 /* LineObjectData.cpp */,
-				E74AA38220E0972900B74C9A /* PaintObjectData.hpp */,
-				E74AA38120E0972900B74C9A /* PaintObjectData.cpp */,
-				E759947620EDBD690098C87C /* SlotObjectData.hpp */,
-				E759947520EDBD690098C87C /* SlotObjectData.cpp */,
-				E72F166E20E1B01A0056D4B7 /* LayerData.hpp */,
-				E72F166F20E1B01B0056D4B7 /* LayerData.cpp */,
-				E7B6193F20EF054F00ECEFAA /* LayerOrderCell.hpp */,
-				E7B6194020EF054F00ECEFAA /* LayerOrderCell.cpp */,
-				E753C11A20EF16CD00BA5608 /* LayerOrderList.hpp */,
-				E753C11920EF16CC00BA5608 /* LayerOrderList.cpp */,
-			);
-			path = bezier;
-			sourceTree = "<group>";
-		};
-		E762C90B20C0EE4100678C67 /* fill */ = {
-			isa = PBXGroup;
-			children = (
-				E77AA86C24A1BE45006D7DC6 /* FillConst.hpp */,
-				E77AA86B24A1BE45006D7DC6 /* FillConst.cpp */,
-				E762C90D20C0EE6E00678C67 /* Fill.hpp */,
-				E762C90C20C0EE6E00678C67 /* Fill.cpp */,
-				E795BB4224F58193007C38B4 /* FillForUndercoat.cpp */,
-				E795BB4124F58193007C38B4 /* FillForExe.cpp */,
-				E75BB94220D00066004544CD /* FillMgr.hpp */,
-				E75BB94020D00065004544CD /* FillMgr.cpp */,
-			);
-			path = fill;
 			sourceTree = "<group>";
 		};
 		E762C90F20C1013D00678C67 /* rand */ = {
@@ -935,12 +817,6 @@
 		E76FA2AA20B4F15400377936 /* tex */ = {
 			isa = PBXGroup;
 			children = (
-				E73FB60D20FDC8FA00A6FA76 /* adjust */,
-				E762C90A20C0EE2700678C67 /* bezier */,
-				E734AFA620EE38580008E085 /* bmp */,
-				E795BB2F24F58101007C38B4 /* bmp_pal */,
-				E7B3E43A20C752A300E10D99 /* stroke */,
-				E762C90B20C0EE4100678C67 /* fill */,
 				E76FA2B320B4F17600377936 /* Tex.hpp */,
 				E76FA2AF20B4F17500377936 /* Tex.cpp */,
 				E793036E21755F1A00398828 /* TexMgr.hpp */,
@@ -986,20 +862,6 @@
 			path = log;
 			sourceTree = "<group>";
 		};
-		E795BB2F24F58101007C38B4 /* bmp_pal */ = {
-			isa = PBXGroup;
-			children = (
-				E795BB3324F5811A007C38B4 /* inc */,
-				E795BB3124F58119007C38B4 /* BmpPalData.cpp */,
-				E795BB3524F5811A007C38B4 /* BmpPalData.hpp */,
-				E795BB3624F5811A007C38B4 /* BmpPalMgr.cpp */,
-				E795BB3224F5811A007C38B4 /* BmpPalMgr.hpp */,
-				E795BB3024F58119007C38B4 /* BPConst.cpp */,
-				E795BB3424F5811A007C38B4 /* BPConst.hpp */,
-			);
-			path = bmp_pal;
-			sourceTree = "<group>";
-		};
 		E7A1A4CB1953A89E00C66860 = {
 			isa = PBXGroup;
 			children = (
@@ -1038,6 +900,7 @@
 			isa = PBXGroup;
 			children = (
 				E70A37D12110A9070057B6E4 /* bdp */,
+				E7F7FCB0255C75BE0023FD66 /* bds */,
 				FE24F7CF1D5414EC002A44D6 /* bin */,
 				E795BB2B24F57F8C007C38B4 /* bpd */,
 				FE24F7D01D5414EC002A44D6 /* image.fpk */,
@@ -1045,21 +908,6 @@
 			);
 			name = Resources;
 			path = ../Prj_Android/app/src/main/assets;
-			sourceTree = "<group>";
-		};
-		E7B3E43A20C752A300E10D99 /* stroke */ = {
-			isa = PBXGroup;
-			children = (
-				E7B7D3DE24A14FB900D1443B /* StrokeConst.hpp */,
-				E7B7D3DF24A1500100D1443B /* StrokeConst.cpp */,
-				E7BA910B20CF6B0200BD7007 /* Stroke.hpp */,
-				E7BA910C20CF6B0200BD7007 /* Stroke.cpp */,
-				E7BBF47C2123F794004218C4 /* StrokeDot.hpp */,
-				E7BBF47D2123F795004218C4 /* StrokeDot.cpp */,
-				E7BA911020CF6B0300BD7007 /* StrokeMgr.hpp */,
-				E7BA910F20CF6B0300BD7007 /* StrokeMgr.cpp */,
-			);
-			path = stroke;
 			sourceTree = "<group>";
 		};
 		E7C34BA720B415A900F7BDF5 /* obj */ = {
@@ -1125,6 +973,207 @@
 			path = num;
 			sourceTree = "<group>";
 		};
+		E7F7FBF1255C6F2B0023FD66 /* bezier */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC11255C6F7B0023FD66 /* adjust */,
+				E7F7FC13255C6FA10023FD66 /* data */,
+				E7F7FC14255C6FAF0023FD66 /* fill */,
+				E7F7FC15255C6FB70023FD66 /* stroke */,
+				E7F7FC16255C6FBD0023FD66 /* struct */,
+				E7F7FBFB255C6F5A0023FD66 /* Bezier.cpp */,
+				E7F7FBFA255C6F5A0023FD66 /* Bezier.hpp */,
+				E7F7FBF8255C6F5A0023FD66 /* BezierConst.cpp */,
+				E7F7FBF3255C6F590023FD66 /* BezierConst.hpp */,
+				E7F7FBF4255C6F5A0023FD66 /* BezierForEdge.cpp */,
+				E7F7FBF5255C6F5A0023FD66 /* BezierForFill.cpp */,
+				E7F7FC02255C6F5B0023FD66 /* BezierForFrill.cpp */,
+				E7F7FBFF255C6F5B0023FD66 /* BezierForFrillLayerData.cpp */,
+				E7F7FC01255C6F5B0023FD66 /* BezierForSub.cpp */,
+				E7F7FBF9255C6F5A0023FD66 /* BezierForTouch.cpp */,
+				E7F7FC00255C6F5B0023FD66 /* BezierForWork.cpp */,
+			);
+			path = bezier;
+			sourceTree = "<group>";
+		};
+		E7F7FBF2255C6F3E0023FD66 /* bmp */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC76255C70480023FD66 /* dot */,
+				E7F7FC77255C704F0023FD66 /* pal */,
+				E7F7FC66255C70360023FD66 /* BmpGenerator.cpp */,
+				E7F7FC6C255C70370023FD66 /* BmpGenerator.hpp */,
+				E7F7FC68255C70370023FD66 /* BmpGeneratorForAngle.cpp */,
+				E7F7FC64255C70360023FD66 /* BmpGeneratorForOrder.cpp */,
+				E7F7FC69255C70370023FD66 /* BmpGeneratorForSetting.cpp */,
+				E7F7FC6D255C70370023FD66 /* BmpGenParam.cpp */,
+				E7F7FC6A255C70370023FD66 /* BmpGenParam.hpp */,
+				E7F7FC6E255C70370023FD66 /* BmpPal.cpp */,
+				E7F7FC6B255C70370023FD66 /* BmpPal.hpp */,
+				E7F7FC65255C70360023FD66 /* BmpTex.cpp */,
+				E7F7FC67255C70370023FD66 /* BmpTex.hpp */,
+			);
+			path = bmp;
+			sourceTree = "<group>";
+		};
+		E7F7FC11255C6F7B0023FD66 /* adjust */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC17255C6FFA0023FD66 /* AdjustablePoint.cpp */,
+				E7F7FC1E255C6FFB0023FD66 /* AdjustablePoint.hpp */,
+				E7F7FC21255C6FFB0023FD66 /* AdjustCalc.cpp */,
+				E7F7FC20255C6FFB0023FD66 /* AdjustCalc.hpp */,
+				E7F7FC1C255C6FFB0023FD66 /* AnglePlane.cpp */,
+				E7F7FC19255C6FFA0023FD66 /* AnglePlane.hpp */,
+				E7F7FC1A255C6FFA0023FD66 /* DelayLog.cpp */,
+				E7F7FC1D255C6FFB0023FD66 /* DelayLog.hpp */,
+				E7F7FC1B255C6FFB0023FD66 /* JointPoint.cpp */,
+				E7F7FC1F255C6FFB0023FD66 /* JointPoint.hpp */,
+				E7F7FC22255C6FFB0023FD66 /* SlotAdjuster.cpp */,
+				E7F7FC18255C6FFA0023FD66 /* SlotAdjuster.hpp */,
+			);
+			path = adjust;
+			sourceTree = "<group>";
+		};
+		E7F7FC13255C6FA10023FD66 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC31255C70060023FD66 /* AnchorPointData.cpp */,
+				E7F7FC35255C70060023FD66 /* AnchorPointData.hpp */,
+				E7F7FC2D255C70060023FD66 /* FillPointData.cpp */,
+				E7F7FC32255C70060023FD66 /* FillPointData.hpp */,
+				E7F7FC3B255C70070023FD66 /* LayerData.cpp */,
+				E7F7FC34255C70060023FD66 /* LayerData.hpp */,
+				E7F7FC37255C70070023FD66 /* LayerObject.cpp */,
+				E7F7FC29255C70050023FD66 /* LayerObject.hpp */,
+				E7F7FC36255C70070023FD66 /* LayerOrderCell.cpp */,
+				E7F7FC2A255C70050023FD66 /* LayerOrderCell.hpp */,
+				E7F7FC2E255C70060023FD66 /* LayerOrderList.cpp */,
+				E7F7FC2B255C70060023FD66 /* LayerOrderList.hpp */,
+				E7F7FC38255C70070023FD66 /* LineObjectData.cpp */,
+				E7F7FC3C255C70070023FD66 /* LineObjectData.hpp */,
+				E7F7FC2F255C70060023FD66 /* PaintObjectData.cpp */,
+				E7F7FC39255C70070023FD66 /* PaintObjectData.hpp */,
+				E7F7FC30255C70060023FD66 /* SlotObjectData.cpp */,
+				E7F7FC33255C70060023FD66 /* SlotObjectData.hpp */,
+				E7F7FC3A255C70070023FD66 /* SlotPointData.cpp */,
+				E7F7FC2C255C70060023FD66 /* SlotPointData.hpp */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		E7F7FC14255C6FAF0023FD66 /* fill */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC48255C70120023FD66 /* Fill.cpp */,
+				E7F7FC4C255C70130023FD66 /* Fill.hpp */,
+				E7F7FC4B255C70130023FD66 /* FillConst.cpp */,
+				E7F7FC47255C70120023FD66 /* FillConst.hpp */,
+				E7F7FC49255C70120023FD66 /* FillForExe.cpp */,
+				E7F7FC4A255C70120023FD66 /* FillForUndercoat.cpp */,
+				E7F7FC4E255C70130023FD66 /* FillMgr.cpp */,
+				E7F7FC4D255C70130023FD66 /* FillMgr.hpp */,
+			);
+			path = fill;
+			sourceTree = "<group>";
+		};
+		E7F7FC15255C6FB70023FD66 /* stroke */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC5B255C701E0023FD66 /* Stroke.cpp */,
+				E7F7FC58255C701E0023FD66 /* Stroke.hpp */,
+				E7F7FC54255C701D0023FD66 /* StrokeConst.cpp */,
+				E7F7FC5A255C701E0023FD66 /* StrokeConst.hpp */,
+				E7F7FC56255C701E0023FD66 /* StrokeDot.cpp */,
+				E7F7FC55255C701E0023FD66 /* StrokeDot.hpp */,
+				E7F7FC57255C701E0023FD66 /* StrokeMgr.cpp */,
+				E7F7FC59255C701E0023FD66 /* StrokeMgr.hpp */,
+			);
+			path = stroke;
+			sourceTree = "<group>";
+		};
+		E7F7FC16255C6FBD0023FD66 /* struct */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC61255C70270023FD66 /* BezierStruct.hpp */,
+				E7F7FC60255C70270023FD66 /* BezierStructConv.cpp */,
+				E7F7FC62255C70270023FD66 /* BezierStructConv.hpp */,
+			);
+			path = struct;
+			sourceTree = "<group>";
+		};
+		E7F7FC76255C70480023FD66 /* dot */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC90255C70800023FD66 /* inc */,
+				E7F7FC7C255C707C0023FD66 /* BDConst.cpp */,
+				E7F7FC78255C707B0023FD66 /* BDConst.hpp */,
+				E7F7FC7E255C707C0023FD66 /* BmpDotData.cpp */,
+				E7F7FC7A255C707C0023FD66 /* BmpDotData.hpp */,
+				E7F7FC79255C707B0023FD66 /* BmpDotMgr.cpp */,
+				E7F7FC84255C707D0023FD66 /* BmpDotMgr.hpp */,
+				E7F7FC87255C707D0023FD66 /* BmpDotOrderData.cpp */,
+				E7F7FC85255C707D0023FD66 /* BmpDotOrderData.hpp */,
+				E7F7FC80255C707C0023FD66 /* BmpDotPack.cpp */,
+				E7F7FC7D255C707C0023FD66 /* BmpDotPack.hpp */,
+				E7F7FC83255C707C0023FD66 /* BmpDotPartData.cpp */,
+				E7F7FC82255C707C0023FD66 /* BmpDotPartData.hpp */,
+				E7F7FC7B255C707C0023FD66 /* BmpDotSettingData.cpp */,
+				E7F7FC86255C707D0023FD66 /* BmpDotSettingData.hpp */,
+				E7F7FC7F255C707C0023FD66 /* BmpDotSettingSlotData.cpp */,
+				E7F7FC81255C707C0023FD66 /* BmpDotSettingSlotData.hpp */,
+			);
+			path = dot;
+			sourceTree = "<group>";
+		};
+		E7F7FC77255C704F0023FD66 /* pal */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FCAD255C70B60023FD66 /* inc */,
+				E7F7FCA8255C70B30023FD66 /* BmpPalData.cpp */,
+				E7F7FCA7255C70B30023FD66 /* BmpPalData.hpp */,
+				E7F7FCA9255C70B30023FD66 /* BmpPalMgr.cpp */,
+				E7F7FCA5255C70B30023FD66 /* BmpPalMgr.hpp */,
+				E7F7FCA6255C70B30023FD66 /* BPConst.cpp */,
+				E7F7FCA4255C70B30023FD66 /* BPConst.hpp */,
+			);
+			path = pal;
+			sourceTree = "<group>";
+		};
+		E7F7FC90255C70800023FD66 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FC94255C70980023FD66 /* BmpDotCategoryId.inc */,
+				E7F7FC93255C70980023FD66 /* BmpDotCategoryLabel.inc */,
+				E7F7FC98255C70990023FD66 /* BmpDotDirId.inc */,
+				E7F7FC9B255C70990023FD66 /* BmpDotDirLabel.inc */,
+				E7F7FCA3255C709A0023FD66 /* BmpDotEmoId.inc */,
+				E7F7FC9E255C70990023FD66 /* BmpDotEmoLabel.inc */,
+				E7F7FC92255C70980023FD66 /* BmpDotFormId.inc */,
+				E7F7FC91255C70980023FD66 /* BmpDotFormLabel.inc */,
+				E7F7FCA1255C70990023FD66 /* BmpDotOptionId.inc */,
+				E7F7FC9D255C70990023FD66 /* BmpDotOptionLabel.inc */,
+				E7F7FC9A255C70990023FD66 /* BmpDotSlotCategory.inc */,
+				E7F7FCA2255C709A0023FD66 /* BmpDotSlotId.inc */,
+				E7F7FC97255C70980023FD66 /* BmpDotSlotIsLow.inc */,
+				E7F7FC99255C70990023FD66 /* BmpDotSlotIsUp.inc */,
+				E7F7FC9C255C70990023FD66 /* BmpDotSlotLabel.inc */,
+				E7F7FC9F255C70990023FD66 /* BmpDotSlotMaskTarget.inc */,
+				E7F7FC95255C70980023FD66 /* BmpDotSlotNum.inc */,
+				E7F7FC96255C70980023FD66 /* BmpDotSlotOrderGroup.inc */,
+				E7F7FCA0255C70990023FD66 /* BmpDotSlotParent.inc */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		E7F7FCAD255C70B60023FD66 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				E7F7FCAE255C70C90023FD66 /* _FixedDefaultBmpPalData.inc */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
 		FEC55D361D507BC80000DFA5 /* app */ = {
 			isa = PBXGroup;
 			children = (
@@ -1185,6 +1234,8 @@
 		FEC55DF51D507BC90000DFA5 /* draw */ = {
 			isa = PBXGroup;
 			children = (
+				E7F7FBF1255C6F2B0023FD66 /* bezier */,
+				E7F7FBF2255C6F3E0023FD66 /* bmp */,
 				FEC55E071D507BC90000DFA5 /* MainRenderer.hpp */,
 				FEC55E061D507BC90000DFA5 /* MainRenderer.cpp */,
 				E734072722F3504100A5C2BC /* DrawConst.hpp */,
@@ -1423,9 +1474,9 @@
 				E70A37D22110A9070057B6E4 /* bdp in Resources */,
 				FE1448421E383CF900793A14 /* Images.xcassets in Resources */,
 				E795BB2C24F57F8C007C38B4 /* bpd in Resources */,
-				E795BB3924F5811A007C38B4 /* inc in Resources */,
 				FE24F7D81D5414EC002A44D6 /* bin in Resources */,
 				FE24F7D91D5414EC002A44D6 /* image.fpk in Resources */,
+				E7F7FCB1255C75BE0023FD66 /* bds in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1440,163 +1491,164 @@
 				E76FA29720B4F04900377936 /* Img.cpp in Sources */,
 				E77451E820B50A4000429BBD /* config_for_app.cpp in Sources */,
 				E76FA2BB20B4F17600377936 /* TexCache.cpp in Sources */,
-				E795BB4C24F587D8007C38B4 /* BezierForEdge.cpp in Sources */,
+				E7F7FC10255C6F5B0023FD66 /* BezierForFrill.cpp in Sources */,
 				FEC55F031D507BC90000DFA5 /* mcell.cpp in Sources */,
-				E734AFAB20EE38EB0008E085 /* BDConst.cpp in Sources */,
 				E76FA2B820B4F17600377936 /* TexStringMgr.cpp in Sources */,
+				E7F7FC8A255C707D0023FD66 /* BDConst.cpp in Sources */,
+				E7F7FC70255C70370023FD66 /* BmpTex.cpp in Sources */,
+				E7F7FC50255C70130023FD66 /* FillForExe.cpp in Sources */,
+				E7F7FC46255C70070023FD66 /* LayerData.cpp in Sources */,
 				E76FA2BA20B4F17600377936 /* Tex.cpp in Sources */,
-				E7B033E020F6ADF500CFEE57 /* BmpDotMgr.cpp in Sources */,
-				E753C11B20EF16CD00BA5608 /* LayerOrderList.cpp in Sources */,
+				E7F7FC42255C70070023FD66 /* LayerOrderCell.cpp in Sources */,
 				E76FA29620B4F04900377936 /* ImgFormat.cpp in Sources */,
 				FEC55EE41D507BC90000DFA5 /* DrawCell.cpp in Sources */,
 				E7DC94DD22F52E5E00E13383 /* GrpMgr.cpp in Sources */,
-				E7E7AC9020EC3E7600B318E5 /* AdjustablePoint.cpp in Sources */,
+				E7F7FC5E255C701E0023FD66 /* StrokeMgr.cpp in Sources */,
 				E744247A20B4058100B0169E /* ScrollBar.cpp in Sources */,
-				E7BA911120CF6B0300BD7007 /* Stroke.cpp in Sources */,
-				E72F167020E1B01B0056D4B7 /* LayerData.cpp in Sources */,
 				E7A21D5C24BE375C009DF219 /* BezierTestLoopForHook.cpp in Sources */,
+				E7F7FC88255C707D0023FD66 /* BmpDotMgr.cpp in Sources */,
+				E7F7FC3D255C70070023FD66 /* FillPointData.cpp in Sources */,
 				E76FA2BF20B4F25300377936 /* DrawCommon.cpp in Sources */,
-				E759947420EDBA510098C87C /* SlotPointData.cpp in Sources */,
-				E759947720EDBD6A0098C87C /* SlotObjectData.cpp in Sources */,
 				E744247720B4058100B0169E /* Win.cpp in Sources */,
-				E75BB94320D00066004544CD /* FillMgr.cpp in Sources */,
+				E7F7FC8B255C707D0023FD66 /* BmpDotData.cpp in Sources */,
 				E7A21D5D24BE375C009DF219 /* BezierTestLoopForLineRepair.cpp in Sources */,
 				FEC55E5F1D507BC90000DFA5 /* env.cpp in Sources */,
 				E753CA9422F1F49400AC6814 /* FileHeader.cpp in Sources */,
 				FEC55EFF1D507BC90000DFA5 /* OutputBuffer.cpp in Sources */,
 				FEC55F0C1D507BC90000DFA5 /* util_rand.cpp in Sources */,
+				E7F7FC5D255C701E0023FD66 /* StrokeDot.cpp in Sources */,
 				FEC55E661D507BC90000DFA5 /* AppMgr.cpp in Sources */,
 				E76FA27E20B4EF4A00377936 /* Font.cpp in Sources */,
-				E738234B21D1310D0049F3BB /* BmpGeneratorForOrder.cpp in Sources */,
-				E762C90E20C0EE6E00678C67 /* Fill.cpp in Sources */,
 				E7D34B17247177B200989B28 /* StrokeCheckLoop.cpp in Sources */,
 				E77451E520B5052000429BBD /* Const.cpp in Sources */,
+				E7F7FC27255C6FFB0023FD66 /* AdjustCalc.cpp in Sources */,
 				E76FA29520B4F04900377936 /* ImgMgr.cpp in Sources */,
-				E795BB3E24F5813A007C38B4 /* BezierForSub.cpp in Sources */,
 				E744247620B4058100B0169E /* Node.cpp in Sources */,
+				E7F7FC0D255C6F5B0023FD66 /* BezierForFrillLayerData.cpp in Sources */,
 				E7DC94E422F52E8B00E13383 /* Num.cpp in Sources */,
 				E76F9B491B44E26A001019C0 /* AppDelegate.mm in Sources */,
+				E7F7FC71255C70370023FD66 /* BmpGenerator.cpp in Sources */,
 				E76FA2BC20B4F17600377936 /* TexCacheBase.cpp in Sources */,
-				E71AAC22215DBDBF00F1E64A /* JointPoint.cpp in Sources */,
+				E7F7FC5C255C701E0023FD66 /* StrokeConst.cpp in Sources */,
 				E795BB4A24F581AF007C38B4 /* EditPalMenu.cpp in Sources */,
 				E76F9B521B44E26A001019C0 /* file_io_ios.mm in Sources */,
-				E775544D20CF79E400F28074 /* FillPointData.cpp in Sources */,
 				FEC55F071D507BC90000DFA5 /* sdarc_pak3.cpp in Sources */,
 				FEC55F051D507BC90000DFA5 /* new_delete.cpp in Sources */,
 				E744245A20B4056D00B0169E /* LoopTaskReserve.cpp in Sources */,
+				E7F7FC03255C6F5B0023FD66 /* BezierForEdge.cpp in Sources */,
 				E7C34BB920B415D400F7BDF5 /* Mover.cpp in Sources */,
-				E7BBF47E2123F795004218C4 /* StrokeDot.cpp in Sources */,
 				E7DC94E522F52E8B00E13383 /* NumMgr.cpp in Sources */,
+				E7F7FC0F255C6F5B0023FD66 /* BezierForSub.cpp in Sources */,
+				E7F7FC8E255C707D0023FD66 /* BmpDotPartData.cpp in Sources */,
 				E744245920B4056D00B0169E /* LoopReserve.cpp in Sources */,
+				E7F7FC51255C70130023FD66 /* FillForUndercoat.cpp in Sources */,
 				FEC55F101D507BC90000DFA5 /* TouchStatusCell.cpp in Sources */,
 				E795BB2E24F57FA8007C38B4 /* BezierTestLoopForTouch.cpp in Sources */,
 				E7351BE01F4D41F60005D89E /* util_str.cpp in Sources */,
-				E795BB3D24F5813A007C38B4 /* BezierForWork.cpp in Sources */,
 				FEC55EEC1D507BC90000DFA5 /* MainRenderer.cpp in Sources */,
-				E74BC1A322E5653E0014BBFB /* BmpDotSettingData.cpp in Sources */,
 				E744247220B4058100B0169E /* EditValueDialog.cpp in Sources */,
-				E77AA86D24A1BE45006D7DC6 /* FillConst.cpp in Sources */,
-				E7B6194320EF05FB00ECEFAA /* LayerObject.cpp in Sources */,
-				E7B6194120EF055000ECEFAA /* LayerOrderCell.cpp in Sources */,
 				FEC55F0F1D507BC90000DFA5 /* TouchMgr.cpp in Sources */,
 				FEC55E681D507BC90000DFA5 /* BgMgr.cpp in Sources */,
 				E76FA2A820B4F11000377936 /* Spr.cpp in Sources */,
 				E7C34BBC20B415D400F7BDF5 /* Spring.cpp in Sources */,
 				E7B8E00721C004DF001BD334 /* Enum.cpp in Sources */,
+				E7F7FC72255C70370023FD66 /* BmpGeneratorForAngle.cpp in Sources */,
+				E7F7FC4F255C70130023FD66 /* Fill.cpp in Sources */,
 				E755395C22F5D253006820E2 /* DefConst.cpp in Sources */,
 				E762173221FAD9B000C02802 /* TouchExObj.cpp in Sources */,
-				E7AEE10A22F5F2CC006DCF75 /* BezierConst.cpp in Sources */,
 				E79F9AA720D9D24E0084E58B /* PullDownMenu.cpp in Sources */,
 				E7C34BBA20B415D400F7BDF5 /* Drawer.cpp in Sources */,
 				E7A21D5B24BE375C009DF219 /* BezierTestLoopForBase.cpp in Sources */,
 				FE48E0711DA9D57F00A20945 /* DebugMenuLoop.cpp in Sources */,
 				E7DC94DE22F52E5E00E13383 /* Grp.cpp in Sources */,
-				E7BA910420CF4A6600BD7007 /* AnchorPointData.cpp in Sources */,
-				E753C0BC21AD15CF006A9555 /* BezierForTouch.cpp in Sources */,
 				FEC55EFC1D507BC90000DFA5 /* InputBuffer.cpp in Sources */,
 				E77AA86A24A1BE28006D7DC6 /* BrushBinData.cpp in Sources */,
+				E7F7FC0E255C6F5B0023FD66 /* BezierForWork.cpp in Sources */,
+				E7F7FC43255C70070023FD66 /* LayerObject.cpp in Sources */,
+				E7F7FC75255C70370023FD66 /* BmpPal.cpp in Sources */,
+				E7F7FC89255C707D0023FD66 /* BmpDotSettingData.cpp in Sources */,
 				E793036F21755F1B00398828 /* TexMgr.cpp in Sources */,
-				E774797B216315BD003FEF71 /* BezierForFrill.cpp in Sources */,
-				E7DFD3592276F48F00F5CD4B /* BmpDotPartData.cpp in Sources */,
 				FEC55F061D507BC90000DFA5 /* sdarc.cpp in Sources */,
+				E7F7FC25255C6FFB0023FD66 /* JointPoint.cpp in Sources */,
 				E76FA2B920B4F17600377936 /* TexCacheMgr.cpp in Sources */,
+				E7F7FC26255C6FFB0023FD66 /* AnglePlane.cpp in Sources */,
+				E7F7FCAA255C70B30023FD66 /* BPConst.cpp in Sources */,
 				E755396C22F5D55D006820E2 /* DefTable.cpp in Sources */,
-				E7561B74227701B4005E2CA2 /* BmpDotData.cpp in Sources */,
 				E744247820B4058100B0169E /* Button.cpp in Sources */,
-				E728026721B949A600B7B3D4 /* AnglePlane.cpp in Sources */,
-				E7DC4E2B215D98D90092B904 /* SlotAdjuster.cpp in Sources */,
-				E795BB4424F58193007C38B4 /* FillForUndercoat.cpp in Sources */,
-				E795BB4024F58168007C38B4 /* BmpDotSlotCategory.inc in Sources */,
-				E795BB3824F5811A007C38B4 /* BmpPalData.cpp in Sources */,
-				E74AA38320E0972900B74C9A /* PaintObjectData.cpp in Sources */,
 				FEC55EFA1D507BC90000DFA5 /* DataList.cpp in Sources */,
 				E76F9B4F1B44E26A001019C0 /* env_native_ios.mm in Sources */,
 				FEC55F0B1D507BC90000DFA5 /* util_pcm.cpp in Sources */,
+				E7F7FC63255C70270023FD66 /* BezierStructConv.cpp in Sources */,
 				E762C91320C101AE00678C67 /* Math.cpp in Sources */,
-				E760811B20F6B6FD00BCE2EC /* BmpGenerator.cpp in Sources */,
 				E744247320B4058100B0169E /* StrMenu.cpp in Sources */,
+				E7F7FC52255C70130023FD66 /* FillConst.cpp in Sources */,
+				E7F7FC44255C70070023FD66 /* LineObjectData.cpp in Sources */,
 				E76FA2A220B4F0C500377936 /* Shader.cpp in Sources */,
-				E7BA911320CF6B0300BD7007 /* StrokeMgr.cpp in Sources */,
 				E7D34B18247177B200989B28 /* BezierTestLoop.cpp in Sources */,
+				E7F7FC6F255C70370023FD66 /* BmpGeneratorForOrder.cpp in Sources */,
 				E7AEE10822F5F0FE006DCF75 /* DrawConst.cpp in Sources */,
 				FEC55F021D507BC90000DFA5 /* fpack.cpp in Sources */,
 				E744245B20B4056D00B0169E /* LoopMgr.cpp in Sources */,
 				E744247520B4058100B0169E /* EditValueMenu.cpp in Sources */,
-				E74BC1A422E5653E0014BBFB /* BmpDotSettingSlotData.cpp in Sources */,
+				E7F7FC74255C70370023FD66 /* BmpGenParam.cpp in Sources */,
+				E7F7FC41255C70070023FD66 /* AnchorPointData.cpp in Sources */,
 				FEC55EFB1D507BC90000DFA5 /* EditValue.cpp in Sources */,
-				E735F23520E06E36005E6147 /* LineObjectData.cpp in Sources */,
-				E7D38BF720F4F2F600149A52 /* BmpGenParam.cpp in Sources */,
 				E7C34BB820B415D400F7BDF5 /* Updater.cpp in Sources */,
+				E7F7FC08255C6F5B0023FD66 /* BezierForTouch.cpp in Sources */,
+				E7F7FC8C255C707D0023FD66 /* BmpDotSettingSlotData.cpp in Sources */,
 				FEC55F0D1D507BC90000DFA5 /* util_sys.cpp in Sources */,
-				E795BB4324F58193007C38B4 /* FillForExe.cpp in Sources */,
-				E795BB3724F5811A007C38B4 /* BPConst.cpp in Sources */,
 				E76FA2A920B4F11000377936 /* SprMgr.cpp in Sources */,
 				E76F9B531B44E26A001019C0 /* TouchInfoCell_ios.mm in Sources */,
 				E7A21D5E24BE375C009DF219 /* BezierTestLoopForDelay.cpp in Sources */,
 				FEC55F0A1D507BC90000DFA5 /* util_endian.cpp in Sources */,
+				E7F7FCAB255C70B30023FD66 /* BmpPalData.cpp in Sources */,
 				FEC55F0E1D507BC90000DFA5 /* util_utf8.cpp in Sources */,
+				E7F7FC8F255C707D0023FD66 /* BmpDotOrderData.cpp in Sources */,
 				E744245C20B4056D00B0169E /* Loop.cpp in Sources */,
-				E75FB1F9216442B90087AFEB /* BezierForFrillLayerData.cpp in Sources */,
-				E7743A4620FEEB0F00575FC1 /* DelayLog.cpp in Sources */,
-				E762C91920C1041E00678C67 /* Bezier.cpp in Sources */,
 				E7C34BB720B415D400F7BDF5 /* Obj.cpp in Sources */,
-				E778C71E21020C1E008D54A2 /* BmpDotPack.cpp in Sources */,
 				E76FA28620B4EF9700377936 /* FrameBuffer.cpp in Sources */,
 				FE81FA291D76EE1A00AACAC2 /* BgGrid.cpp in Sources */,
-				E78A563321C2D3F40026C347 /* AdjustCalc.cpp in Sources */,
 				FEC55EF91D507BC90000DFA5 /* DataFile.cpp in Sources */,
 				E72EDFB11EE4F6670046BC2A /* MainViewController.mm in Sources */,
 				E7D34B15247177B200989B28 /* BrushCheckLoop.cpp in Sources */,
 				FEC55EFE1D507BC90000DFA5 /* ListNode.cpp in Sources */,
 				FEC55F081D507BC90000DFA5 /* sdarc_unpak3.cpp in Sources */,
+				E7F7FC28255C6FFB0023FD66 /* SlotAdjuster.cpp in Sources */,
+				E7F7FC24255C6FFB0023FD66 /* DelayLog.cpp in Sources */,
 				E792DEC220B4EA0C0064907F /* time_log.cpp in Sources */,
 				E795BB4924F581AF007C38B4 /* EditPalDialog.cpp in Sources */,
 				E7F2A95C21A23FEA00D2A368 /* TouchObj.cpp in Sources */,
 				E77E9D0E20B390D90043BF09 /* env_native_ios_for_dialog.mm in Sources */,
 				E76F9B4D1B44E26A001019C0 /* MainView.mm in Sources */,
-				E795BB3A24F5811A007C38B4 /* BmpPalMgr.cpp in Sources */,
 				E76FA2B720B4F17600377936 /* TexString.cpp in Sources */,
-				E7FEE25A20F33213004CC0F2 /* BezierDataConv.cpp in Sources */,
 				FEC55F041D507BC90000DFA5 /* MemMgr.cpp in Sources */,
-				E72FB104225D785000DB1531 /* BezierForFill.cpp in Sources */,
 				E76FA28520B4EF9700377936 /* FrameBufferMgr.cpp in Sources */,
 				FEC55EFD1D507BC90000DFA5 /* List.cpp in Sources */,
 				FEC55F091D507BC90000DFA5 /* util_encrypt.cpp in Sources */,
 				E755397C22F5D73C006820E2 /* CsvCell.cpp in Sources */,
 				FEC55F011D507BC90000DFA5 /* FileMgr.cpp in Sources */,
+				E7F7FC23255C6FFB0023FD66 /* AdjustablePoint.cpp in Sources */,
 				E744247420B4058100B0169E /* TouchNode.cpp in Sources */,
+				E7F7FC8D255C707D0023FD66 /* BmpDotPack.cpp in Sources */,
 				E76FA27F20B4EF4A00377936 /* FontMgr.cpp in Sources */,
+				E7F7FC04255C6F5B0023FD66 /* BezierForFill.cpp in Sources */,
+				E7F7FC07255C6F5B0023FD66 /* BezierConst.cpp in Sources */,
 				E744247920B4058100B0169E /* ScrollBarMenu.cpp in Sources */,
+				E7F7FC40255C70070023FD66 /* SlotObjectData.cpp in Sources */,
 				E744247D20B4081D00B0169E /* GestureLoop.cpp in Sources */,
-				E738234D21D132DF0049F3BB /* BmpGeneratorForAngle.cpp in Sources */,
+				E7F7FC53255C70130023FD66 /* FillMgr.cpp in Sources */,
+				E7F7FCAC255C70B30023FD66 /* BmpPalMgr.cpp in Sources */,
+				E7F7FC09255C6F5B0023FD66 /* Bezier.cpp in Sources */,
+				E7F7FC3F255C70070023FD66 /* PaintObjectData.cpp in Sources */,
 				E76F9B501B44E26A001019C0 /* native_ios.mm in Sources */,
+				E7F7FC73255C70370023FD66 /* BmpGeneratorForSetting.cpp in Sources */,
 				E74A8C271F3962F100CEFA5A /* DialogHelper.cpp in Sources */,
-				E74BC19E22E564B70014BBFB /* BmpDotOrderData.cpp in Sources */,
-				E750D33F22E4BFCA00A5F9D4 /* BmpGeneratorForSetting.cpp in Sources */,
+				E7F7FC3E255C70070023FD66 /* LayerOrderList.cpp in Sources */,
 				E76FA2A120B4F0C500377936 /* ShaderMgr.cpp in Sources */,
 				E744247120B4058100B0169E /* Menu.cpp in Sources */,
+				E7F7FC5F255C701E0023FD66 /* Stroke.cpp in Sources */,
+				E7F7FC45255C70070023FD66 /* SlotPointData.cpp in Sources */,
 				E7C34BB620B415D400F7BDF5 /* Fade.cpp in Sources */,
-				E7B7D3E024A1500100D1443B /* StrokeConst.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

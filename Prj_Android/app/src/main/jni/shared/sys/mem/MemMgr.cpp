@@ -246,6 +246,7 @@ void CMemMgr::ReportField( eMEM_FIELD fieldId, bool isDetail ){
 	// ワーク
 	uint32 sizeFree = 0;
 	uint32 sizeUsed = 0;
+    float rate;
 
 	// プロパティの出力
 	LOGD( "@ name     = %s\n", pField->field.pName );
@@ -277,12 +278,14 @@ void CMemMgr::ReportField( eMEM_FIELD fieldId, bool isDetail ){
 			LOGD( "@ }\n" );
 		}
 	}
-	LOGD( "@ status: %3.2f%%(used:%d/free:%d)\n", 100.0f*sizeUsed/pField->size, sizeUsed, sizeFree );
+    rate = CConst::CalcUseRate( sizeUsed, pField->size );
+	LOGD( "@ status: %3.2f%%(used:%d/free:%d)\n", rate, sizeUsed, sizeFree );
 
 	if( !pField->isStatic ){
 		uint32 cellActive = pField->field.numActiveCell;
 		uint32 cellNum = pField->field.numCell;
-		LOGD( "@ cell status: %3.2f%%(active:%u/%u)\n", 100.0f*cellActive/cellNum, cellActive, cellNum );
+        rate = CConst::CalcUseRate( cellActive, cellNum );
+		LOGD( "@ cell status: %3.2f%%(active:%u/%u)\n", rate, cellActive, cellNum );
 	}
 }
 
@@ -293,7 +296,7 @@ void CMemMgr::DrawLog( void ){
 	char* buf = GetBufFromTempStr();
 	stMEM_FIELD* pField;
 	int i, used, rgba;
-	float usedRate;
+	float rate;
 
 	//------------------------------
 	// 右下（表示順は下から上）
@@ -318,21 +321,19 @@ void CMemMgr::DrawLog( void ){
 			}
 
 			// 利用領域警告
-			if( !pField->isStatic ){
-				usedRate = 100.0f*used/pField->size;
-				if( usedRate >= 96.0f ){ rgba = 0xFF8080FF; }
-				else if( usedRate >= 92.0f ){ rgba = 0xFFFF80FF; }
-				else{ rgba = 0x80FF80FF; }
+            rate = CConst::CalcUseRate( used, pField->size );
+			if( ! pField->isStatic ){
+                rgba = CConst::GetUseAlertRGBA( rate );
 			}else{
 				rgba = 0xEEEEEEFF;
 			}
 
 			// field情報
 			if( pField->size >= 1*MB ){
-				sprintf( buf, "F[%d]:  %.1fm(%.1f%%)%d/%d: %s", i, pField->size/MBf, 100.0f*used/pField->size,
+				sprintf( buf, "F[%d]:  %.1fm(%.1f%%)%d/%d: %s", i, pField->size/MBf, rate,
 						pField->field.numActiveCell, pField->field.numCell, pField->field.pName );
 			}else{
-				sprintf( buf, "F[%d]:  %.1fk(%.1f%%)%d/%d: %s", i, pField->size/KBf, 100.0f*used/pField->size,
+				sprintf( buf, "F[%d]:  %.1fk(%.1f%%)%d/%d: %s", i, pField->size/KBf, rate,
 						pField->field.numActiveCell, pField->field.numCell, pField->field.pName );
 			}
 			CDrawCell::DrawLogAlign( buf, rgba );
@@ -340,7 +341,8 @@ void CMemMgr::DrawLog( void ){
 	}
 
 	// 全体情報
-	sprintf( buf, "M:%.1fm(%.1f%%)", s_nSize/MBf, 100.0f*s_nUsed/s_nSize );
+    rate = CConst::CalcUseRate( s_nUsed, s_nSize );
+	sprintf( buf, "M:%.1fm(%.1f%%)", s_nSize/MBf, rate );
 	CDrawCell::DrawLogAlign( buf );
 
 	// label

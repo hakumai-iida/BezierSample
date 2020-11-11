@@ -13,7 +13,7 @@
   |	Include		インクルードヘッダ
   +----------------------------------------------------------------+*/
 #include "env.hpp"
-#include "draw/tex/fill/FillConst.hpp"
+#include "draw/bezier/fill/FillConst.hpp"
 
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義

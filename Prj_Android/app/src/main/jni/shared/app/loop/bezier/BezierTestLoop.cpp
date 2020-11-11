@@ -9,7 +9,7 @@
 #include "env.hpp"
 
 #include "BezierTestLoop.hpp"
-#include "draw/tex/bezier/BezierDataConv.hpp"
+#include "draw/bezier/struct/BezierStructConv.hpp"
 
 /*+----------------------------------------------------------------+
   |	Define		デファイン定義
@@ -20,8 +20,7 @@
 //--------------------------------------------------------------------------
 // [CLayerData]による表示確認
 //--------------------------------------------------------------------------
-// この定義を有効にすると[createBmpWithLayerData]が呼ばれる
-// この定義を無効にすると[createBmpWithBmpDot]が呼ばれる（※BD素材によるテクスチャ作成）
+// この定義を有効にするとテストレイヤーデータによる描画がおこなわれる
 //--------------------------------------------------------------------------
 //#define LAYER_BASE
 
@@ -32,7 +31,7 @@
     //----------------------------------------------------------------------
     // この定義を有効にすると[allocForLayerForTouch]により素材を作成する
     //----------------------------------------------------------------------
-    //#define LAYER_BASE_FOR_TOUCH
+    #define LAYER_BASE_FOR_TOUCH
 
     //----------------------------------------------------------------------
     // 遅延確認
@@ -162,51 +161,102 @@
 //---------------------------
 // 選択値の最大／初期値
 static int _menu_item_info[][2] = {
-    { 2, 0 },   // eBTMI_SELECT_CHARA,         // キャラクタ選択
-    { 2, 0 },   // eBTMI_SELECT_COSTUME,       // 着ぐるみ選択
-    { 6, 1 },   // eBTMI_SELECT_STROKE,        // ストローク選択
-    { 6, 1 },   // eBTMI_SELECT_COLOR,         // 色選択
-    { 2, 1 },   // eBTMI_ENABLE_TOUCH,         // タッチを有効にするか？
-    { 2, 1 },   // eBTMI_ENABLE_STRIPE,        // ストライプを有効にするか？
-    { 2, 1 },   // eBTMI_ENABLE_FRILL,         // フリルを有効にするか？
-    { 2, 1 },   // eBTMI_ENABLE_FILL_EDGE,     // エッジ塗りを有効にするか？
-    { 2, 1 },   // eBTMI_ENABLE_FILL_OPTION,   // 塗りオプションを有効にするか？
-    { 3, 0 },   // eBTMI_DISP_WORK_PATH,       // ワークパスを表示するか？
-    { 2, 1 },   // eBTMI_DISP_BG,              // 背景を表示するか？
-    { 2, 0 },   // eBTMI_DISP_FLIP_H,          // 横反転するか？
-    { 2, 0 },   // eBTMI_DISP_FLIP_V,          // 縦反転するか？
+    { 6, 0 },   // eBTMI_SELECT_CHARA,              // キャラクタ選択
+    { 7, 0 },   // eBTMI_SELECT_FACE,               // 顔選択
+    { 7, 0 },   // eBTMI_SELECT_UP,                 // 上半身選択
+    { 7, 0 },   // eBTMI_SELECT_LOW,                // 下半身選択
+    { 4, 0 },   // eBTMI_SELECT_COSTUME,            // 着ぐるみ選択
+    { 6, 2 },   // eBTMI_SELECT_STROKE,             // ストローク選択
+    { 14, 1 },   // eBTMI_SELECT_COLOR,             // 色選択
+    { 2, 1 },   // eBTMI_ENABLE_TOUCH,              // タッチを有効にするか？
+    { 2, 1 },   // eBTMI_ENABLE_STRIPE,             // ストライプを有効にするか？
+    { 2, 1 },   // eBTMI_ENABLE_FRILL,              // フリルを有効にするか？
+    { 2, 1 },   // eBTMI_ENABLE_FILL_EDGE,          // エッジ塗りを有効にするか？
+    { 2, 1 },   // eBTMI_ENABLE_FILL_OPTION,        // 塗りオプションを有効にするか？
+    { 3, 0 },   // eBTMI_DISP_WORK_PATH,            // ワークパスを表示するか？
+    { 2, 1 },   // eBTMI_DISP_BG,                   // 背景を表示するか？
+    { 2, 0 },   // eBTMI_DISP_FLIP_H,               // 横反転するか？
+    { 2, 0 },   // eBTMI_DISP_FLIP_V,               // 縦反転するか？
 #ifdef LAYER_BASE
-    { 2, 0 },   // eBTMI_DISP_ON_GROUND,       // 接地表示するか？
+    { 2, 0 },   // eBTMI_DISP_ON_GROUND,            // 接地表示するか？
 #else
-    { 2, 1 },   // eBTMI_DISP_ON_GROUND,       // 接地表示するか？
+    { 2, 1 },   // eBTMI_DISP_ON_GROUND,            // 接地表示するか？
 #endif
 };
 
+// 参照する[bdp/bpd]のUID
+static const int _menu_item_UID_CHARA[] = { 1004, 1003, 1002, 1001, 100, 101 };
+static const int _menu_item_UID_COSTUME[] = { 102, 101, 100 };
+
 // メニュー項目名
 static const char* _menu_item_label[] = {
-    "CHARA",        // eBTMI_SELECT_CHARA,         // キャラクタ選択
-    "COSTUME",      // eBTMI_SELECT_COSTUME,       // 着ぐるみ選択
-    "STROKE",       // eBTMI_SELECT_STROKE,        // ストローク選択
-    "COLOR",        // eBTMI_SELECT_COLOR,         // 色選択
-    "TOUCH",        // eBTMI_ENABLE_TOUCH,         // タッチを有効にするか？
-    "STRIPE",       // eBTMI_ENABLE_STRIPE,        // ストライプを有効にするか？
-    "FRILL",        // eBTMI_ENABLE_FRILL,         // フリルを有効にするか？
-    "EDGE",         // eBTMI_ENABLE_FILL_EDGE,     // エッジ塗りを有効にするか？
-    "FILL_OPTION",  // eBTMI_ENABLE_FILL_OPTION,   // 塗りオプションを有効にするか？
-    "WORK_PATH",    // eBTMI_DISP_WORK_PATH,       // ワークパスを表示するか？
-    "BG",           // eBTMI_DISP_BG,              // 背景を表示するか？
-    "FLIP_H",       // eBTMI_DISP_FLIP_H,          // 横反転するか？
-    "FLIP_V",       // eBTMI_DISP_FLIP_V,          // 縦反転するか？
-    "ON_GROUND",    // eBTMI_DISP_ON_GROUND,       // 接地表示するか？
+    "chara",        // eBTMI_SELECT_CHARA,          // キャラクタ選択
+    "face",         // eBTMI_SELECT_FACE,           // 顔選択
+    "up",           // eBTMI_SELECT_UP,             // 上半身選択
+    "low",          // eBTMI_SELECT_LOW,            // 下半身選択
+    "costume",      // eBTMI_SELECT_COSTUME,        // 着ぐるみ選択
+    "stroke",       // eBTMI_SELECT_STROKE,         // ストローク選択
+    "color",        // eBTMI_SELECT_COLOR,          // 色選択
+    "touch",        // eBTMI_ENABLE_TOUCH,          // タッチを有効にするか？
+    "stripe",       // eBTMI_ENABLE_STRIPE,         // ストライプを有効にするか？
+    "frill",        // eBTMI_ENABLE_FRILL,          // フリルを有効にするか？
+    "edge",         // eBTMI_ENABLE_FILL_EDGE,      // エッジ塗りを有効にするか？
+    "fill option",  // eBTMI_ENABLE_FILL_OPTION,    // 塗りオプションを有効にするか？
+    "work path",    // eBTMI_DISP_WORK_PATH,        // ワークパスを表示するか？
+    "bg",           // eBTMI_DISP_BG,               // 背景を表示するか？
+    "flip h",       // eBTMI_DISP_FLIP_H,           // 横反転するか？
+    "flip v",       // eBTMI_DISP_FLIP_V,           // 縦反転するか？
+    "on ground",    // eBTMI_DISP_ON_GROUND,        // 接地表示するか？
 
     NULL,
 };
 
 // メニュー項目の各種表示
-static const char* _menu_item_SELECT_CHARA[] = { "GOTH", "MIKU" };
-static const char* _menu_item_SELECT_COSTUME[] = { "OFF", "NEGI" };
-static const char* _menu_item_SELECT_STROKE[] = { "OFF", "TEST 1", "TEST 2", "TEST 3", "TEST 4", "TEST 5" };
-static const char* _menu_item_SELECT_COLOR[] = { "OFF", "TEST 1", "TEST 2", "TEST 3", "TEST 4", "TEST 5" };
+static const char* _menu_item_SELECT_CHARA[] = {
+    "TYPE04",
+    "TYPE03",
+    "TYPE02",
+    "TYPE01",
+    "GOTH",
+    "MIKU"
+};
+
+static const char* _menu_item_SELECT_PART[] = {
+    "---",
+    "TYPE04",
+    "TYPE03",
+    "TYPE02",
+    "TYPE01",
+    "GOTH",
+    "MIKU"
+};
+
+static const char* _menu_item_SELECT_COSTUME[] = {
+    "---",
+    "SHEEP",
+    "NEGI",
+    "BOX"
+};
+
+static const char* _menu_item_SELECT_STROKE[] = {
+    "OFF",
+    "TEST 1",
+    "TEST 2",
+    "TEST 3",
+    "TEST 4",
+    "TEST 5",
+};
+
+static const char* _menu_item_SELECT_COLOR[] = {
+    "OFF",
+    "TYPE04_0", "TYPE04_1",
+    "TYPE03_0", "TYPE03_1",
+    "TYPE02_0", "TYPE02_1",
+    "TYPE01_0", "TYPE01_1",
+    "GOTH_0", "GOTH_1",
+    "MIKU_0", "MIKU_1", "MIKU_2"
+};
+
 static const char* _menu_item_ENABLE_TOUCH[] = { "OFF", "ON" };
 static const char* _menu_item_ENABLE_STRIPE[] = { "OFF", "ON" };
 static const char* _menu_item_ENABLE_FRILL[] = { "OFF", "ON" };
@@ -220,6 +270,9 @@ static const char* _menu_item_DISP_ON_GROUND[] = { "OFF", "ON" };
 
 static const char** _menu_item[]= {
     _menu_item_SELECT_CHARA,        // キャラクタ選択
+    _menu_item_SELECT_PART,         // 顔選択
+    _menu_item_SELECT_PART,         // 上半身選択
+    _menu_item_SELECT_PART,         // 下半身選択
     _menu_item_SELECT_COSTUME,      // 着ぐるみ選択
     _menu_item_SELECT_STROKE,       // ストローク選択
     _menu_item_SELECT_COLOR,        // 色選択
@@ -260,8 +313,8 @@ CBezierTestLoop::CBezierTestLoop( void ){
     CBezier::SetDispOffDirVectorAlways( true );
 #endif
     
-    // パスとアンカーポイントを目立たせる
-    CBezier::SetDispPathActiveAlways( true );
+    // 全てのアンカーポイントを目立たせる
+    CBezier::SetDispAllSelected( true );
     CBezier::SetDispOnlyAnchorPoint( true );
 
     // 領域確保
@@ -540,13 +593,27 @@ void CBezierTestLoop::update0( void ){
     //------------------------------------
 	// [RESET]
 	if( m_pButtonReset->isTapped() ){
+        // メニューの一部を戻す
+        m_nArrMenuVal[eBTMI_SELECT_FACE] = _menu_item_info[eBTMI_SELECT_FACE][1];
+        m_nArrMenuVal[eBTMI_SELECT_UP] = _menu_item_info[eBTMI_SELECT_UP][1];
+        m_nArrMenuVal[eBTMI_SELECT_LOW] = _menu_item_info[eBTMI_SELECT_LOW][1];
+        m_nArrMenuVal[eBTMI_SELECT_COSTUME] = _menu_item_info[eBTMI_SELECT_LOW][1];
+        m_nArrMenuVal[eBTMI_SELECT_COSTUME] = _menu_item_info[eBTMI_SELECT_COSTUME][1];
+        m_nArrMenuVal[eBTMI_SELECT_STROKE] = _menu_item_info[eBTMI_SELECT_STROKE][1];
+        m_nArrMenuVal[eBTMI_SELECT_COLOR] = _menu_item_info[eBTMI_SELECT_COLOR][1];
+        m_nArrMenuVal[eBTMI_ENABLE_FRILL] = _menu_item_info[eBTMI_ENABLE_FRILL][1];
+        m_nArrMenuVal[eBTMI_ENABLE_STRIPE] = _menu_item_info[eBTMI_ENABLE_STRIPE][1];
+        m_nArrMenuVal[eBTMI_ENABLE_TOUCH] = _menu_item_info[eBTMI_ENABLE_TOUCH][1];
+        m_nArrMenuVal[eBTMI_ENABLE_FILL_EDGE] = _menu_item_info[eBTMI_ENABLE_FILL_EDGE][1];
+        m_nArrMenuVal[eBTMI_ENABLE_FILL_OPTION] = _menu_item_info[eBTMI_ENABLE_FILL_OPTION][1];
+
         onReset();
         isUpdated = true;
 	}
     // [RAND]
     else if( m_pButtonRand->isTapped() ){
         // 設定＆メニュー確定
-        fixForSetting( true );
+        fixForSetting( false, true );
         fixForMenu();
 
         isUpdated = true;
@@ -562,7 +629,7 @@ void CBezierTestLoop::update0( void ){
         m_nArrMenuVal[select] = val;
         
         // 設定＆メニュー確定
-        fixForSetting( false );
+        fixForSetting( (select==eBTMI_SELECT_CHARA), false );
         fixForMenu();
         
         isUpdated = true;
@@ -676,6 +743,10 @@ void CBezierTestLoop::update0( void ){
 // 描画
 //------------------------
 void CBezierTestLoop::onDraw0( void ){
+    CTex* pTexForLine = m_pBmpTex->getTexForLine();
+    CTex* pTexForColor = m_pBmpTex->getTexForColor();
+    CTex* pTexForPath = m_pBmpTex->getTexForPath();
+
     CDrawCell* pDC = CDrawCell::GetFreeCell();
     char* buf = CMemMgr::GetBufFromTempStr();
 
@@ -686,7 +757,7 @@ void CBezierTestLoop::onDraw0( void ){
     float h0 = s * CBmpGenerator::GetBaseTexSizeH();        // 名目上のサイズ
     float w = s * CBmpGenerator::GetTotalTexSizeW();        // 実サイズ
     float h = s * CBmpGenerator::GetTotalTexSizeH();        // 実サイズ
-
+    
     // [RECT] 下地
     if( m_nArrMenuVal[eBTMI_DISP_BG] != 0 ){
         // 実サイズ
@@ -720,10 +791,10 @@ void CBezierTestLoop::onDraw0( void ){
         }
     }
 
-    // 設置指定があれば調整
+    // 接地指定があれば調整
     if( m_nArrMenuVal[eBTMI_DISP_ON_GROUND] != 0 ){
-        x = SA_XC - m_pTexForLine->getBaseX()/pixelRate;
-        y = SA_YM - m_pTexForLine->getBaseY()/pixelRate + (5*h0/8);
+        x = SA_XC - pTexForLine->getBaseX()/pixelRate;
+        y = SA_YM - pTexForLine->getBaseY()/pixelRate + (5*h0/8);
     }else{
         x = SA_XC - w/2.0f;
         y = SA_YM - h/2.0f;
@@ -732,7 +803,7 @@ void CBezierTestLoop::onDraw0( void ){
     // [P8D&P] ベジェ：塗り
     if( m_nArrMenuVal[eBTMI_SELECT_COLOR] != 0 ){
         pDC->clear();
-        pDC->setTex( m_pTexForColor, CImgMgr::GetImgPal( eIMG_BMP_PAL_HEAD ) );
+        pDC->setTex( pTexForColor, CImgMgr::GetImgPal( eIMG_BMP_PAL_00 ) );
         pDC->setBlendAlpha();
         pDC->setWidth( w );
         pDC->setHeight( h );
@@ -742,7 +813,7 @@ void CBezierTestLoop::onDraw0( void ){
     // [GRAY] ベジェ：線
     if( m_nArrMenuVal[eBTMI_SELECT_STROKE] != 0 ){
         pDC->clear();
-        pDC->setTex( m_pTexForLine, NULL );
+        pDC->setTex( pTexForLine, NULL );
         pDC->setWidth( w );
         pDC->setHeight( h );
         pDC->setBlendAlpha();
@@ -751,8 +822,8 @@ void CBezierTestLoop::onDraw0( void ){
 
         if( m_nArrMenuVal[eBTMI_DISP_ON_GROUND] == 0 ){
             // カーソル表示：基本座標
-            float groundX = SA_XC - w/2 + m_pTexForLine->getBaseX()/pixelRate;
-            float groundY = SA_YM - h/2 + m_pTexForLine->getBaseY()/pixelRate;
+            float groundX = SA_XC - w/2 + pTexForLine->getBaseX()/pixelRate;
+            float groundY = SA_YM - h/2 + pTexForLine->getBaseY()/pixelRate;
 
             pDC->clear();
             pDC->setRect( 1, 3 );
@@ -767,8 +838,8 @@ void CBezierTestLoop::onDraw0( void ){
             pDC->drawF( groundX, groundY );
             
             // カーソル表示：フォーカス座標
-            float focusX = SA_XC - w/2 + m_pTexForLine->getFocusX()/pixelRate;
-            float focusY = SA_YM - h/2 + m_pTexForLine->getFocusY()/pixelRate;
+            float focusX = SA_XC - w/2 + pTexForLine->getFocusX()/pixelRate;
+            float focusY = SA_YM - h/2 + pTexForLine->getFocusY()/pixelRate;
 
             pDC->clear();
             pDC->setRect( 1, 3 );
@@ -787,7 +858,7 @@ void CBezierTestLoop::onDraw0( void ){
     // [P8D&P] ベジェ：パス
     if( m_nArrMenuVal[eBTMI_DISP_WORK_PATH] != 0  ){
         pDC->clear();
-        pDC->setTex( m_pTexForPath, CImgMgr::GetImgPal( eIMG_PAL_WORK_PATH ) );
+        pDC->setTex( pTexForPath, CImgMgr::GetImgPal( eIMG_PAL_WORK_PATH ) );
         pDC->setWidth( w );
         pDC->setHeight( h );
         pDC->drawF( x, y );
@@ -797,8 +868,8 @@ void CBezierTestLoop::onDraw0( void ){
     if( m_nArrMenuVal[eBTMI_DISP_ON_GROUND] == 0 ){
         // ログ（名目上のサイズの左上）
         sprintf( buf, "B:%d-%d F:%d-%d",
-                 (int)m_pTexForLine->getBaseX(), (int)m_pTexForLine->getBaseY(),
-                 (int)m_pTexForLine->getFocusX(), (int)m_pTexForLine->getFocusY()
+                 (int)pTexForLine->getBaseX(), (int)pTexForLine->getBaseY(),
+                 (int)pTexForLine->getFocusX(), (int)pTexForLine->getFocusY()
                 );
 
         // 名目サイズ
@@ -850,10 +921,12 @@ void CBezierTestLoop::onDraw0( void ){
     // 生成時間
     CDrawCell::SetLogAlignRT( TIME_LOG_S, TIME_LOG_X, TIME_LOG_Y );
     
-    sprintf( buf, "bmp:%d.%d ms", m_nBmpGenTime/1000, (m_nBmpGenTime%1000)/100 );
+    int genTime = m_pBmpTex->getBmpGenTime();
+    sprintf( buf, "bmp:%d.%d ms", genTime/1000, (genTime%1000)/100 );
     CDrawCell::DrawLogAlign( buf );
 
-    sprintf( buf, "path: %d.%d ms", m_nBmpGenTimeForPath/1000, (m_nBmpGenTimeForPath%1000)/100 );
+    int genTimeForPath = m_pBmpTex->getBmpGenTimeForPath();
+    sprintf( buf, "path: %d.%d ms", genTimeForPath/1000, (genTimeForPath%1000)/100 );
     CDrawCell::DrawLogAlign( buf );
 }
 
@@ -908,18 +981,6 @@ bool CBezierTestLoop::updateAnim( void ){
 // ベジェ確認：リセット
 //-------------------
 void CBezierTestLoop::onReset( void ){
-    if( m_pTexForLine != NULL ){
-        m_pTexForLine->release();
-    }
-
-    if( m_pTexForColor != NULL ){
-        m_pTexForColor->release();
-    }
-    
-    if( m_pTexForPath != NULL ){
-        m_pTexForPath->release();
-    }
-
     // 調整値
     m_fAdjustRateH = m_fAdjustRateVH = 0.0f;
     m_fAdjustRateV = m_fAdjustRateVV = 0.0f;
@@ -935,7 +996,7 @@ void CBezierTestLoop::onReset( void ){
     m_bAnimOn = false;
     
     // 設定＆メニュー確定
-    fixForSetting( false );
+    fixForSetting( true, false );
     fixForMenu();
     
     fixForAnimButton();
@@ -1062,31 +1123,31 @@ void CBezierTestLoop::onAnimShot( void ){
 //--------------------
 // セッティング確定
 //--------------------
-void CBezierTestLoop::fixForSetting( bool isRandom ){
-    // デフォルトに設定
-    m_oSetting.setDefault();
+void CBezierTestLoop::fixForSetting( bool isReset, bool isRandom ){
+    CBmpDotSettingData* pSetting = m_pBmpTex->getDotSetting();
 
-    // [FACE/BODY]設定
-    m_oSetting.setIdForFace( m_nArrMenuVal[eBTMI_SELECT_CHARA] );
-    m_oSetting.setIdForBody( m_nArrMenuVal[eBTMI_SELECT_CHARA] );
-
-    // 基本設定であれば
-    if( ! isRandom ){
-        // ぬいぐるみ（右）は無効
-        CBmpDotSettingSlotData* pSlot = m_oSetting.searchSlot( eBD_SLOT_AmOptionA, 1 );
-        pSlot->setInvalid( true );
-        
-        // マイク（右）は無効
-        m_oSetting.setOptionValid( eBD_OPTION_FcEarMike, 1, false );
+    // リセット指定があればデフォルトに
+    if( isReset ){
+        pSetting->setDefault();
     }
-    // ランダム設定であれば
-    else{
+
+    CBmpDotSettingSlotData* pSlot;
+    int charaUid = _menu_item_UID_CHARA[m_nArrMenuVal[eBTMI_SELECT_CHARA]];
+    int faceUid = BD_UID_INVALID;
+    int upUid = BD_UID_INVALID;
+    int lowUid = BD_UID_INVALID;
+    int suitUid = BD_UID_INVALID;
+    eBD_CATEGORY categoryForFace = eBD_CATEGORY_BODY;
+    eBD_CATEGORY categoryForBody = eBD_CATEGORY_BODY;
+
+    // ランダム指定があれば設定
+    if( isRandom ){
         // パーツのシャッフル
-        m_oSetting.setRandomPart();
+        pSetting->setRandomPart();
 
         // テンションとサイズの設定
-        m_oSetting.setRandomAdjForT();
-        m_oSetting.setRandomAdjForS();
+        pSetting->setRandomAdjForT();
+        pSetting->setRandomAdjForS();
 
         // 調整値
         m_fAdjustRateH = 2.0f*CRand::GetRandF() - 1.0f;
@@ -1096,77 +1157,137 @@ void CBezierTestLoop::fixForSetting( bool isRandom ){
         m_fAdjustRateLR = 2.0f*CRand::GetRandF() - 1.0f;
         m_fAdjustRateUD = 2.0f*CRand::GetRandF() - 1.0f;
         
-        // 線と色の設定
+        // 線と色
         m_nArrMenuVal[eBTMI_SELECT_STROKE] = 1 + CRand::GetRand( _menu_item_info[eBTMI_SELECT_STROKE][0]-1 );
         m_nArrMenuVal[eBTMI_SELECT_COLOR] = 1 + CRand::GetRand( _menu_item_info[eBTMI_SELECT_COLOR][0]-1 );
+        
+#if 0
+        // ベジェ機能
+        m_nArrMenuVal[eBTMI_ENABLE_TOUCH] = (CRand::IsRandHappen( 1, 3 )? 1: 0);
+        m_nArrMenuVal[eBTMI_ENABLE_STRIPE] = (CRand::IsRandHappen( 1, 3 )? 1: 0);
+        m_nArrMenuVal[eBTMI_ENABLE_FRILL] = (CRand::IsRandHappen( 1, 3 )? 1: 0);
+        m_nArrMenuVal[eBTMI_ENABLE_FILL_EDGE] = (CRand::IsRandHappen( 1, 3 )? 1: 0);
+        m_nArrMenuVal[eBTMI_ENABLE_FILL_OPTION] = (CRand::IsRandHappen( 1, 3 )? 1: 0);
+#endif
+    }else{
+        // ぬいぐるみ（右）は無効
+        CBmpDotSettingSlotData* pSlot = pSetting->searchSlot( eBD_SLOT_AmOptionA, 1 );
+        pSlot->setInvalid( true );
+        
+        // マイク（右）は無効
+        pSetting->setOptionForSlotValidAt( eBD_SLOT_FcEar, 1, 0, false );
+
+        // 基本設定
+        pSetting->setIdForFace( charaUid );
+        pSetting->setIdForBody( charaUid );
+        faceUid = upUid = lowUid = charaUid;
+
+        // [FACE]差し替え
+        if( m_nArrMenuVal[eBTMI_SELECT_FACE] != 0 ){
+            faceUid = _menu_item_UID_CHARA[m_nArrMenuVal[eBTMI_SELECT_FACE]-1];
+            pSetting->setIdForFace( faceUid );
+        }
+
+        // [UP]差し替え
+        if( m_nArrMenuVal[eBTMI_SELECT_UP] != 0 ){
+            upUid = _menu_item_UID_CHARA[m_nArrMenuVal[eBTMI_SELECT_UP]-1];
+            pSetting->setReplacedIdForUp( upUid );
+        }else{
+            pSetting->setReplacedIdForUp( BD_UID_INVALID );
+        }
+
+        // [LOW]差し替え
+        if( m_nArrMenuVal[eBTMI_SELECT_LOW] != 0 ){
+            lowUid = _menu_item_UID_CHARA[m_nArrMenuVal[eBTMI_SELECT_LOW]-1];
+            pSetting->setReplacedIdForLow( lowUid );
+        }else{
+            pSetting->setReplacedIdForLow( BD_UID_INVALID );
+        }
+    }
+
+    //-----------------------
+    // [SUIT]設定
+    //-----------------------
+    // 指定が有効であれば設定を差し替える
+    if( m_nArrMenuVal[eBTMI_SELECT_COSTUME] != 0 ){
+        suitUid = _menu_item_UID_COSTUME[m_nArrMenuVal[eBTMI_SELECT_COSTUME]-1];
+        faceUid = suitUid;
+        upUid = suitUid;
+        lowUid = suitUid;
+        categoryForFace = eBD_CATEGORY_SUIT;
+        categoryForBody = eBD_CATEGORY_SUIT;
+    }
+    pSetting->setIdForSuit( suitUid );
+
+    // 顔が有効であれば
+    if( IS_BD_UID_VALID( faceUid ) ){
+        // HdTopCover
+        pSlot = pSetting->searchSlot( eBD_SLOT_HdTopCover, 0 );
+        pSlot->setCategory( categoryForFace );
+        pSlot->setUid( faceUid );
+        
+        // FcUnderCover
+        pSlot = pSetting->searchSlot( eBD_SLOT_FcUnderCover, 0 );
+        pSlot->setCategory( categoryForFace );
+        pSlot->setUid( faceUid );
     }
     
-    // ランダム設定後に[SUIT]設定（※ここは初期値が無効になるように）
-    if( m_nArrMenuVal[eBTMI_SELECT_COSTUME] > 0 ){
-        int target = m_nArrMenuVal[eBTMI_SELECT_COSTUME] - 1;
-
-        m_oSetting.setIdForSuit( target );
-        
-        // スーツパーツを固定で割り当て
-        CBmpDotSettingSlotData* pSlot;
-
-        // FgTop
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_FgTop, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-        
+    // 上半身有効であれば
+    if( IS_BD_UID_VALID( upUid ) ){
         // BlBase
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_BlBase, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-
-        // BlJointUpBody
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_BlJointUpBody, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-
-        // BlJointLowBody
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_BlJointLowBody, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
+        pSlot = pSetting->searchSlot( eBD_SLOT_BlBase, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( upUid );
 
         // UpBase
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_UpBase, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-
-        // LwBase
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_LwBase, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-
-        // HdBase
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_HdBase, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
+        pSlot = pSetting->searchSlot( eBD_SLOT_UpBase, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( upUid );
+        
+        // NkCover
+        pSlot = pSetting->searchSlot( eBD_SLOT_NkCover, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( upUid );
 
         // AmCover[0]
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_AmCover, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
+        pSlot = pSetting->searchSlot( eBD_SLOT_AmCover, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( upUid );
 
         // AmCover[1]
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_AmCover, 1 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
+        pSlot = pSetting->searchSlot( eBD_SLOT_AmCover, 1 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( upUid );
+    }
+
+    // 下半身が有効であれば
+    if( IS_BD_UID_VALID( lowUid ) ){
+        // LwBase
+        pSlot = pSetting->searchSlot( eBD_SLOT_LwBase, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( lowUid );
 
         // LgCover[0]
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_LgCover, 0 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
+        pSlot = pSetting->searchSlot( eBD_SLOT_LgCover, 0 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( lowUid );
 
         // LgCover[1]
-        pSlot = m_oSetting.searchSlot( eBD_SLOT_LgCover, 1 );
-        pSlot->setCategory( eBD_CATEGORY_SUIT );
-        pSlot->setUid( target );
-    }else{
-        m_oSetting.setIdForSuit( - 1 );
+        pSlot = pSetting->searchSlot( eBD_SLOT_LgCover, 1 );
+        pSlot->setCategory( categoryForBody );
+        pSlot->setUid( lowUid  );
     }
+
+    //-----------------------------------------------
+    // FgTopは必ず有効な値を指定する（※無効値だと表示されない）
+    //-----------------------------------------------
+    if( ! IS_BD_UID_VALID( upUid ) ){
+        upUid = _menu_item_UID_CHARA[m_nArrMenuVal[eBTMI_SELECT_CHARA]];
+    }
+    
+    pSlot = pSetting->searchSlot( eBD_SLOT_FgTop, 0 );
+    pSlot->setCategory( categoryForBody );
+    pSlot->setUid( upUid );
 }
 
 //----------------
@@ -1175,14 +1296,14 @@ void CBezierTestLoop::fixForSetting( bool isRandom ){
 void CBezierTestLoop::fixForMenu( void ){
     // ストロークへ反映
     if( m_nArrMenuVal[eBTMI_SELECT_STROKE] > 0 ){
-        CBezierDataConv::SetFixedBrush( (eBRUSH)(eBRUSH_C_BASE+m_nArrMenuVal[eBTMI_SELECT_STROKE]) );
+        CBezierStructConv::SetFixedBrush( (eBRUSH)(eBRUSH_C_BASE+m_nArrMenuVal[eBTMI_SELECT_STROKE]) );
     }
 
     // カラーへ反映
     if( m_nArrMenuVal[eBTMI_SELECT_COLOR] > 0 ){
         CBmpPalData* pPal = CBmpPalMgr::GetBmpPalDataAt( m_nArrMenuVal[eBTMI_SELECT_COLOR]-1 );
         if( pPal != NULL ){
-            pPal->reloadPalImg( eIMG_BMP_PAL_HEAD );
+            pPal->loadToImgPal( eIMG_BMP_PAL_00 );
         }
     }
 
@@ -1223,62 +1344,53 @@ void CBezierTestLoop::fixForMenu( void ){
 // ベジェ確認：BMP作成
 //----------------------
 void CBezierTestLoop::createBmp( void ){
-    //----------------------------------
+    CBmpDotSettingData* pSetting = m_pBmpTex->getDotSetting();
+
+    // 一時パラメータの設定
+    pSetting->resetFixed();
+
+    pSetting->setFlipHFixed( m_nArrMenuVal[eBTMI_DISP_FLIP_H] != 0 );
+    pSetting->setFlipVFixed( m_nArrMenuVal[eBTMI_DISP_FLIP_V] != 0 );
+    pSetting->setScaleFixed( m_fDispScale*BMP_GEN_BASE_SCALE );
+    pSetting->setRotFixed( m_fDispRotation );
+    
+    pSetting->setEmoFixed( eBD_EMO_BASE );
+    pSetting->setFormFixed( eBD_FORM_FRONT );
+
+    pSetting->setAdjustHFixed( m_fAdjustRateH );
+    pSetting->setAdjustVFixed( m_fAdjustRateV );
+    pSetting->setAdjustTFixed( m_fAdjustRateT );
+    pSetting->setAdjustSFixed( m_fAdjustRateS );
+    pSetting->setAngleLRFixed( m_fAdjustRateLR );
+    pSetting->setAngleUDFixed( m_fAdjustRateUD );
+    
     // BMP作成パラメータ準備
-    //----------------------------------
     stBMP_GEN_CREATE_PARAM createParam;
-    CLEAR_BMP_GEN_CREATE_PARAM( &createParam );
+    CBmpGenerator::SetBmpGenCreateParam( &createParam, pSetting, m_pDelayLog );
 
-    for( int i=0; i<eBD_OPTION_MAX; i++ ){
-        for( int j=0; j<BD_SLOT_INDEX_MAX; j++ ){
-            createParam.arrOption[i][j] = m_oSetting.isOptionValid( (eBD_OPTION)i, j );
-        }
-    }
-
-    createParam.isFlipH = (m_nArrMenuVal[eBTMI_DISP_FLIP_H] != 0);
-    createParam.isFlipV = (m_nArrMenuVal[eBTMI_DISP_FLIP_V] != 0);
-    createParam.scale = m_fDispScale * BMP_GEN_BASE_SCALE;
-    createParam.rot = m_fDispRotation;
-
-    createParam.adjustRateH = m_fAdjustRateH;
-    createParam.adjustRateV = m_fAdjustRateV;
-    createParam.adjustRateLR = m_fAdjustRateLR;
-    createParam.adjustRateUD = m_fAdjustRateUD;
-    createParam.pDelayLog = m_pDelayLog;
-        
 #ifdef LAYER_BASE
-    createBmpWithLayerData( &createParam );
-#else
-    createBmpWithBmpDot( &createParam );
-#endif
-}
-
-//----------------------------------
-// レイヤーデータによるBMP作成
-//----------------------------------
-void CBezierTestLoop::createBmpWithLayerData( stBMP_GEN_CREATE_PARAM* pCreateParam ){
+    //-----------------------------------
+    // レイヤーリストによる描画
+    //-----------------------------------
     CList list;
     
-    //-----------------------------------
-    // 各レイヤーデータが有効であればリストへ登録
-    //-----------------------------------
     // フリル
     if( m_pLayerRefForFrill != NULL ){ list.add( m_pLayerRefForFrill ); }
     // 線修復
     else if( m_pLayerLineRepair != NULL ){ list.add( m_pLayerLineRepair ); }
     // フック[Ａ／Ｂ／Ｃ]
     else if( m_pLayerHookA != NULL && m_pLayerHookB != NULL && m_pLayerHookC != NULL ){
-#ifdef LAYER_BASE_FOR_HOOK_CHECK_REVERSE
+        #ifdef LAYER_BASE_FOR_HOOK_CHECK_REVERSE
         // C -> A -> B
         list.add( m_pLayerHookC );
         list.add( m_pLayerHookA );
         list.add( m_pLayerHookB );
-#else
+        #else
         // B -> A -> C
         list.add( m_pLayerHookB );
         list.add( m_pLayerHookA );
         list.add( m_pLayerHookC );
-#endif
+        #endif
     }
     // 遅延
     else if( m_pLayerDelay != NULL ){ list.add( m_pLayerDelay ); }
@@ -1286,43 +1398,17 @@ void CBezierTestLoop::createBmpWithLayerData( stBMP_GEN_CREATE_PARAM* pCreatePar
     else if( m_pLayerTouch != NULL ){ list.add( m_pLayerTouch ); }
     // 基本
     else if( m_pLayerBase != NULL ){ list.add( m_pLayerBase ); }
-    
-    // 描画（※作業パス＆実画像）
-    m_nBmpGenTimeForPath = CBmpGenerator::CreateTexWithLayerList( m_pTexForPath, NULL, &list, pCreateParam, true );
-    m_nBmpGenTime = CBmpGenerator::CreateTexWithLayerList( m_pTexForLine, m_pTexForColor, &list, pCreateParam, false );
+
+    m_pBmpTex->createBmpWithLayerList( &createParam, &list, true );
 
     // リスト切断（※[CList]が破棄される際はなにもしないので明示的に切断）
     list.disconnectAll();
-}
-
-//----------------------------------
-// BDPDによるBMP作成
-//----------------------------------
-void CBezierTestLoop::createBmpWithBmpDot( stBMP_GEN_CREATE_PARAM* pCreateParam ){
-    // 対象データ
-    int idForFace = m_oSetting.getIdForFace();
-    int idForBody = m_oSetting.getIdForBody();
-    int idForSuit = m_oSetting.getIdForSuit();
-    eBD_EMO emo = eBD_EMO_BASE;
-    eBD_FORM form = eBD_FORM_FRONT;
-    eBD_SLOT slot = eBD_SLOT_FgTop;
-    
-    // 用心
-    if( idForFace < 0 ){ idForFace = 0; }
-    if( idForBody < 0 ){ idForBody = 0; }
-    //if( idForSuit < 0 ){ idForSuit = 0; } // スーツは無効を許可する
-
-    // 生成パラメータ確保
-    CBmpGenParam* pBmpGenParam = CBmpGenerator::CreateBmpGenParam( &m_oSetting,
-                                                                   idForFace, idForBody, idForSuit, emo, form,
-                                                                   m_fAdjustRateT, m_fAdjustRateS );
-    
-    // 描画（※作業パス＆実画像）
-    m_nBmpGenTimeForPath = CBmpGenerator::CreateTexWithGenParam( m_pTexForPath, NULL, pBmpGenParam, slot, 0, 0, pCreateParam, true, false );
-    m_nBmpGenTime = CBmpGenerator::CreateTexWithGenParam( m_pTexForLine, m_pTexForColor, pBmpGenParam, slot, 0, 0, pCreateParam, false, false );
-    
-    // 生成パラメータ解放
-    CBmpGenerator::ReleaseBmpGenParam( pBmpGenParam );
+#else
+    //-----------------------------------
+    // BMP設定による描画
+    //-----------------------------------
+    m_pBmpTex->createBmpWithDotSetting( &createParam, eBD_SLOT_FgTop, 0, 0, true );
+#endif
 }
 
 //----------------------
@@ -1337,9 +1423,7 @@ void CBezierTestLoop::allocForTest( void ){
     //--------------------------
     CMemMgr::PushTargetField( eMEM_FIELD_D_APP );
     m_pDelayLog = new CDelayLog();
-    m_pTexForLine = new CTex();
-    m_pTexForColor = new CTex();
-    m_pTexForPath = new CTex();
+    m_pBmpTex = new CBmpTex();
     CMemMgr::PopTargetField();
 
 #ifdef LAYER_BASE
@@ -1397,9 +1481,7 @@ void CBezierTestLoop::allocForTest( void ){
 void CBezierTestLoop::releaseForTest( void ){
     // 領域解放
     SAFE_DELETE( m_pDelayLog );
-    SAFE_DELETE( m_pTexForLine );
-    SAFE_DELETE( m_pTexForColor );
-    SAFE_DELETE( m_pTexForPath );
+    SAFE_DELETE( m_pBmpTex );
     
     // テストレイヤー解放
     CLayerData::Free( m_pLayerBase );       m_pLayerBase = NULL;

@@ -53,7 +53,7 @@ protected:
 	int32 m_nValueUndo;
 	int32 m_nValueRedo;
 	int32 m_nValuePaste;
-
+    
 	// 名前
 	char m_cArrName[COMMON_NAME_LEN];
 
@@ -70,6 +70,8 @@ protected:
 	bool m_bChanged;
     bool m_bLabelRight;
     bool m_bLabelBottom;
+    
+    bool m_bBlocked;
 
 public:
 	CEditValueDialog( void );
@@ -98,6 +100,9 @@ public:
 
 	virtual float getW( void );
 	virtual float getH( void );
+    
+    inline virtual void setBlock( bool flag ){ m_bBlocked = flag; }
+    inline virtual bool isBlocked( void ){ return( m_bBlocked ); }
 
 protected:
 	virtual void onUpdate0( void );

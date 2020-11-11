@@ -28,6 +28,8 @@
 #define SM_ITEM_RGBA_DARK           0x808080FF
 #define SM_ITEM_SELECTED_RGBA	    0xFF6060FF
 #define SM_ITEM_SELECTED_RGBA_DARK  0x803030FF
+#define SM_ITEM_SEPARATOR_RGBA      0x804040B0
+#define SM_ITEM_SEPARATOR_RGBA_DARK 0x402020B0
 
 // ブロックされた項目であればこの値を乗算する
 #define SM_ITEM_BLOCKED_RGBA_RATE   0xA0A0A0FF
@@ -46,6 +48,9 @@ protected:
 	// メンバー
 	char** m_pArrItem;
 	char* m_cArrItemBuf;
+    
+    // セパレーター間隔（※メニュー項目に対して一律で区切り線を引く）
+    int m_nSeparatorStep;
 
 public:
     // コンストラクタ／デストラクタ（※メニューの見た目に関わる設定はコンストラクタでのみ行う想定）
@@ -64,6 +69,8 @@ public:
     
     // 選択項目のラベル取得（※表示したい時等）
     const char* getSelectedLabel( void );
+    
+    virtual inline void setSeparatorStep( int step ){ m_nSeparatorStep = step; }
 
 protected:
 	virtual float calcInternalW( void );

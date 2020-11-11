@@ -75,7 +75,7 @@ public:
 	bool setItemAtAsBool( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type=eEDIT_VALUE_TYPE_INT8, bool isBlock=false );
 	bool setItemAtAsBit( int id, const char* pName, void* pVal, eEDIT_VALUE_TYPE type, int bit, bool isBlock=false );
     
-    void setSeparatorAt( int id, bool flag );
+    bool setSeparatorAt( int id, bool flag );
 
 	// 取得
 	stEDIT_VALUE_MENU_ITEM* getItemAt( int at );

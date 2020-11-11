@@ -484,7 +484,7 @@ void CMainRenderer::OnDrawFrame( void ){
         }
         
         // 出力
-        DumpScreenShotToLocal( s_cArrDumpFileName );
+        DumpCurFrameBufferToLocal( s_cArrDumpFileName );
         
         // 後始末
         s_cArrDumpFileName[0]= '\0';
@@ -713,19 +713,21 @@ void CMainRenderer::ReserveScreenShot( const char* pFileName ){
 // スクリーンショット保存
 //（※呼び出し前にスクリーンショット用のフレームバッファが設定されている想定）
 //-------------------------------------------------------------
-bool CMainRenderer::DumpScreenShotToLocal( const char* pFileName ){
+bool CMainRenderer::DumpCurFrameBufferToLocal( const char* pFileName ){
 	// 出力領域確保
 	BYTE* pBuf = (BYTE*) CMemMgr::GetAddrFromShare( eMEM_FIELD_SHARE_SS_OUT );
 	uint32 sizeBufOut = CMemMgr::GetSizeFromShare( eMEM_FIELD_SHARE_SS_OUT );
 
     // BMPサイズ ＝ [ヘッダサイズ ＋ 画素(RGB)サイズ]
-    uint32 sizeBmp = (uint32)(54 + 3*s_nScreenShotW*s_nScreenShotH);
-    sizeBmp = 4*((sizeBmp+3)/4);        // ４バイトアライメント
+    uint32 bmpW = s_nCurFrameBufferW;
+    uint32 bmpH = s_nCurFrameBufferH;
+    uint32 bmpSize = (uint32)(54 + 3*bmpW*bmpH);
+    bmpSize = 4*((bmpSize+3)/4);        // ４バイトアライメント
 
     // サイズ確認
-    LOGD( "@ SIZE FOR OUTPUT: %d/%d\n", sizeBmp, sizeBufOut );
-	if( sizeBmp > sizeBufOut ){
-        LOGE( "@ CMainRenderer::DumpScreenShotToLocal: BUF SHORTAGE:%s: %d > %d\n", pFileName, sizeBmp, sizeBufOut );
+    LOGD( "@ SIZE FOR BMP DUMP: w=%d, h=%d, size=%d/%d\n", bmpW, bmpH, bmpSize, sizeBufOut );
+	if( bmpSize > sizeBufOut ){
+        LOGE( "@ CMainRenderer::DumpCurFrameBufferToLocal: BUF SHORTAGE:%s: %d > %d\n", pFileName, bmpSize, sizeBufOut );
 		return( false );
 	}
 
@@ -735,25 +737,25 @@ bool CMainRenderer::DumpScreenShotToLocal( const char* pFileName ){
 	ob.setForLittleEndian();
 
 	// ファイルヘッダ: 14byte
-	ob.writeInt8( 0x42 );		        // 1:B
-	ob.writeInt8( 0x4D );		        // 1:M
-	ob.writeInt32( sizeBmp );	        // 4:ファイルサイズ
-	ob.writeInt16( 0 );			        // 2:予約
-	ob.writeInt16( 0 );			        // 2:予約
-	ob.writeInt32( 54 );		        // 4:データオフセット
+	ob.writeInt8( 0x42 );		// 1:B
+	ob.writeInt8( 0x4D );		// 1:M
+	ob.writeInt32( bmpSize );	// 4:ファイルサイズ
+	ob.writeInt16( 0 );			// 2:予約
+	ob.writeInt16( 0 );			// 2:予約
+	ob.writeInt32( 54 );		// 4:データオフセット
 
 	// 情報ヘッダ： 40byte
-	ob.writeInt32( 40 );			    // 4:ヘッダサイズ
-	ob.writeInt32( s_nScreenShotW );	// 4:横幅
-	ob.writeInt32( s_nScreenShotH );	// 4:縦幅
-	ob.writeInt16( 1 );				    // 2:プレーン数(1)
-	ob.writeInt16( 24 );			    // 2:画素サイズ(RGB=24)
-	ob.writeInt32( 0 );				    // 4:圧縮形式(0)
-	ob.writeInt32( 0 );				    // 4:画像データ部のサイズ(0)
-	ob.writeInt32( 0 );				    // 4:横方向の解像度(0)
-	ob.writeInt32( 0 );				    // 4:縦方向の解像度(0)
-	ob.writeInt32( 0 );				    // 4:パレット数(0)
-	ob.writeInt32( 0 );				    // 4:パレットインデックス(0)
+	ob.writeInt32( 40 );		// 4:ヘッダサイズ
+	ob.writeInt32( bmpW );	    // 4:横幅
+	ob.writeInt32( bmpH );	    // 4:縦幅
+	ob.writeInt16( 1 );			// 2:プレーン数(1)
+	ob.writeInt16( 24 );		// 2:画素サイズ(RGB=24)
+	ob.writeInt32( 0 );			// 4:圧縮形式(0)
+	ob.writeInt32( 0 );			// 4:画像データ部のサイズ(0)
+	ob.writeInt32( 0 );			// 4:横方向の解像度(0)
+	ob.writeInt32( 0 );			// 4:縦方向の解像度(0)
+	ob.writeInt32( 0 );		    // 4:パレット数(0)
+	ob.writeInt32( 0 );		    // 4:パレットインデックス(0)
 
 	//---------------------------------------
 	// 画素設定
@@ -763,24 +765,24 @@ bool CMainRenderer::DumpScreenShotToLocal( const char* pFileName ){
 	uint32 sizeBufWork = CMemMgr::GetSizeFromShare( eMEM_FIELD_SHARE_SS_WORK );
     
     // リソースサイズ（※フレームバッファ[RGBA]内容サイズ）
-    uint32 sizeRsc = 4*s_nScreenShotW*s_nScreenShotH;
+    uint32 sizeRsc = 4*bmpW*bmpH;
 
     // サイズ確認
-    LOGD( "@ SIZE FOR WORK: %d/%d\n", sizeRsc, sizeBufWork );
+    LOGD( "@ SIZE FOR BMP WORK: %d/%d\n", sizeRsc, sizeBufWork );
 	if( sizeRsc > sizeBufWork ){
-        LOGE( "@ CMainRenderer::DumpScreenShotToLocal: RGBA BUF SHORTAGE:%s: %d > %d\n", pFileName, sizeRsc, sizeBufWork );
+        LOGE( "@ CMainRenderer::DumpCurFrameBufferToLocal: RGBA BUF SHORTAGE:%s: %d > %d\n", pFileName, sizeRsc, sizeBufWork );
 		return( false );
 	}
 
     // フレームバッファの内容をバッファに読み込む
-	glReadPixels( 0, 0, s_nScreenShotW, s_nScreenShotH, GL_RGBA, GL_UNSIGNED_BYTE, pRGBA );
+	glReadPixels( 0, 0, bmpW, bmpH, GL_RGBA, GL_UNSIGNED_BYTE, pRGBA );
 
 	// [RGB]を抽出
 	BYTE* pRGB = &pBuf[54];
 	int at=0, atRGBA;
-	for( int i=0; i<s_nScreenShotH; i++ ){
-		for( int j=0; j<s_nScreenShotW; j++ ){
-			atRGBA = 4*(s_nScreenShotW*i+j);
+	for( int i=0; i<bmpH; i++ ){
+		for( int j=0; j<bmpW; j++ ){
+			atRGBA = 4*(bmpW*i+j);
 			pRGB[at++] = pRGBA[atRGBA+2];
 			pRGB[at++] = pRGBA[atRGBA+1];
 			pRGB[at++] = pRGBA[atRGBA+0];
@@ -790,12 +792,12 @@ bool CMainRenderer::DumpScreenShotToLocal( const char* pFileName ){
 	//----------------------------
 	// 出力
 	//----------------------------
-	if( CFileMgr::SaveLocalDataToCaches( pFileName, pBuf, sizeBmp ) ){
-		LOGD( "@ CMainRenderer::DumpScreenShotToLocal: %s\n", pFileName );
+	if( CFileMgr::SaveLocalDataToCaches( pFileName, pBuf, bmpSize ) ){
+		LOGD( "@ CMainRenderer::DumpCurFrameBufferToLocal: %s\n", pFileName );
 		return( true );
 	}
 
-    LOGE( "@ CMainRenderer::DumpScreenShotToLocal: FAILED TO SAVE: %s\n", pFileName );
+    LOGE( "@ CMainRenderer::DumpCurFrameBufferToLocal: FAILED TO SAVE: %s\n", pFileName );
     return( false );
 }
 
@@ -850,7 +852,7 @@ void CMainRenderer::DrawRenderLog( void ){
 	//------------------------------
 	// 左上：CPU＆クロック情報
 	//------------------------------
-	CDrawCell::SetLogAlignLT( 0.5f, 96, 0 );
+	CDrawCell::SetLogAlignLT( 0.5f, 82, 0 );
 
 	// cpu & endian
 	sprintf( buf, "cpu: %s(%s)", CAppMgr::GetCpuArchitecture(), (util_endian_is_big()? "BE": "LE") );

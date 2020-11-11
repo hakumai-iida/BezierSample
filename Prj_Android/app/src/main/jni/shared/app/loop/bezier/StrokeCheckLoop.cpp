@@ -295,7 +295,7 @@ void CStrokeCheckLoop::onDraw0( void ){
     // [GRAY] テクスチャ表示：線
     //-------------------------------
     pDC->clear();
-    pDC->setTex( m_pTex, NULL );
+    pDC->setTex( m_pBmpTex->getTexForLine(), NULL );
     pDC->setWidth( w );
     pDC->setHeight( h );
     pDC->setAlignXY( eDRAW_ALIGN_X_C, eDRAW_ALIGN_Y_M );
@@ -335,7 +335,7 @@ void CStrokeCheckLoop::allocForTest( void ){
     
     // テクスチャ確保
     CMemMgr::PushTargetField( eMEM_FIELD_D_APP );
-    m_pTex = new CTex();
+    m_pBmpTex = new CBmpTex();
     CMemMgr::PopTargetField();
 
     // テストデータ作成
@@ -346,7 +346,8 @@ void CStrokeCheckLoop::allocForTest( void ){
 // テストデータ開放
 //----------------------
 void CStrokeCheckLoop::releaseForTest( void ){
-    SAFE_DELETE( m_pTex );
+    SAFE_DELETE( m_pBmpTex );
+
     ReleaseLayerDataForBrush( &m_pLayer );
 }
 
@@ -388,7 +389,9 @@ void CStrokeCheckLoop::updateTex( eSTROKE_TYPE stroke, int sizeAt, int range1000
     for( m_nCalcNum=0; m_nCalcNum<num; m_nCalcNum++ ){
         CList list;
         list.add( m_pLayer );
-        m_nCalcTimeTotal += CBmpGenerator::CreateTexWithLayerList( m_pTex, NULL, &list, &createParam, false );
+        
+        m_pBmpTex->createBmpWithLayerList( &createParam, &list );
+        m_nCalcTimeTotal += m_pBmpTex->getBmpGenTime();
     }
     
     m_nCalcTimeAvg = m_nCalcTimeTotal/ m_nCalcNum;
@@ -458,7 +461,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 0 );
-    pAP->setStroke(  0,10000, 10000,0 );
+    pAP->setStroke(  10000,0, 0,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -478,7 +481,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,10000, 10000,5000 );
+    pAP->setStroke( 10000,0, 5000,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -496,7 +499,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,10000, 10000,2500 );
+    pAP->setStroke( 10000,0, 2500,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -514,7 +517,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,10000, 10000,2500 );
+    pAP->setStroke( 10000,0, 2500,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -535,7 +538,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 4000, 0, 0, 0, 0 );
-    pAP->setStroke( 10000,2500, 0,10000 );
+    pAP->setStroke( 0,2500, 0,10000 );
     pLOD->addData( pAP );
     
     // 点１
@@ -553,7 +556,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,10000, 10000,2500 );
+    pAP->setStroke( 10000,0, 2500,0 );
     pLOD->addData( pAP );
     
     // 点１
@@ -572,13 +575,13 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 0, 0, 0, 0, 4000 );
-    pAP->setStroke( 3333,30000, 3333,5000 );
+    pAP->setStroke( 30000,3333, 5000,3333 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, 0, 0, 4000, 0, -4000 );
-    pAP->setStroke( 3333,5000, 3333,30000 );
+    pAP->setStroke( 5000,3333, 30000,3333 );
     pLOD->addData( pAP );
     
     // 点２
@@ -598,7 +601,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 0, 0, 0, 0, 4000 );
-    pAP->setStroke( 3333,1000, 3333,1000 );
+    pAP->setStroke( 1000,3333, 1000,3333 );
     pLOD->addData( pAP );
     
     // 点１
@@ -617,7 +620,7 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -6000, 0, 0, -4000, 0 );
-    pAP->setStroke( 6666,30000, 3333,2000 );
+    pAP->setStroke( 30000,6666, 2000,3333 );
     pLOD->addData( pAP );
     
     // 点１
@@ -637,25 +640,25 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, -4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,0, 0,7500 );
+    pAP->setStroke( 0,0, 7500,0 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, -4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,7500, 0,15000 );
+    pAP->setStroke( 7500,0, 15000,0 );
     pLOD->addData( pAP );
     
     // 点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( 4000, 4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,15000, 0,22500 );
+    pAP->setStroke( 15000,0, 22500,0 );
     pLOD->addData( pAP );
     
     // 点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( -4000, 4000, 0, 0, 0, 0 );
-    pAP->setStroke( 0,22500, 0,30000 );
+    pAP->setStroke( 22500,0, 30000,0 );
     pLOD->addData( pAP );
     
     //----------------------------
@@ -673,25 +676,25 @@ bool CStrokeCheckLoop::CreateLayerDataForBrush( CLayerData** ppData, eBRUSH brus
     // 点０
     pAP = CAnchorPointData::Alloc();
     pAP->set( -r, 0, 0, dirPow, 0, -dirPow );
-    pAP->setStroke( 0,30000, 0,22500 );
+    pAP->setStroke( 30000,0, 22500,0 );
     pLOD->addData( pAP );
     
     // 点１
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, -r, -dirPow, 0, dirPow, 0 );
-    pAP->setStroke( 0,22500, 0,15000 );
+    pAP->setStroke( 22500,0, 15000,0 );
     pLOD->addData( pAP );
     
     // 点２
     pAP = CAnchorPointData::Alloc();
     pAP->set( r, 0, 0, -dirPow, 0, dirPow );
-    pAP->setStroke( 0,15000, 0,7500 );
+    pAP->setStroke( 15000,0, 7500,0 );
     pLOD->addData( pAP );
     
     // 点３
     pAP = CAnchorPointData::Alloc();
     pAP->set( 0, r, dirPow, 0, -dirPow, 0 );
-    pAP->setStroke( 0,7500, 0,0 );
+    pAP->setStroke( 7500,0, 0,0 );
     pLOD->addData( pAP );
     
     return( true );

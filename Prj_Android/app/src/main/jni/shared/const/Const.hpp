@@ -85,11 +85,13 @@ enum eASYNC_TYPE{
 //（※列挙子のルールと同様に負で無効値、０以上で有効な値としておく）
 //（※本当は[UID_***]としたいが、[android]環境でシステム側の定義とかぶるので断念）
 //-------------------------------------------------------------------
-#define UNIQUE_ID_INVALID   -1
-#define UNIQUE_ID_MIN       0
-#define UNIQUE_ID_MAX       99999999
+// 00000000 〜 99999999
+#define UNIQUE_ID_INVALID           -1
+#define UNIQUE_ID_MIN               0
+#define UNIQUE_ID_MAX               100000000
 
-#define IS_UNIQUE_ID_VALID( _uid )  ((_uid)>=UNIQUE_ID_MIN && (_uid)<=UNIQUE_ID_MAX)
+// 慣習的に [ MIN >= id < MAX ] となる点に注意
+#define IS_UNIQUE_ID_VALID( _uid )  ((_uid)>=UNIQUE_ID_MIN && (_uid)<UNIQUE_ID_MAX)
 
 /*+----------------------------------------------------------------+
   |	Struct		構造体型宣言
@@ -154,11 +156,16 @@ public:
 	inline static bool IsIncrementableToMax( float val, float max ){ return( val < max ); }
 	inline static bool IsDecrementableToZero( float val ){ return( val > 0.0f ); }
 
-    //----------------------
+    //----------------------------------------------
     // 利用状況
-    //----------------------
+    //----------------------------------------------
     static float CalcUseRate( int num, int max );
     static DWORD GetUseAlertRGBA( float rate );
+    
+    //----------------------------------------------
+    // 抽選
+    //----------------------------------------------
+    static int Lottery( int val, int numCand, int* arrWeight );
 
 	//----------------------------------------------
 	// フラグ

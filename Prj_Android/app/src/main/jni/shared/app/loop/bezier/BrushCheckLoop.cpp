@@ -295,7 +295,7 @@ void CBrushCheckLoop::onDraw0( void ){
     // [GRAY] テクスチャ表示：線
     //-------------------------------
     pDC->clear();
-    pDC->setTex( m_pTex, NULL );
+    pDC->setTex( m_pBmpTex->getTexForLine(), NULL );
     pDC->setWidth( w );
     pDC->setHeight( h );
     pDC->setAlignXY( eDRAW_ALIGN_X_C, eDRAW_ALIGN_Y_M );
@@ -321,7 +321,7 @@ void CBrushCheckLoop::allocForTest( void ){
     
     // テクスチャ確保
     CMemMgr::PushTargetField( eMEM_FIELD_D_APP );
-    m_pTex = new CTex();
+    m_pBmpTex = new CBmpTex();
     CMemMgr::PopTargetField();
 
     // テストデータ作成
@@ -332,8 +332,9 @@ void CBrushCheckLoop::allocForTest( void ){
 // テストデータ開放
 //----------------------
 void CBrushCheckLoop::releaseForTest( void ){
+    SAFE_DELETE( m_pBmpTex );
+
     CStrokeCheckLoop::ReleaseLayerDataForBrush( &m_pLayer );
-    SAFE_DELETE( m_pTex );
 }
 
 //----------------------
@@ -368,7 +369,10 @@ void CBrushCheckLoop::updateTex( eBRUSH brush, bool isDot, int num ){
     for( m_nCalcNum=0; m_nCalcNum<num; m_nCalcNum++ ){
         CList list;
         list.add( m_pLayer );
-        m_nCalcTimeTotal += CBmpGenerator::CreateTexWithLayerList( m_pTex, NULL, &list, &createParam, false );
+        
+        m_pBmpTex->createBmpWithLayerList( &createParam, &list );
+        m_nCalcTimeTotal += m_pBmpTex->getBmpGenTime();
     }
+    
     m_nCalcTimeAvg = m_nCalcTimeTotal/ m_nCalcNum;
 }

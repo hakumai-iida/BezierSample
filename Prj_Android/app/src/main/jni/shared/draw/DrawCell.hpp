@@ -51,6 +51,7 @@ private:
 	static float s_fOfsX;
 	static float s_fOfsY;
 	static BYTE  s_nAlpha;
+    static DWORD s_nRGBA;
 
     // 特殊表示用
 	static bool  s_bIgnoreApplyRate;
@@ -151,10 +152,12 @@ public:
 	inline static void ResetDepthOfs( void ){ s_fDepthOfs = 0.0f; }
 
     // 広域指定
-    inline static void ResetOfsXY(){ s_fOfsX = 0.0f; s_fOfsY = 0.0f; }
+    inline static void ResetOfsXY( void ){ s_fOfsX = 0.0f; s_fOfsY = 0.0f; }
 	inline static void SetOfsXY( float x, float y ){ s_fOfsX = x; s_fOfsY = y; }
-    inline static void ResetAlpha(){ s_nAlpha = 0xFF; }
+    inline static void ResetAlpha( void ){ s_nAlpha = 0xFF; }
 	inline static void SetAlpha( BYTE a ){ s_nAlpha = a; }
+    inline static void SetRGBA( DWORD rgba ){ s_nRGBA = rgba; }
+    inline static void ResetRGBA( void ){ s_nRGBA = 0xFFFFFFFF; }
 
     // 特殊描画指定
     inline static void ResetApplyRate( void ){ s_bIgnoreApplyRate = false; s_fNegaRate = s_fMonoRate = s_fSepiaRate = 0.0f; }

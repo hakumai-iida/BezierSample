@@ -39,6 +39,7 @@ float CDrawCell::s_fDepthOfs = 0.0f;
 float CDrawCell::s_fOfsX = 0.0f;
 float CDrawCell::s_fOfsY = 0.0f;
 BYTE  CDrawCell::s_nAlpha = 0xFF;
+DWORD CDrawCell::s_nRGBA = 0xFFFFFFFF;
 
 bool  CDrawCell::s_bIgnoreApplyRate = false;
 float CDrawCell::s_fNegaRate = 0.0f;
@@ -509,16 +510,16 @@ CShader* CDrawCell::getShaderObject( void ){
 	//----------------------------
 	// シェーダー事前設定
 	//----------------------------
-	BYTE alpha = (BYTE)((s_nAlpha * m_nAlpha)/0xFF);
+	BYTE alpha = (BYTE)((s_nAlpha * (m_nAlpha))/0xFF);
 
 	// 色
-	if( m_nRGBA == 0xFFFFFFFF && alpha >= 0xFF ){
+	if( s_nRGBA==0xFFFFFFFF && m_nRGBA==0xFFFFFFFF && alpha >= 0xFF ){
 		pPrg->setRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
 	}else{
-		float r = ((m_nRGBA >> 24)&0xFF) / 255.0f;
-		float g = ((m_nRGBA >> 16)&0xFF) / 255.0f;
-		float b = ((m_nRGBA >>  8)&0xFF) / 255.0f;
-		float a = ((m_nRGBA&0xFF)/255.0f) * (alpha/255.0f);
+		float r = (((s_nRGBA >> 24)&0xFF)/255.0f) * (((m_nRGBA >> 24)&0xFF)/255.0f);
+		float g = (((s_nRGBA >> 16)&0xFF)/255.0f) * (((m_nRGBA >> 16)&0xFF)/255.0f);
+		float b = ((s_nRGBA >> 8)&0xFF)/255.0f * (((m_nRGBA >> 8)&0xFF)/255.0f);
+		float a = ((s_nRGBA&0xFF)/255.0f) * ((m_nRGBA&0xFF)/255.0f) * (alpha/255.0f);
 
 		// 加算の場合：アルファの反映（アルファが小さいほど加算の効果を小さく）
 		if( blend == eDRAW_BLEND_ADD ){
@@ -585,7 +586,7 @@ CShader* CDrawCell::getShaderObject( void ){
 void CDrawCell::draw0( float x, float y, bool isGame, bool isSafeArea, bool isInt ){
 	// 無効確認
 	if( s_nAlpha <= 0 || m_nAlpha <= 0 ){ return; }
-	if( (m_nRGBA & 0xFF) <= 0 ){ return; }
+	if( (s_nRGBA & 0xFF) <= 0 || (m_nRGBA & 0xFF) <= 0 ){ return; }
 	if( m_fScaleX <= 0.0f || m_fScaleY <= 0.0f ){ return; }
 
     // フラグの保持

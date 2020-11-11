@@ -160,7 +160,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( -500,-1500+200, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -173,7 +173,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( 500,-2000, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -213,7 +213,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( 1500-200,-500, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -226,7 +226,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( 2000,500, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -266,7 +266,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( 500,1500-200, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -279,7 +279,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( -500,2000, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -319,7 +319,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( -1500+200,500, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     
@@ -332,7 +332,7 @@ void CBezierTestLoop::allocForLayerForLineRepair( void ){
     pAP = CAnchorPointData::Alloc();
     pAP->set( -2000,-500, 0,0, 0,0 );
 #ifdef ENABLE_LINE_REPAIR_SETTING
-    pAP->setFlagOn( eAPD_FLAG_LINE_REPAIR_TEST );
+    pAP->setFlagOn( eAPD_FLAG_TEST_LINE_REPAIR );
 #endif
     pLOD->addData( pAP );
     

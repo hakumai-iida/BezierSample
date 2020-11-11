@@ -478,7 +478,7 @@ CTex* CTexMgr::GetBankTexWithType( eBANK bank, const char*pName, eBMP_TYPE type,
 	}
 
 	// ここまで来たら無効画像を返しておく
-    CImg* pImg = CImgMgr::GetImg( (eIMG) 0 );
+    CImg* pImg = CImgMgr::GetImg( eIMG_DEBUG_CIRCLE );
     return( pImg->getDot() );
 }
 

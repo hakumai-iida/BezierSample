@@ -69,6 +69,11 @@ protected:
 
 	// ノードリスト（※レイアウトに登録された要素管理用）
 	CList m_oListNode;
+    
+    // 描画制御
+    bool m_bSkipDraw;
+    bool m_bSkipDrawNode;
+    bool m_bSkipDrawLog;
 
 public:
 	//--------------------------------------------------------------------------------
@@ -151,6 +156,11 @@ public:
 	inline CLoop* getParent( void ){ return( m_pParent ); }
 	inline int getOption( void ){ return( m_nOption ); }
 
+    // 描画制御
+    inline void setSkipDraw( bool flag ){ m_bSkipDraw = flag; }
+    inline void setSkipDrawNode( bool flag ){ m_bSkipDrawNode = flag; }
+    inline void setSkipDrawLog( bool flag ){ m_bSkipDrawLog = flag; }
+
 protected:
     //-------------------------------------------------------------
     // 設定（※派生先のコンストラクタでIDを設定する）
@@ -176,7 +186,7 @@ protected:
 	// 処理実体：必要であれば上書きする
     //-------------------------------------------------------------
 	virtual void registForDraw0( void ){}
-	virtual void drawUI0( void ){}
+	virtual void drawNode0( void ){}
 	virtual void drawLog0( void ){}
 
 	virtual void sleep0( void ){}
