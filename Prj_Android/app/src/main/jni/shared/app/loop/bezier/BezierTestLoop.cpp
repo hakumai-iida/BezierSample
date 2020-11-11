@@ -803,7 +803,7 @@ void CBezierTestLoop::onDraw0( void ){
     // [P8D&P] ベジェ：塗り
     if( m_nArrMenuVal[eBTMI_SELECT_COLOR] != 0 ){
         pDC->clear();
-        pDC->setTex( pTexForColor, CImgMgr::GetImgPal( eIMG_BMP_PAL_00 ) );
+        pDC->setTex( pTexForColor, CImgMgr::GetImgPal( eIMG_PAL_BEZIER_COLOR ) );
         pDC->setBlendAlpha();
         pDC->setWidth( w );
         pDC->setHeight( h );
@@ -858,7 +858,7 @@ void CBezierTestLoop::onDraw0( void ){
     // [P8D&P] ベジェ：パス
     if( m_nArrMenuVal[eBTMI_DISP_WORK_PATH] != 0  ){
         pDC->clear();
-        pDC->setTex( pTexForPath, CImgMgr::GetImgPal( eIMG_PAL_WORK_PATH ) );
+        pDC->setTex( pTexForPath, CImgMgr::GetImgPal( eIMG_PAL_BEZIER_WORK_PATH ) );
         pDC->setWidth( w );
         pDC->setHeight( h );
         pDC->drawF( x, y );
@@ -1303,7 +1303,7 @@ void CBezierTestLoop::fixForMenu( void ){
     if( m_nArrMenuVal[eBTMI_SELECT_COLOR] > 0 ){
         CBmpPalData* pPal = CBmpPalMgr::GetBmpPalDataAt( m_nArrMenuVal[eBTMI_SELECT_COLOR]-1 );
         if( pPal != NULL ){
-            pPal->loadToImgPal( eIMG_BMP_PAL_00 );
+            pPal->loadToImgPal( eIMG_PAL_BEZIER_COLOR );
         }
     }
 

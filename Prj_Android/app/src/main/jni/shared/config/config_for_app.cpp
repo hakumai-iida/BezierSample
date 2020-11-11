@@ -77,7 +77,7 @@ bool CMemMgr::AllocForApp( void ){
     //---------------------------
     // 管理メモリ領域確保
     //---------------------------
-    uint32 size = 60*MB;
+    uint32 size = 58*MB;
 
     //---------------------------
     // 解像度による変動値の調整
@@ -166,13 +166,13 @@ bool CMemMgr::AllocForApp( void ){
     if( !set_field( eMEM_FIELD_S_SHARE,    sizeShare,   true,          0,  "Share",  false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BASE,        512*KB,   false,      2048,  "Base",   false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_CSV,         256*KB,   false,       128,  "Csv",    false ) ){ return( false ); }
-    if( !set_field( eMEM_FIELD_D_DRAW,          1*MB,   false,       512,  "Draw",   false ) ){ return( false ); }
+    if( !set_field( eMEM_FIELD_D_DRAW,        512*KB,   false,       128,  "Draw",   false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_STROKE,  sizeStroke,   false, numStroke,  "Stroke", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_FILL,      sizeFill,   false,   numFill,  "Fill",   false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BEZIER,  sizeBezier,   false, numBezier,  "Bezier", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BMP_DOT, sizeBmpDot,   false, numBmpDot,  "BmpDot", false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BMP_PAL, sizeBmpPal,   false, numBmpPal,  "BmpPal", false ) ){ return( false ); }
-    if( !set_field( eMEM_FIELD_D_TEX,           1*MB,   false,       128,  "Tex",    false ) ){ return( false ); }
+    if( !set_field( eMEM_FIELD_D_TEX,         512*KB,   false,       128,  "Tex",    false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_OBJ,          32*KB,   false,         8,  "Obj",    false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_BG,           32*KB,   false,         8,  "BG",     false ) ){ return( false ); }
     if( !set_field( eMEM_FIELD_D_APP,           1*MB,   false,      1024,  "App",    false ) ){ return( false ); }

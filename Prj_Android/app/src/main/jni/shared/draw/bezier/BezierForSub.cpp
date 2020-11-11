@@ -55,7 +55,7 @@ void CBezier::ResetEnv( void ){
     
     // パレットをデフォルトに
     CBmpPalData* pPal = CBmpPalMgr::GetBmpPalDataAt( 0 );
-    pPal->loadToImgPal( eIMG_BMP_PAL_00 );
+    pPal->loadToImgPal( eIMG_PAL_BEZIER_COLOR );
 }
 
 //------------------------
