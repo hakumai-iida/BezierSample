@@ -44,6 +44,68 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/draw/DrawConst.cpp \
 				   	shared/draw/MainRenderer.cpp \
 				   	\
+				   	shared/draw/bezier/Bezier.cpp \
+				   	shared/draw/bezier/BezierConst.cpp \
+				   	shared/draw/bezier/BezierForEdge.cpp \
+				   	shared/draw/bezier/BezierForFill.cpp \
+				   	shared/draw/bezier/BezierForFrill.cpp \
+				   	shared/draw/bezier/BezierForFrillLayerData.cpp \
+				   	shared/draw/bezier/BezierForSub.cpp \
+				   	shared/draw/bezier/BezierForTouch.cpp \
+				   	shared/draw/bezier/BezierForWork.cpp \
+				   	\
+				   	shared/draw/bezier/adjust/AdjustablePoint.cpp \
+				   	shared/draw/bezier/adjust/AdjustCalc.cpp \
+				   	shared/draw/bezier/adjust/AnglePlane.cpp \
+				   	shared/draw/bezier/adjust/DelayLog.cpp \
+				   	shared/draw/bezier/adjust/JointPoint.cpp \
+				   	shared/draw/bezier/adjust/SlotAdjuster.cpp \
+				   	\
+				   	shared/draw/bezier/data/AnchorPointData.cpp \
+				   	shared/draw/bezier/data/FillPointData.cpp \
+				   	shared/draw/bezier/data/LayerData.cpp \
+				   	shared/draw/bezier/data/LayerObject.cpp \
+				   	shared/draw/bezier/data/LayerOrderCell.cpp \
+				   	shared/draw/bezier/data/LayerOrderList.cpp \
+				   	shared/draw/bezier/data/LineObjectData.cpp \
+				   	shared/draw/bezier/data/PaintObjectData.cpp \
+				   	shared/draw/bezier/data/SlotObjectData.cpp \
+				   	shared/draw/bezier/data/SlotPointData.cpp \
+				   	\
+				   	shared/draw/bezier/fill/Fill.cpp \
+				   	shared/draw/bezier/fill/FillConst.cpp \
+				   	shared/draw/bezier/fill/FillForExe.cpp \
+				   	shared/draw/bezier/fill/FillForUndercoat.cpp \
+				   	shared/draw/bezier/fill/FillMgr.cpp \
+				   	\
+				   	shared/draw/bezier/stroke/Stroke.cpp \
+				   	shared/draw/bezier/stroke/StrokeConst.cpp \
+				   	shared/draw/bezier/stroke/StrokeDot.cpp \
+				   	shared/draw/bezier/stroke/StrokeMgr.cpp \
+				   	\
+				   	shared/draw/bezier/struct/BezierStructConv.cpp \
+				   	\
+				   	shared/draw/bmp/BmpGenerator.cpp \
+				   	shared/draw/bmp/BmpGeneratorForAngle.cpp \
+				   	shared/draw/bmp/BmpGeneratorForOrder.cpp \
+				   	shared/draw/bmp/BmpGeneratorForSetting.cpp \
+				   	shared/draw/bmp/BmpGenParam.cpp \
+				   	shared/draw/bmp/BmpPal.cpp \
+				   	shared/draw/bmp/BmpTex.cpp \
+				   	\
+				   	shared/draw/bmp/dot/BDConst.cpp \
+				   	shared/draw/bmp/dot/BmpDotData.cpp \
+				   	shared/draw/bmp/dot/BmpDotMgr.cpp \
+				   	shared/draw/bmp/dot/BmpDotOrderData.cpp \
+				   	shared/draw/bmp/dot/BmpDotPack.cpp \
+				   	shared/draw/bmp/dot/BmpDotPartData.cpp \
+				   	shared/draw/bmp/dot/BmpDotSettingData.cpp \
+				   	shared/draw/bmp/dot/BmpDotSettingSlotData.cpp \
+				   	\
+				   	shared/draw/bmp/pal/BmpPalData.cpp \
+				   	shared/draw/bmp/pal/BmpPalMgr.cpp \
+				   	shared/draw/bmp/pal/BPConst.cpp \
+				   	\
 				   	shared/draw/font/Font.cpp \
 				   	shared/draw/font/FontMgr.cpp \
 				   	\
@@ -73,63 +135,6 @@ LOCAL_SRC_FILES  :=	native/env_native_android.cpp \
 				   	shared/draw/tex/TexMgr.cpp \
 				   	shared/draw/tex/TexString.cpp \
 				   	shared/draw/tex/TexStringMgr.cpp \
-				   	\
-				   	shared/draw/tex/adjust/AdjustablePoint.cpp \
-				   	shared/draw/tex/adjust/AdjustCalc.cpp \
-				   	shared/draw/tex/adjust/AnglePlane.cpp \
-				   	shared/draw/tex/adjust/DelayLog.cpp \
-				   	shared/draw/tex/adjust/JointPoint.cpp \
-				   	shared/draw/tex/adjust/SlotAdjuster.cpp \
-				   	\
-				   	shared/draw/tex/bezier/AnchorPointData.cpp \
-				   	shared/draw/tex/bezier/Bezier.cpp \
-				   	shared/draw/tex/bezier/BezierConst.cpp \
-				   	shared/draw/tex/bezier/BezierDataConv.cpp \
-				   	shared/draw/tex/bezier/BezierForEdge.cpp \
-				   	shared/draw/tex/bezier/BezierForFill.cpp \
-				   	shared/draw/tex/bezier/BezierForFrill.cpp \
-				   	shared/draw/tex/bezier/BezierForFrillLayerData.cpp \
-				   	shared/draw/tex/bezier/BezierForSub.cpp \
-				   	shared/draw/tex/bezier/BezierForTouch.cpp \
-				   	shared/draw/tex/bezier/BezierForWork.cpp \
-				   	shared/draw/tex/bezier/FillPointData.cpp \
-				   	shared/draw/tex/bezier/LayerData.cpp \
-				   	shared/draw/tex/bezier/LayerObject.cpp \
-				   	shared/draw/tex/bezier/LayerOrderCell.cpp \
-				   	shared/draw/tex/bezier/LayerOrderList.cpp \
-				   	shared/draw/tex/bezier/LineObjectData.cpp \
-				   	shared/draw/tex/bezier/PaintObjectData.cpp \
-				   	shared/draw/tex/bezier/SlotObjectData.cpp \
-				   	shared/draw/tex/bezier/SlotPointData.cpp \
-				   	\
-				   	shared/draw/tex/bmp/BDConst.cpp \
-				   	shared/draw/tex/bmp/BmpDotData.cpp \
-				   	shared/draw/tex/bmp/BmpDotMgr.cpp \
-				   	shared/draw/tex/bmp/BmpDotOrderData.cpp \
-				   	shared/draw/tex/bmp/BmpDotPack.cpp \
-				   	shared/draw/tex/bmp/BmpDotPartData.cpp \
-				   	shared/draw/tex/bmp/BmpDotSettingData.cpp \
-				   	shared/draw/tex/bmp/BmpDotSettingSlotData.cpp \
-				   	shared/draw/tex/bmp/BmpGenerator.cpp \
-				   	shared/draw/tex/bmp/BmpGeneratorForAngle.cpp \
-				   	shared/draw/tex/bmp/BmpGeneratorForOrder.cpp \
-				   	shared/draw/tex/bmp/BmpGeneratorForSetting.cpp \
-				   	shared/draw/tex/bmp/BmpGenParam.cpp \
-				   	\
-				   	shared/draw/tex/bmp_pal/BmpPalData.cpp \
-				   	shared/draw/tex/bmp_pal/BmpPalMgr.cpp \
-				   	shared/draw/tex/bmp_pal/BPConst.cpp \
-				   	\
-				   	shared/draw/tex/fill/Fill.cpp \
-				   	shared/draw/tex/fill/FillConst.cpp \
-				   	shared/draw/tex/fill/FillForExe.cpp \
-				   	shared/draw/tex/fill/FillForUndercoat.cpp \
-				   	shared/draw/tex/fill/FillMgr.cpp \
-				   	\
-				   	shared/draw/tex/stroke/StrokeConst.cpp \
-				   	shared/draw/tex/stroke/Stroke.cpp \
-				   	shared/draw/tex/stroke/StrokeDot.cpp \
-				   	shared/draw/tex/stroke/StrokeMgr.cpp \
 				   	\
 				   	shared/helper/DialogHelper.cpp \
 				   	\
